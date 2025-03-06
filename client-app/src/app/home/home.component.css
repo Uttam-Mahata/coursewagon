@@ -1,0 +1,252 @@
+/* General Styling */
+.landing-page {
+  font-family: 'Poppins', sans-serif;
+}
+
+.header {
+  background: linear-gradient(135deg, #4a90e2 0%, #ffa200 100%);
+  position: relative;
+  overflow: hidden;
+  padding-top: 50px;
+}
+
+.logo-container {
+  width: 120px;
+  height: 120px;
+}
+
+.logo-svg {
+  width: 100px;
+  height: 100px;
+}
+
+.btn-hover {
+  transition: all 0.3s ease;
+}
+
+.btn-hover:hover {
+  background-color: #007bff;
+  color: #fff;
+  box-shadow: 0px 4px 15px rgba(0, 123, 255, 0.4);
+}
+
+/* Features Section */
+.features .card {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 15px;
+  background-color: #e6d1c1;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.features .card:hover {
+  transform: translateY(-5px);
+}
+
+.features .card-body {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+}
+
+.features .card-body i {
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+
+.features .card:hover i {
+  color: #ff6f61;
+}
+
+.features .card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+.features .card:hover .card-title {
+  color: #f5f1f1;
+}
+
+.features .card:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #4a90e2, #ff6f61);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.features .card:hover:before {
+  opacity: 1;
+  box-shadow: 0 0 15px rgba(255, 111, 97, 0.6), 0 0 25px rgba(255, 111, 97, 0.4);
+}
+
+
+/* Testimonials Section */
+.testimonials .testimonial {
+  background-color: #fbf8f8;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonials .testimonial:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.testimonials .testimonial-icon {
+  width: 70px;
+  height: 70px;
+  background-color: #4a90e2;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #fff;
+  transition: background-color 0.3s ease;
+}
+
+.testimonials .testimonial:hover .testimonial-icon {
+  background-color: #ff6f61;
+}
+
+.testimonials h6 {
+  font-weight: bold;
+  margin-top: 0.5rem;
+  color: #4a90e2;
+}
+
+.testimonials p {
+  font-style: italic;
+  color: #333;
+}
+
+
+/* CTA Section */
+.cta {
+  background: linear-gradient(135deg, #4a90e2, #8e44ad);
+  color: #ffffff;
+  padding: 5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta h2 {
+  color: #ffffff;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Button Styling */
+.cta .btn-hover {
+  background-color: #ff6f61;
+  border: none;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 0.75rem 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.cta .btn-hover:hover {
+  background-color: #e85b50;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-3px);
+}
+
+.cta .btn-hover i {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.cta .btn-hover:hover i {
+  transform: scale(1.2);
+}
+
+/* Animated Background Overlays */
+.cta::before, .cta::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.6;
+  z-index: 1;
+  animation: float 6s ease-in-out infinite;
+}
+
+.cta::before {
+  width: 300px;
+  height: 300px;
+  background-color: rgba(255, 255, 255, 0.15);
+  top: -50px;
+  left: 20%;
+}
+
+.cta::after {
+  width: 400px;
+  height: 400px;
+  background-color: rgba(255, 255, 255, 0.1);
+  bottom: -100px;
+  right: 20%;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+
+.how-it-works {
+  background: linear-gradient(120deg, #e0f7fa, #ffecb3);
+  padding-bottom: 60px;
+}
+
+.how-it-works h2 {
+  font-size: 2.5rem;
+  color: #4a90e2;
+  font-weight: bold;
+}
+
+.work-step {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+  background-color: #fff;
+  border: 2px solid transparent;
+  border-radius: 10px;
+}
+
+.work-step:hover {
+  transform: translateY(-10px);
+  border: 2px solid #4a90e2;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.text-icon-gradient {
+  background: linear-gradient(135deg, #4a90e2, #d35400);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Hide CTA keyframe in mobile */
+
+@media (max-width: 768px) {
+  .cta::before, .cta::after {
+    display: none;
+  }
+}
+

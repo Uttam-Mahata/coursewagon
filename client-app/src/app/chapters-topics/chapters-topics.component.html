@@ -1,0 +1,65 @@
+<div class="container mt-5">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb bg-light p-2 rounded">
+        <li class="breadcrumb-item"><a routerLink="/home"><i class="fa fa-home"></i> Home</a></li>
+        <li class="breadcrumb-item"><a routerLink="/courses"><i class="fa fa-book"></i> Courses</a></li>
+        <li class="breadcrumb-item"><a routerLink="/subjects"><i class="fa fa-layer-group"></i> {{ courseName }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">
+          {{ moduleName }}
+        </li>
+      </ol>
+    </nav>
+  
+    <!-- Page Title -->
+    <h3 class="text-primary mb-4">{{moduleName}} - Chapters and Topics</h3>
+  
+    <div class="row">
+      <!-- Chapters Column -->
+      <div class="col-lg-4">
+        <h5 class="text-secondary">Chapters</h5>
+        <div *ngFor="let chapter of chapters" class="card mb-3 shadow-sm chapter-card">
+          <div class="card-body">
+            <h6 class="card-title text-primary">{{ chapter.name }}</h6>
+            <p class="card-text text-muted">{{ chapter.description }}</p>
+            <button class="btn btn-sm btn-outline-primary" (click)="viewTopics(chapter.id)">
+              <i class="fas fa-list"></i> View Topics
+            </button>
+            <button class="btn btn-sm btn-outline-success float-end" (click)="generateTopics(chapter.id)">
+              <i class="fas fa-plus-circle"></i> Generate Topics
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Topics Column -->
+      <div class="col-lg-8">
+        <h5 class="text-secondary">{{ selectedChapterName ? selectedChapterName + ' Topics' : 'Topics' }}</h5>
+  
+        <!-- Topic Cards -->
+        <div *ngIf="topics.length === 0 && !selectedChapterId" class="alert alert-info">
+          <i class="fa fa-info-circle"></i> Please select a chapter to view its topics.
+        </div>
+  
+        <div *ngIf="topics.length > 0" class="row">
+          <div *ngFor="let topic of topics" class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100 border-primary topic-card">
+              <div class="card-body">
+                <h6 class="card-title text-primary">{{ topic.name }}</h6>
+                <p class="card-text text-muted">{{ topic.description }}</p>
+              </div>
+              <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                <button class="btn btn-outline-primary" (click)="viewSubtopics(topic.id)">
+                  <i class="fas fa-eye"></i> View Subtopics
+                </button>
+                <button class="btn btn-outline-success" (click)="generateSubtopics(topic.id)">
+                  <i class="fas fa-magic"></i> Generate Subtopics
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

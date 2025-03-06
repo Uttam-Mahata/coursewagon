@@ -1,0 +1,55 @@
+<div class="container mt-5">
+  <!-- Breadcrumb Navigation -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light p-2 rounded">
+      <li class="breadcrumb-item"><a routerLink="/home"><i class="fa fa-home"></i> Home</a></li>
+      <li class="breadcrumb-item"><a routerLink="/courses"><i class="fa fa-book"></i> Courses</a></li>
+      <li class="breadcrumb-item"><a routerLink="/subjects"><i class="fa fa-layer-group"></i> {{ courseName }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ moduleName }}</li>
+    </ol>
+  </nav>
+
+  <!-- Page Title -->
+  <h3 class="text-primary mb-4">{{ topicName }} - Subtopics and Content</h3>
+
+  <div class="row">
+    <!-- Conditionally display Subtopics Column -->
+    <div class="col-lg-4" *ngIf="showSubtopics">
+      <h5 class="text-secondary">Subtopics</h5>
+      <div *ngFor="let subtopic of subtopics" class="card mb-3 shadow-sm subtopic-card">
+        <div class="card-body">
+          <h6 class="card-title text-primary">{{ subtopic.name }}</h6>
+          <p class="card-text text-muted">{{ subtopic.description }}</p>
+          <button class="btn btn-sm btn-outline-primary" (click)="viewContent(subtopic.id)">
+            <i class="fas fa-eye"></i> View Content
+          </button>
+          <button class="btn btn-sm btn-outline-success float-end" (click)="generateContent(subtopic.id)">
+            <i class="fas fa-magic"></i> Generate Content
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Column -->
+    <div [class.col-lg-12]="!showSubtopics" [class.col-lg-8]="showSubtopics" class="mb-4">
+      <h5 class="text-secondary">Content
+        <button class="btn btn-sm btn-outline-secondary" (click)="hideSubtopics()">
+          <i class="fas" [ngClass]="showSubtopics ? 'fa-eye-slash' : 'fa-eye'"></i>
+          {{ showSubtopics ? 'Hide' : 'Show' }} Subtopics
+        </button>
+      </h5>
+
+      <!-- Display Content -->
+      <div *ngIf="content" class="card shadow-sm content-card">
+        <div class="card-body">
+          <h6 class="card-title text-primary">{{ selectedSubtopicName }}</h6>
+          <div markdown mermaid katex *ngIf="content">{{ content }}</div> <!-- Render content as markdown -->
+        </div>
+      </div>
+
+      <div *ngIf="!content && !selectedSubtopicId" class="alert alert-info mt-3">
+        <i class="fa fa-info-circle"></i> Please select a subtopic to view its content.
+      </div>
+    </div>
+  </div>
+</div>

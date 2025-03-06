@@ -1,0 +1,63 @@
+<div class="container mt-5">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb bg-light p-2 rounded">
+      <li class="breadcrumb-item"><a routerLink="/home"><i class="fa fa-home"></i> Home</a></li>
+      <li class="breadcrumb-item"><a routerLink="/courses"><i class="fa fa-book"></i> Courses</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <i class="fa fa-layer-group"></i> {{ courseName }}
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Page Title -->
+  <h3 class="text-primary mb-4">{{courseName}}</h3>
+
+  <div class="row">
+    <!-- Subjects Column -->
+    <div class="col-lg-4">
+      <h5 class="text-secondary">Subjects</h5>
+      <div *ngFor="let subject of subjects" class="card mb-3 shadow-sm subject-card">
+        <div class="card-body">
+          <h6 class="card-title text-primary">{{ subject.name }}</h6>
+          <p class="card-text text-muted">{{ subject.description }}</p>
+          <button class="btn btn-sm btn-outline-primary" (click)="viewModules(subject.id)">
+            <i class="fa fa-eye"></i> View Modules
+          </button>
+          <button class="btn btn-sm btn-outline-success float-end" (click)="generateModules(subject.id)">
+            <i class="fa fa-magic"></i> Generate Modules
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modules Column -->
+    <div class="col-lg-8" id="modulesSection">
+      <h5 class="text-secondary">{{ selectedSubjectName ? selectedSubjectName + ' Modules' : 'Modules' }}</h5>
+      
+      <div *ngIf="modules.length === 0 && !selectedSubjectId" class="alert alert-info">
+        <i class="fa fa-info-circle"></i> Please select a subject to view its modules.
+      </div>
+
+      <!-- Grid Display for Modules on Desktop -->
+      <div *ngIf="modules.length > 0" class="row">
+        <div *ngFor="let module of modules" class="col-md-6 mb-4">
+          <div class="card shadow-sm h-100 border-primary module-card">
+            <div class="card-body">
+              <h6 class="card-title text-light">{{ module.name }}</h6>
+              <p class="card-text text-muted">{{ module.description }}</p>
+            </div>
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+              <button class="btn btn-outline-primary" (click)="viewChapters(module.id)">
+                <i class="fa fa-book-open"></i> View Chapters
+              </button>
+              <button class="btn btn-outline-success" (click)="generateChapters(module.id)">
+                <i class="fa fa-magic"></i> Generate Chapters
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

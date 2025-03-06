@@ -1,0 +1,146 @@
+<div class="course">
+
+  <!-- Header Section -->
+  <header class="bg-primary text-white text-center py-5">
+    <div class="create-course">
+    <div class="container">
+      <h1 class="display-4">Create Your Course</h1>
+      <p class="lead">Start your journey with AI-powered course creation!</p>
+    </div>
+  </div>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-8 offset-md-2 col-lg-6 offset-lg-3 p-4">
+        <div class="wagon-card shadow-lg rounded gradient-border">
+          <!-- Title and Description -->
+          <div class="text-center mb-4">
+            <h2 style="color: #2c3e50;">
+              <i class="fa fa-chalkboard-teacher text-primary"></i> Course Wagon
+            </h2>
+            <p class="text-muted">Transform your idea into structured courses</p>
+          </div>
+          
+          <!-- Course Name Input Field -->
+          <div class="mb-3">
+            <input 
+              id="courseName" 
+              type="text" 
+              class="form-control" 
+              placeholder="Enter Course Name" 
+              [(ngModel)]="courseName"
+            />
+          </div>
+  
+          <!-- Generate Course Button -->
+          <div class="text-center">
+            <button class="btn gradient-btn btn-large" (click)="generateCourse()">
+              <i class="fa fa-magic"></i> Generate Course
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  </header>
+  
+  <div class="container">
+ 
+    <!-- Info Cards -->
+   
+    
+
+    <!-- How It Works Section -->
+    <div class="steps-section mt-5">
+      <h3 class="text-center mb-4">How It Works</h3>
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="step-card gradient-border">
+            <div class="d-flex align-items-center mb-3">
+              <div class="feature-icon">1</div>
+              <h5 class="mb-0">Enter Course Name</h5>
+            </div>
+            <p>Simply input your desired course topic and let our AI understand your requirements.</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="step-card gradient-border">
+            <div class="d-flex align-items-center mb-3">
+              <div class="feature-icon">2</div>
+              <h5 class="mb-0">AI Generation</h5>
+            </div>
+            <p>AI analyzes and creates a structured curriculum with detailed modules.</p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="step-card gradient-border">
+            <div class="d-flex align-items-center mb-3">
+              <div class="feature-icon">3</div>
+              <h5 class="mb-0">Manually Add Subjects</h5>
+            </div>
+            <p>Add subjects to your course manually then generate content on those by AI.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+    <!-- Features Section -->
+    <div class="features-section">
+      <h3 class="text-center mb-4">Key Features</h3>
+      <div class="row">
+        <div class="col-md-6 d-flex mb-4">
+          <div class="feature-item gradient-border d-flex flex-grow-1">
+            <div class="feature-icon">
+              <i class="fa fa-brain"></i>
+            </div>
+            <div>
+              <h5>AI-Powered Content Generation</h5>
+              <p>Automatically generate comprehensive course content with our advanced AI technology.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 d-flex mb-4">
+          <div class="feature-item gradient-border d-flex flex-grow-1">
+            <div class="feature-icon">
+              <i class="fa fa-tasks"></i>
+            </div>
+            <div>
+              <h5>Interactive Assessments</h5>
+              <p>Create engaging quizzes and assignments to test knowledge retention.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 d-flex mb-4">
+          <div class="feature-item gradient-border d-flex flex-grow-1">
+            <div class="feature-icon">
+              <i class="fa fa-mobile-alt"></i>
+            </div>
+            <div>
+              <h5>Mobile Responsive</h5>
+              <p>Access and manage your courses on any device, anywhere.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 d-flex mb-4">
+          <div class="feature-item gradient-border d-flex flex-grow-1">
+            <div class="feature-icon">
+              <i class="fa fa-clock"></i>
+            </div>
+            <div>
+              <h5>Time-Saving</h5>
+              <p>Reduce course creation time from weeks to minutes with automated generation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+  </div>
+
+
+
+</div>

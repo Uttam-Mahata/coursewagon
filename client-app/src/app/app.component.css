@@ -1,0 +1,124 @@
+
+    .navbar {
+        padding: 8px 16px;
+        height: 70px;
+    }
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.6rem;
+        color: #4a90e2 !important;
+        gap: 12px;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    .logo-svg {
+        width: 70px;
+        height: 50px;
+        transform: translateY(-2px);
+    }
+    .brand-text {
+        display: inline-block;
+        line-height: 50px;
+        margin: 0;
+        padding: 0;
+    }
+    .nav-link {
+        color: #525355 !important;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: color 0.3s ease;
+    }
+    .nav-link:hover {
+        color: #4a90e2 !important;
+    }
+    .nav-icon {
+        font-size: 1.2rem;
+    }
+
+    .navbar-toggler {
+        background: none;
+        border: none;
+        outline: none;
+      }
+      
+      .navbar-collapse {
+        display: none;
+        transition: max-height 0.3s ease;
+      }
+      
+      .navbar-collapse.show {
+        display: block;
+      }
+
+
+
+      /* Nabvar for mobile an tablet */
+
+      @media screen and (max-width: 992px) {
+        .navbar {
+          padding: 8px 16px;
+          height: 70px;
+        }
+        .navbar-brand {
+          display: flex;
+          align-items: center;
+          font-family: 'Poppins', sans-serif;
+          font-size: 1.6rem;
+          color: #4a90e2 !important;
+          gap: 12px;
+          height: 100%;
+          padding: 0;
+          margin: 0;
+        }
+        .logo-svg {
+          width: 70px;
+          height: 50px;
+          transform: translateY(-2px);
+        }
+        .brand-text {
+          display: inline-block;
+          line-height: 50px;
+          margin: 0;
+          padding: 0;
+        }
+        .nav-link {
+          color: #252526 !important;
+          font-family: 'Poppins', sans-serif;
+          font-size: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+          color: #1e80e1 !important;
+        }
+        .nav-icon {
+          font-size: 1.2rem;
+        }
+      
+        .navbar-toggler {
+          background: none;
+          border: none;
+          outline: none;
+        }
+        
+        .navbar-collapse {
+          display: none;
+          transition: max-height 0.3s ease;
+        }
+        
+        .navbar-collapse.show {
+          display: block;
+          /* gradient background */
+            background: linear-gradient(135deg, #eaebec 0%, #a6b5e7 100%);
+        }
+        }
+    
+    

@@ -1,0 +1,93 @@
+/* Main container padding for mobile */
+@media (max-width: 576px) {
+  .container {
+    padding: 1rem;
+  }
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  font-size: 0.9rem;
+}
+a {
+  text-decoration: none;
+}
+
+/* Card Styles */
+.subject-card{
+  border: none;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #e3f2fd, #e0f7fa);
+}
+
+.module-card {
+  border: none;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #398ff2, #e9cc7c);
+}
+
+.subject-card .card-title, .module-card .card-title {
+  color: #0d47a1;
+}
+
+.subject-card .card-body, .module-card .card-body {
+  padding: 1.25rem;
+}
+
+.subject-card .card-text, .module-card .card-text {
+  color: #616161;
+  font-size: 0.875rem;
+}
+
+/* Button Styles */
+.btn-outline-primary {
+  color: #0d47a1;
+  border-color: #0d47a1;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d47a1;
+  color: #fff;
+}
+
+.btn-outline-success {
+  color: #2e7d32;
+  border-color: #2e7d32;
+}
+
+.btn-outline-success:hover {
+  background-color: #2e7d32;
+  color: #fff;
+}
+
+/* Dropdown on Mobile */
+.dropdown-toggle {
+  background-color: #1565c0;
+  color: white;
+  font-size: 0.9rem;
+  border-radius: 0.4rem;
+}
+
+.dropdown-menu {
+  width: 100%;
+}
+
+.dropdown-item {
+  font-size: 0.875rem;
+}
+
+/* Card Shadow */
+.subject-card, .module-card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.subject-card:hover, .module-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive Text Sizes */
+@media (min-width: 576px) {
+  .breadcrumb, .card-title, .card-text {
+    font-size: 1rem;
+  }
+}

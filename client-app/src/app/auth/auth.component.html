@@ -1,0 +1,98 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="text-center">{{ isLoginMode ? 'Login' : 'Sign Up' }}</h3>
+        </div>
+        <div class="card-body">
+          <div *ngIf="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+          <div *ngIf="successMessage" class="alert alert-success">
+            {{ successMessage }}
+          </div>
+
+          <!-- Login Form -->
+          <form *ngIf="isLoginMode" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="email" 
+                [(ngModel)]="loginData.email" 
+                name="email" 
+                required>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="password" 
+                [(ngModel)]="loginData.password" 
+                name="password" 
+                required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+          </form>
+
+          <!-- Register Form -->
+          <form *ngIf="!isLoginMode" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="firstName" class="form-label">First Name</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="firstName" 
+                [(ngModel)]="registerData.first_name" 
+                name="firstName" 
+                required>
+            </div>
+            <div class="mb-3">
+              <label for="lastName" class="form-label">Last Name</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="lastName" 
+                [(ngModel)]="registerData.last_name" 
+                name="lastName" 
+                required>
+            </div>
+            <div class="mb-3">
+              <label for="registerEmail" class="form-label">Email</label>
+              <input 
+                type="email" 
+                class="form-control" 
+                id="registerEmail" 
+                [(ngModel)]="registerData.email" 
+                name="email" 
+                required>
+            </div>
+            <div class="mb-3">
+              <label for="registerPassword" class="form-label">Password</label>
+              <input 
+                type="password" 
+                class="form-control" 
+                id="registerPassword" 
+                [(ngModel)]="registerData.password" 
+                name="password" 
+                required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 disabled">Sign Up</button>
+          </form>
+
+          <div class="mt-3 text-center">
+            <!-- <button 
+              type="button" 
+              class="btn btn-link" 
+              (click)="toggleMode()">
+              {{ isLoginMode ? 'Need an account? Sign up' : 'Already have an account? Login' }}
+            </button> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

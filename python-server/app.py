@@ -63,6 +63,28 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
 )
 
+# Database error handling middleware
+@app.middleware("http")
+async def handle_database_errors(request, call_next):
+    try:
+        response = await call_next(request)
+        return response
+    except OperationalError as e:
+        logger.error(f"Database operational error: {str(e)}")
+        # Reset the database connection pool on operational errors
+        from extensions import engine, SessionLocal
+        engine.dispose()
+        return JSONResponse(
+            status_code=503,
+            content={"error": "Database connection error. Please try again."}
+        )
+    except SQLAlchemyError as e:
+        logger.error(f"SQLAlchemy error: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Database error occurred. Please try again."}
+        )
+
 # Global error handlers
 @app.exception_handler(500)
 async def handle_server_error(request, exc):

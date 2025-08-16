@@ -1,0 +1,355 @@
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.375rem;
+  margin: 1rem 0;
+}
+
+.markdown-content pre {
+  margin: 1rem 0;
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 0.375rem;
+  max-width: 100%;
+}
+
+/* Mobile overflows fix */
+.prose {
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.markdown-content {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Make sure the sidebar occupies full height on mobile */
+@media (max-width: 768px) {
+  .fixed.h-full {
+    height: 100vh;
+    padding-top: 0; /* Remove extra padding */
+    top: 0; /* Ensure sidebar starts from the top */
+    padding-top: 4rem; /* Add padding for the top navigation bar */
+  }
+  
+  /* Adjust the sidebar toggle button position for different screen sizes */
+  button.fixed.top-16 {
+    top: 4rem; /* Position below navbar */
+    padding: 0.625rem; /* Larger touch target for mobile */
+  }
+  
+  /* Ensure main content takes full width when sidebar is closed */
+  .flex-1.overflow-y-auto {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 0;
+  }
+  
+  /* Hide scrolling on body when sidebar is open */
+  body.sidebar-open {
+    overflow: hidden;
+  }
+
+  /* Ensure proper space for toggle button in sidebar header */
+  .border-b.border-gray-700 .flex {
+    padding-right: 0.5rem;
+  }
+  
+  /* Breadcrumb improvements for mobile */
+  nav ol {
+    padding-bottom: 0.5rem;
+  }
+  
+  /* Ensure truncated text works properly */
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60px;
+  }
+  
+  /* Add some space for the mobile nav */
+  .container {
+    padding-top: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Hide sidebar when closed */
+  .-translate-x-full {
+    transform: translateX(-100%);
+  }
+  
+  /* Make toggle button more visible */
+  .bg-white.shadow {
+    z-index: 30;  /* Lower than sidebar but higher than content */
+  }
+  
+  /* Ensure main content takes full width when sidebar is closed */
+  .flex-1.overflow-y-auto {
+    width: 100%;
+  }
+  
+  /* Additional space for breadcrumb section */
+  .flex-1.overflow-y-auto .sticky {
+    padding-top: 0.5rem;
+  }
+
+  /* Ensure content doesn't exceed screen width */
+  .container {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .prose {
+    font-size: 0.95rem;
+  }
+  
+  /* Fix table overflow */
+  .markdown-content table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  /* Fix sticky header */
+  .sticky {
+    width: 100%;
+    left: 0;
+  }
+}
+
+/* Fix for tablet sidebar toggle position */
+@media (min-width: 768px) and (max-width: 1024px) {
+  button.fixed.top-16 {
+    display: none; /* Hide on tablet as sidebar is always visible */
+  }
+}
+
+/* Fix for the code blocks */
+.markdown-content code:not(.hljs) {
+  background: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  color: #e53e3e;
+  word-break: break-word;
+}
+
+/* Custom styling for mermaid diagrams */
+.markdown-content .mermaid {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* Highlight the active topic */
+.bg-gray-700 {
+  position: relative;
+}
+
+.bg-gray-700::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: #3b82f6;
+}
+
+/* Ensure sidebar is always visible on larger screens */
+@media (min-width: 768px) {
+  .md\:translate-x-0 {
+    transform: translateX(0) !important;
+  }
+  
+  .md\:relative {
+    position: relative !important;
+  }
+  
+  .md\:pt-0 {
+    padding-top: 0 !important;
+  }
+  
+  /* Hide the mobile navigation on desktop */
+  .md\:hidden {
+    display: none;
+  }
+}
+
+/* Fixed positioning for sidebar on mobile */
+.fixed.md\:relative {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Higher z-index for content area on mobile when sidebar is closed */
+.flex-1.overflow-y-auto {
+  z-index: 5;
+  position: relative;
+  transition: margin-left 0.3s ease-in-out;
+  width: 100%;
+  flex-grow: 1;
+}
+
+/* Remove max-width constraint from container in content area */
+.flex-1.overflow-y-auto .container {
+  max-width: none;
+  width: 100%;
+}
+
+/* Adjust content display to use available space */
+.prose.prose-blue {
+  max-width: none;
+}
+
+/* Ensure proper spacing on smaller screens */
+@media (max-width: 768px) {
+  .flex-1.overflow-y-auto {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Ensure sidebar has proper width and doesn't grow */
+.w-72 {
+  min-width: 18rem;
+  max-width: 18rem;
+  flex-shrink: 0;
+}
+
+/* Breadcrumb fixes for overflow */
+nav ol {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+
+/* Sticky mobile nav */
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+  z-index: 20;  /* Lower than sidebar */
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Smooth transitions for better UX */
+.transition-all {
+  transition-property: all;
+  transition-duration: 300ms;
+}
+
+/* Improve overall content layout */
+.flex-1 {
+  min-width: 0; /* Prevent flex items from overflowing */
+}
+
+/* Styles for MathJax blocks and equations */
+.mathjax-block {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border-left: 3px solid #3b82f6;
+}
+
+/* Fix for long equations */
+.MathJax {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* For MathJax display math */
+mjx-container[jax="CHTML"][display="true"] {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0 !important;
+}
+
+/* Ensure markdown container doesn't overflow on mobile */
+.markdown-content {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Styling for the equation environment */
+.markdown-content .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}
+
+/* Extended styling for math elements to ensure they don't cause horizontal scrolling on mobile */
+.markdown-content .katex,
+.markdown-content mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
+/* Add some styling to differentiate KaTeX and MathJax equations */
+.markdown-content .katex-display {
+  background-color: #f8fafc;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 3px solid #10b981; /* Green border for KaTeX */
+}
+
+/* Enhance table styling for equations */
+.markdown-content table td .katex,
+.markdown-content table td mjx-container {
+  display: inline-flex !important;
+  white-space: nowrap;
+}
+
+/* Better padding for table cells with equations */
+.markdown-content table td {
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+/* Fix display mode equations in tables */
+.markdown-content table .katex-display,
+.markdown-content table mjx-container[jax="CHTML"][display="true"] {
+  margin: 0.25rem 0 !important;
+}
+
+/* Improve multiline equations display */
+.mathjax-block .MathJax {
+  padding: 0.5rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Fix specific issues with trapezoidal and triangular function equations */
+.markdown-content .cases-equation {
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+/* Ensure equations in lists are properly displayed */
+.markdown-content li .katex,
+.markdown-content li mjx-container {
+  vertical-align: middle;
+}

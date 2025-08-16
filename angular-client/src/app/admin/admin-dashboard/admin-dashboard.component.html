@@ -1,0 +1,136 @@
+<!-- Dashboard Stats -->
+<div *ngIf="!loading && !error" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <!-- Users Card -->
+  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+    <div class="flex items-center">
+      <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+        <fa-icon [icon]="faUsers" size="2x"></fa-icon>
+      </div>
+      <div class="ml-5">
+        <div class="text-gray-500 text-sm">Total Users</div>
+        <div class="text-3xl font-bold text-gray-700">{{dashboardStats.total_users || 0}}</div>
+      </div>
+    </div>
+    <div class="mt-4">
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-500">Active Users</span>
+        <span class="text-sm font-semibold">{{dashboardStats.active_users || 0}}</span>
+      </div>
+      <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+        <div class="bg-blue-600 h-2.5 rounded-full" 
+          [style.width.%]="dashboardStats.total_users ? (dashboardStats.active_users / dashboardStats.total_users) * 100 : 0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Courses Card -->
+  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+    <div class="flex items-center">
+      <div class="p-3 rounded-full bg-green-100 text-green-600">
+        <fa-icon [icon]="faGraduationCap" size="2x"></fa-icon>
+      </div>
+      <div class="ml-5">
+        <div class="text-gray-500 text-sm">Total Courses</div>
+        <div class="text-3xl font-bold text-gray-700">{{dashboardStats.total_courses || 0}}</div>
+      </div>
+    </div>
+    <div class="mt-4" *ngIf="dashboardStats.recent_courses?.length">
+      <div class="text-sm text-gray-500 mb-2">Recent Courses</div>
+      <div class="text-sm truncate" *ngFor="let course of dashboardStats.recent_courses?.slice(0,3)">
+        {{course.name}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonials Card -->
+  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+    <div class="flex items-center">
+      <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+        <fa-icon [icon]="faStar" size="2x"></fa-icon>
+      </div>
+      <div class="ml-5">
+        <div class="text-gray-500 text-sm">Total Testimonials</div>
+        <div class="text-3xl font-bold text-gray-700">{{dashboardStats.total_testimonials || 0}}</div>
+      </div>
+    </div>
+    <div class="mt-4">
+      <div class="flex justify-between items-center">
+        <span class="text-sm text-gray-500">Pending Approval</span>
+        <span 
+          [class.text-red-600]="dashboardStats.pending_testimonials > 0"
+          class="text-sm font-semibold">
+          {{dashboardStats.pending_testimonials || 0}}
+        </span>
+      </div>
+      <button 
+        *ngIf="dashboardStats.pending_testimonials > 0"
+        class="mt-2 text-sm bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded"
+        (click)="reviewTestimonials()">
+        Review Testimonials
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Users -->
+<div *ngIf="!loading && !error && dashboardStats.recent_users?.length" class="mb-8">
+  <h2 class="text-xl font-semibold mb-4">Recent Users</h2>
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <tr *ngFor="let user of dashboardStats.recent_users">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">{{user.first_name}} {{user.last_name}}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-500">{{user.email}}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-500">{{user.created_at | date}}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span 
+              [class.bg-green-100]="user.is_active" 
+              [class.text-green-800]="user.is_active"
+              [class.bg-red-100]="!user.is_active" 
+              [class.text-red-800]="!user.is_active"
+              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+              {{user.is_active ? 'Active' : 'Inactive'}}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-4">
+    <button 
+      class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+      (click)="viewAllUsers()">
+      View All Users
+    </button>
+  </div>
+</div>
+
+<!-- Loading Indicator -->
+<div *ngIf="loading" class="flex justify-center items-center py-12">
+  <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+</div>
+
+<!-- Error Message -->
+<div *ngIf="error" class="bg-red-100 text-red-700 p-4 rounded-md mb-6">
+  <p>{{error}}</p>
+  <button 
+    class="mt-2 text-sm underline"
+    (click)="retryLoading()">
+    Retry
+  </button>
+</div>

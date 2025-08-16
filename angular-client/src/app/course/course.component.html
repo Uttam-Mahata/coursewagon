@@ -1,0 +1,222 @@
+<div class="min-h-screen bg-gradient-to-b from-white to-blue-50">
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-16 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+      <div class="absolute top-0 left-0 w-full h-full bg-pattern"></div>
+    </div>
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="text-center max-w-3xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Author Your Course</h1>
+        <p class="text-xl opacity-90">Create, structure, and enrich your courses with AI-powered authoring tools!</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="container mx-auto px-4 py-12 max-w-6xl">
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 mb-8 rounded-md flex items-center">
+      <fa-icon [icon]="faExclamationCircle" class="text-red-500 mr-3 text-lg"></fa-icon>
+      <p class="text-red-700">{{ errorMessage }}</p>
+    </div>
+
+    <!-- Create Course Card -->
+    <div class="max-w-xl mx-auto">
+      <div class="bg-white rounded-2xl shadow-xl border border-blue-100 overflow-hidden mb-12 transform transition-all hover:shadow-2xl">
+        <div class="p-8">
+          <!-- Title and Description -->
+          <div class="text-center mb-8">
+            <div class="h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <fa-icon [icon]="faChalkboardTeacher" class="text-white text-2xl"></fa-icon>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Course Wagon</h2>
+            <p class="text-gray-500">Author and organize your educational content with ease</p>
+          </div>
+          
+          <!-- Course Name Input Field -->
+          <div class="mb-6">
+            <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Description</label>
+            <div class="relative">
+              <fa-icon [icon]="faBook" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
+              <input 
+                id="courseName" 
+                type="text" 
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                placeholder="Enter your course description or use voice input below..." 
+                [(ngModel)]="courseName"
+              />
+            </div>
+          </div>
+
+          <!-- Audio Recording Section -->
+          <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h3 class="text-sm font-medium text-gray-700 mb-3">Or Record Your Course Description</h3>
+            
+            <!-- Recording Controls -->
+            <div class="flex items-center space-x-4 mb-3">
+              <button 
+                type="button"
+                *ngIf="!isRecording && !audioBlob"
+                (click)="startRecording()"
+                class="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                [disabled]="isLoading">
+                <fa-icon [icon]="faMicrophone" class="mr-2"></fa-icon>
+                Start Recording
+              </button>
+              
+              <button 
+                type="button"
+                *ngIf="isRecording"
+                (click)="stopRecording()"
+                class="flex items-center px-4 py-2 bg-red-700 text-white rounded-lg animate-pulse">
+                <fa-icon [icon]="faStop" class="mr-2"></fa-icon>
+                Stop Recording
+              </button>
+              
+              <button 
+                type="button"
+                *ngIf="audioBlob && !isRecording"
+                (click)="playRecording()"
+                class="flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+                <fa-icon [icon]="faPlay" class="mr-2"></fa-icon>
+                Play
+              </button>
+              
+              <button 
+                type="button"
+                *ngIf="audioBlob && !isRecording"
+                (click)="clearRecording()"
+                class="flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                <fa-icon [icon]="faTrash" class="mr-2"></fa-icon>
+                Clear
+              </button>
+            </div>
+            
+            <!-- Recording Status -->
+            <div *ngIf="isRecording" class="text-sm text-red-600 flex items-center">
+              <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></div>
+              Recording... Speak clearly about your course
+            </div>
+            
+            <div *ngIf="audioBlob && !isRecording" class="text-sm text-green-600 flex items-center">
+              <fa-icon [icon]="faCheckCircle" class="mr-2"></fa-icon>
+              Audio recorded successfully
+            </div>
+          </div>
+  
+          <!-- Generate Course Button -->
+          <div class="text-center space-y-3">
+            <!-- Text-based generation -->
+            <button 
+              *ngIf="!audioBlob"
+              [disabled]="isLoading || !courseName.trim()" 
+              (click)="generateCourse()"
+              class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-6 rounded-lg font-medium transition duration-300 transform hover:-translate-y-0.5 shadow-md focus:ring-4 focus:ring-blue-300 focus:outline-none"
+              [ngClass]="{'opacity-75 cursor-not-allowed': isLoading || !courseName.trim()}">
+              <div *ngIf="isLoading" class="inline-flex items-center">
+                <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                <span>Generating...</span>
+              </div>
+              <div *ngIf="!isLoading" class="flex items-center justify-center">
+                <fa-icon [icon]="faMagic" class="mr-2"></fa-icon>
+                <span>Generate Course from Text</span>
+              </div>
+            </button>
+            
+            <!-- Audio-based generation -->
+            <button 
+              *ngIf="audioBlob"
+              [disabled]="isLoading" 
+              (click)="generateCourseFromAudio()"
+              class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-6 rounded-lg font-medium transition duration-300 transform hover:-translate-y-0.5 shadow-md focus:ring-4 focus:ring-purple-300 focus:outline-none"
+              [ngClass]="{'opacity-75 cursor-not-allowed': isLoading}">
+              <div *ngIf="isLoading" class="inline-flex items-center">
+                <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                <span>Processing Audio...</span>
+              </div>
+              <div *ngIf="!isLoading" class="flex items-center justify-center">
+                <fa-icon [icon]="faMicrophone" class="mr-2"></fa-icon>
+                <span>Generate Course from Audio</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="mb-16">
+      <h3 class="text-2xl font-bold text-gray-800 text-center mb-10">How It Works</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all">
+          <div class="flex items-center mb-4">
+            <div class="h-10 w-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3">1</div>
+            <h5 class="text-lg font-medium text-gray-800">Enter Course Name</h5>
+          </div>
+          <p class="text-gray-600">Start by specifying your course topic. Our platform helps you organize your ideas into a structured course outline.</p>
+        </div>
+        
+        <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all">
+          <div class="flex items-center mb-4">
+            <div class="h-10 w-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3">2</div>
+            <h5 class="text-lg font-medium text-gray-800">AI-Assisted Authoring</h5>
+          </div>
+          <p class="text-gray-600">Leverage AI to generate curriculum structure, suggest modules, and draft content for your course.</p>
+        </div>
+        
+        <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all">
+          <div class="flex items-center mb-4">
+            <div class="h-10 w-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3">3</div>
+            <h5 class="text-lg font-medium text-gray-800">Customize & Refine</h5>
+          </div>
+          <p class="text-gray-600">Manually add, edit, or remove subjects and content. Fine-tune your course to match your teaching style and objectives.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="mb-12">
+      <h3 class="text-2xl font-bold text-gray-800 text-center mb-10">Key Features</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all flex">
+          <div class="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white mr-4">
+            <fa-icon [icon]="faBrain"></fa-icon>
+          </div>
+          <div>
+            <h5 class="text-lg font-medium text-gray-800 mb-2">AI-Powered Authoring</h5>
+            <p class="text-gray-600">Generate outlines, modules, and draft content for your courses with advanced AI assistance.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all flex">
+          <div class="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white mr-4">
+            <fa-icon [icon]="faTasks"></fa-icon>
+          </div>
+          <div>
+            <h5 class="text-lg font-medium text-gray-800 mb-2">Interactive Assessments</h5>
+            <p class="text-gray-600">Design quizzes and assignments to reinforce learning and evaluate progress.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all flex">
+          <div class="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white mr-4">
+            <fa-icon [icon]="faMobileAlt"></fa-icon>
+          </div>
+          <div>
+            <h5 class="text-lg font-medium text-gray-800 mb-2">Mobile Responsive</h5>
+            <p class="text-gray-600">Author and manage your courses on any device, anywhere, anytime.</p>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all flex">
+          <div class="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-white mr-4">
+            <fa-icon [icon]="faClock"></fa-icon>
+          </div>
+          <div>
+            <h5 class="text-lg font-medium text-gray-800 mb-2">Save Time</h5>
+            <p class="text-gray-600">Accelerate course creation with automation, letting you focus on quality and creativity.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

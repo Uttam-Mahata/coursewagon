@@ -20,6 +20,9 @@ class ContentRepository:
     def get_content_by_topic_id(self, topic_id):
         return self.db.query(Content).filter(Content.topic_id == topic_id).first()
         
+    def get_content_by_id(self, content_id):
+        return self.db.query(Content).filter(Content.id == content_id).first()
+        
     def delete_content_by_topic_id(self, topic_id):
         self.db.query(Content).filter(Content.topic_id == topic_id).delete()
         self.db.commit()

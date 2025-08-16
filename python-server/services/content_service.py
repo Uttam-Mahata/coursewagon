@@ -103,8 +103,13 @@ class ContentService:
     def get_content_by_topic_id(self, topic_id):
       content = self.content_repo.get_content_by_topic_id(topic_id)
       if content:
-        return mermaid_content(content.content)
-       
+        # Get the content with media files
+        content_dict = content.to_dict()
+        
+        # Apply mermaid processing to the content text
+        content_dict['content'] = mermaid_content(content.content)
+        
+        return content_dict
       else:
         return None
 

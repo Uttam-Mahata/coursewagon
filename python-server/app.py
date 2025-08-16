@@ -37,6 +37,7 @@ from routes.content_routes import content_router
 from routes.auth_routes import auth_router
 from routes.testimonial_routes import testimonial_router
 from routes.image_routes import image_router
+from routes.media_routes import media_router
 from admin.routes import admin_router
 from routes.utility_routes import utility_router
 
@@ -111,6 +112,7 @@ app.include_router(content_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(testimonial_router, prefix="/api")
 app.include_router(image_router, prefix="/api")
+app.include_router(media_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(utility_router, prefix="/api")
 

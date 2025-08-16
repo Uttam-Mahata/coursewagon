@@ -52,6 +52,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "*",
         "http://localhost:4200",
         "http://127.0.0.1:4200",
         "https://coursewagon-backend.victoriousforest-3a334815.southeastasia.azurecontainerapps.io",

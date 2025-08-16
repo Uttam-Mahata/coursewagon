@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -93,4 +94,9 @@ func SanitizeString(input string) string {
 	input = htmlRegex.ReplaceAllString(input, "")
 	
 	return strings.TrimSpace(input)
+}
+
+// GenerateUniqueID generates a unique ID for various purposes
+func GenerateUniqueID() uint {
+	return uint(time.Now().UnixNano() / int64(time.Millisecond))
 }

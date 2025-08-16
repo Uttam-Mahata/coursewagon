@@ -11,16 +11,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupCourseRoutes(router *gin.RouterGroup, courseService services.CourseService, subjectRepo repositories.SubjectRepository, chapterRepo repositories.ChapterRepository, topicRepo repositories.TopicRepository) {
+func SetupCourseRoutes(router *gin.RouterGroup, courseService services.CourseService, subjectService services.SubjectService, chapterService services.ChapterService, topicService services.TopicService) {
 	router.POST("", handleCreateCourse(courseService))
 	router.GET("", handleGetUserCourses(courseService))
 	router.GET("/:id", handleGetCourse(courseService))
 	router.PUT("/:id", handleUpdateCourse(courseService))
 	router.DELETE("/:id", handleDeleteCourse(courseService))
 	router.POST("/:id/subjects", handleGenerateSubjects(courseService))
-	router.GET("/:id/subjects", handleGetCourseSubjects(subjectRepo))
-	router.POST("/:id/subjects/bulk", handleCreateSubjects(subjectRepo, courseService))
-	router.GET("/:id/hierarchy", handleGetCourseHierarchy(courseService, subjectRepo, chapterRepo, topicRepo))
+	router.GET("/:id/subjects", handleGetCourseSubjects(subjectService))
+	router.POST("/:id/subjects/bulk", handleCreateSubjects(subjectService, courseService))
+	router.GET("/:id/hierarchy", handleGetCourseHierarchy(courseService, subjectService, chapterService, topicService))
 }
 
 func handleCreateCourse(courseService services.CourseService) gin.HandlerFunc {
@@ -280,7 +280,7 @@ func handleGenerateSubjects(courseService services.CourseService) gin.HandlerFun
 	}
 }
 
-func handleGetCourseSubjects(subjectRepo repositories.SubjectRepository) gin.HandlerFunc {
+func handleGetCourseSubjects(subjectService services.SubjectService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		courseID, err := middleware.ParseIDParam(c, "id")
 		if err != nil {

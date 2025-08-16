@@ -187,7 +187,7 @@ gcloud run deploy coursewagon-api \
 - `./scripts/test-local.sh` - Test with local Azure storage
 - `./scripts/deploy-complete.sh` - Deploy to production
 
-## > Contributing
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -210,7 +210,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For support, email contact@coursewagon.live or open an issue in the GitHub repository.
 
-## = Links
+## Links
 
 - **Live Application**: [https://www.coursewagon.live](https://www.coursewagon.live)
 

@@ -62,3 +62,10 @@ coverage.xml
 
 # Dependencies
 node_modules/
+
+# Scripts (contains deployment and setup scripts)
+scripts/
+
+# Firebase Service Account Keys
+*firebase-adminsdk*.json
+coursewagon-firebase-adminsdk-*.json

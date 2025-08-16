@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "623320490056",
+    "project_id": "coursewagon",
+    "storage_bucket": "coursewagon.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623320490056:android:3d70a6118fe67370d2f87d",
+        "android_client_info": {
+          "package_name": "com.coursewagon.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623320490056-2cq34ithv4dglq3eamkc3vukdhs2519p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOw_jX0b7we2cbUNDEfRRUXACUlvjHDI0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623320490056-2cq34ithv4dglq3eamkc3vukdhs2519p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "623320490056-qjg9qqrljjk1sn00vtn83kqkh3fago87.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.coursewagon.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

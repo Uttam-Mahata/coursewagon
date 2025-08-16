@@ -3,6 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+export interface ContentGenerationOptions {
+  include_media_placeholders?: boolean;
+}
+
+export interface MediaPlacementRequest {
+  media_id: number;
+  position?: number;
+  section_identifier?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -11,9 +21,45 @@ export class ContentService {
   
   constructor(private http: HttpClient) { }
   
-  generateContent(courseId: number, subjectId: number, chapterId: number, topicId: number): Observable<any> {
+  generateContent(
+    courseId: number, 
+    subjectId: number, 
+    chapterId: number, 
+    topicId: number,
+    options: ContentGenerationOptions = {}
+  ): Observable<any> {
     console.log(`Generating content for course: ${courseId}, subject: ${subjectId}, chapter: ${chapterId}, topic: ${topicId}`);
-    return this.http.post(`${this.apiUrl}/${courseId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/generate_content`, {});
+    return this.http.post(
+      `${this.apiUrl}/${courseId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/generate_content`,
+      options
+    );
+  }
+  
+  generateContentWithMediaSuggestions(
+    courseId: number, 
+    subjectId: number, 
+    chapterId: number, 
+    topicId: number
+  ): Observable<any> {
+    console.log(`Generating content with media suggestions for course: ${courseId}, subject: ${subjectId}, chapter: ${chapterId}, topic: ${topicId}`);
+    return this.http.post(
+      `${this.apiUrl}/${courseId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/generate_content_with_media_suggestions`,
+      {}
+    );
+  }
+  
+  insertMediaInContent(
+    courseId: number, 
+    subjectId: number, 
+    chapterId: number, 
+    topicId: number,
+    placement: MediaPlacementRequest
+  ): Observable<any> {
+    console.log(`Inserting media in content for course: ${courseId}, subject: ${subjectId}, chapter: ${chapterId}, topic: ${topicId}`);
+    return this.http.post(
+      `${this.apiUrl}/${courseId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/insert_media`,
+      placement
+    );
   }
   
   getContent(courseId: number, subjectId: number, chapterId: number, topicId: number): Observable<any> {

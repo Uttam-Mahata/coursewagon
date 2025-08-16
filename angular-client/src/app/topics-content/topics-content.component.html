@@ -90,6 +90,16 @@
           <fa-icon [icon]="faUpload" class="mr-1.5"></fa-icon> 
           Upload Media
         </button>
+        
+        <!-- Media Suggestions Button -->
+        <button 
+          *ngIf="!content && mediaFiles.length > 0"
+          class="flex items-center bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200"
+          (click)="showMediaSuggestions()">
+          <fa-icon [icon]="faMagic" class="mr-1.5"></fa-icon> 
+          Get Media Suggestions
+        </button>
+        
         <!-- Show appropriate button based on content existence -->
         <button 
           class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200"
@@ -100,6 +110,42 @@
           <fa-icon *ngIf="!isGenerating" [icon]="faMagic" class="mr-1.5"></fa-icon> 
           {{ isGenerating ? 'Processing...' : (content || (currentTopic && currentTopic.has_content) ? 'Update Content' : 'Generate Content') }}
         </button>
+      </div>
+    </div>
+
+    <!-- Media Suggestions Modal -->
+    <div *ngIf="showMediaSuggestionsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Media Placement Suggestions</h3>
+          <button 
+            (click)="closeMediaSuggestions()"
+            class="text-gray-500 hover:text-gray-700">
+            <fa-icon [icon]="faTimes"></fa-icon>
+          </button>
+        </div>
+        
+        <div *ngIf="mediaSuggestions" class="prose max-w-none">
+          <div [innerHTML]="mediaSuggestions"></div>
+        </div>
+        
+        <div *ngIf="isLoadingSuggestions" class="text-center py-8">
+          <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 mx-auto"></div>
+          <p class="mt-2 text-gray-600">Generating media suggestions...</p>
+        </div>
+        
+        <div class="flex justify-end mt-6 space-x-2">
+          <button 
+            (click)="closeMediaSuggestions()"
+            class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-md text-sm transition duration-200">
+            Close
+          </button>
+          <button 
+            (click)="generateContentWithMedia()"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm transition duration-200">
+            Generate Content with Media
+          </button>
+        </div>
       </div>
     </div>
 
@@ -191,6 +237,14 @@
                 {{ media.file_type }}
               </span>
               <div class="flex space-x-2">
+                <!-- Insert Media Button -->
+                <button 
+                  *ngIf="content"
+                  class="text-green-600 hover:text-green-800 text-sm"
+                  (click)="insertMediaInContent(media)"
+                  title="Insert media into content">
+                  <fa-icon [icon]="faPlus"></fa-icon>
+                </button>
                 <button 
                   class="text-blue-600 hover:text-blue-800 text-sm"
                   (click)="copyEmbedCode(media)"
@@ -221,6 +275,7 @@
       <div>
         <p class="text-blue-700">No content available for this topic yet.</p>
         <p class="text-sm text-blue-600 mt-1">Click "Generate Content" to create content for this topic.</p>
+        <p *ngIf="mediaFiles.length > 0" class="text-sm text-blue-600 mt-1">Or click "Get Media Suggestions" to see where media files could be placed.</p>
       </div>
     </div>
   </div>

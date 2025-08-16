@@ -28,10 +28,45 @@ class ContentCreate(BaseModel):
 class ContentUpdate(BaseModel):
     content: str
 
+class MediaPlacementRequest(BaseModel):
+    media_id: int
+    position: int = None
+    section_identifier: str = None
+
+class ContentGenerationOptions(BaseModel):
+    include_media_placeholders: bool = True
+
 @content_router.post(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/generate_content'
 )
 async def generate_content(
+    course_id: int,
+    subject_id: int,
+    chapter_id: int,
+    topic_id: int,
+    options: ContentGenerationOptions = ContentGenerationOptions(),
+    current_user_id: int = Depends(get_current_user_id),
+    content_service: ContentService = Depends(get_content_service),
+    course_service: CourseService = Depends(get_course_service)
+):
+    try:
+        # Verify course ownership
+        course = course_service.get_course_by_id(course_id)
+        if not course or course.get('user_id') != current_user_id:
+            raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
+            
+        result = content_service.generate_content(
+            course_id, subject_id, chapter_id, topic_id, 
+            options.include_media_placeholders
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@content_router.post(
+    '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/generate_content_with_media_suggestions'
+)
+async def generate_content_with_media_suggestions(
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -46,7 +81,38 @@ async def generate_content(
         if not course or course.get('user_id') != current_user_id:
             raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
             
-        result = content_service.generate_content(course_id, subject_id, chapter_id, topic_id)
+        result = content_service.generate_content_with_media_suggestions(
+            course_id, subject_id, chapter_id, topic_id
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@content_router.post(
+    '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/insert_media'
+)
+async def insert_media_in_content(
+    course_id: int,
+    subject_id: int,
+    chapter_id: int,
+    topic_id: int,
+    placement: MediaPlacementRequest,
+    current_user_id: int = Depends(get_current_user_id),
+    content_service: ContentService = Depends(get_content_service),
+    course_service: CourseService = Depends(get_course_service)
+):
+    try:
+        # Verify course ownership
+        course = course_service.get_course_by_id(course_id)
+        if not course or course.get('user_id') != current_user_id:
+            raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
+            
+        result = content_service.insert_media_at_position(
+            topic_id, 
+            placement.media_id, 
+            placement.position, 
+            placement.section_identifier
+        )
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

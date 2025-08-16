@@ -4,12 +4,13 @@ import { CourseService } from '../services/course.service';
 import { SubjectService } from '../services/subject.service';
 import { ChapterService } from '../services/chapter.service';
 import { TopicService } from '../services/topic.service';
-import { ContentService } from '../services/content.service';
+import { ContentService, ContentGenerationOptions, MediaPlacementRequest } from '../services/content.service';
 import { MediaService, MediaFile } from '../services/media.service';
 import { 
   faHome, faBook, faLayerGroup, faEye, faEyeSlash, faMagic, 
   faInfoCircle, faFileAlt, faSpinner, faChevronRight, faBookOpen,
-  faChevronLeft, faList, faImage, faVideo, faUpload, faTrash, faEdit
+  faChevronLeft, faList, faImage, faVideo, faUpload, faTrash, faEdit,
+  faPlus, faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -40,6 +41,8 @@ export class TopicsContentComponent implements OnInit, OnDestroy {
   faUpload = faUpload;
   faTrash = faTrash;
   faEdit = faEdit;
+  faPlus = faPlus;
+  faTimes = faTimes;
 
   
   content: any = null;
@@ -69,6 +72,11 @@ export class TopicsContentComponent implements OnInit, OnDestroy {
   selectedFileType: 'image' | 'video' = 'image';
   mediaCaption: string = '';
   mediaAltText: string = '';
+  
+  // Media suggestions properties
+  showMediaSuggestionsModal: boolean = false;
+  mediaSuggestions: string = '';
+  isLoadingSuggestions: boolean = false;
   
   // Subscription to handle route parameter changes
   private routeSubscription: Subscription;
@@ -233,8 +241,13 @@ export class TopicsContentComponent implements OnInit, OnDestroy {
     const currentTopic = this.topics.find(t => t.id === this.topicId);
     const actionVerb = currentTopic && currentTopic.has_content ? 'updating' : 'generating';
     
+    // Check if we have media files and should include them
+    const options: ContentGenerationOptions = {
+      include_media_placeholders: this.mediaFiles.length > 0
+    };
+    
     // Trigger content generation for the topic
-    this.contentService.generateContent(this.courseId, this.subjectId, this.chapterId, this.topicId).subscribe({
+    this.contentService.generateContent(this.courseId, this.subjectId, this.chapterId, this.topicId, options).subscribe({
       next: (response) => {
         console.log(`Content ${actionVerb} response:`, response);
         
@@ -251,6 +264,68 @@ export class TopicsContentComponent implements OnInit, OnDestroy {
         console.error(`Error ${actionVerb} content:`, error);
         this.isGenerating = false;
         this.errorMessage = `Failed to ${actionVerb.replace('ing', '')} content. Please try again.`;
+      }
+    });
+  }
+  
+  // Media suggestions methods
+  showMediaSuggestions() {
+    this.showMediaSuggestionsModal = true;
+    this.isLoadingSuggestions = true;
+    this.mediaSuggestions = '';
+    
+    this.contentService.generateContentWithMediaSuggestions(
+      this.courseId, this.subjectId, this.chapterId, this.topicId
+    ).subscribe({
+      next: (response) => {
+        console.log('Media suggestions response:', response);
+        this.mediaSuggestions = response.media_suggestions;
+        this.isLoadingSuggestions = false;
+      },
+      error: (error) => {
+        console.error('Error generating media suggestions:', error);
+        this.isLoadingSuggestions = false;
+        this.errorMessage = 'Failed to generate media suggestions. Please try again.';
+      }
+    });
+  }
+  
+  closeMediaSuggestions() {
+    this.showMediaSuggestionsModal = false;
+    this.mediaSuggestions = '';
+    this.isLoadingSuggestions = false;
+  }
+  
+  generateContentWithMedia() {
+    this.closeMediaSuggestions();
+    this.generateContent(); // This will automatically include media placeholders
+  }
+  
+  // Media placement methods
+  insertMediaInContent(media: MediaFile) {
+    if (!this.content) {
+      this.errorMessage = 'No content available to insert media into.';
+      return;
+    }
+    
+    // For now, we'll insert at the end of the content
+    // In a more advanced implementation, you could add a modal to select position
+    const placement: MediaPlacementRequest = {
+      media_id: media.id,
+      position: this.content.length // Insert at the end
+    };
+    
+    this.contentService.insertMediaInContent(
+      this.courseId, this.subjectId, this.chapterId, this.topicId, placement
+    ).subscribe({
+      next: (response) => {
+        console.log('Media inserted successfully:', response);
+        // Reload the content to show the inserted media
+        this.loadContent();
+      },
+      error: (error) => {
+        console.error('Error inserting media:', error);
+        this.errorMessage = 'Failed to insert media into content. Please try again.';
       }
     });
   }

@@ -5,9 +5,11 @@ from repositories.topic_repo import TopicRepository
 from repositories.chapter_repo import ChapterRepository
 from repositories.subject_repo import SubjectRepository
 from repositories.course_repo import CourseRepository
+from repositories.media_repo import MediaRepository
 from utils.gemini_helper import GeminiHelper, mermaid_content, extract_markdown
 from sqlalchemy.orm import Session
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +20,9 @@ class ContentService:
         self.chapter_repo = ChapterRepository(db)
         self.subject_repo = SubjectRepository(db)
         self.course_repo = CourseRepository(db)
+        self.media_repo = MediaRepository(db)
 
-    def generate_content(self, course_id, subject_id, chapter_id, topic_id):
+    def generate_content(self, course_id, subject_id, chapter_id, topic_id, include_media_placeholders=True):
         topic = self.topic_repo.get_topic_by_id(topic_id)
         if not topic:
             raise Exception("Topic Not Found")
@@ -42,11 +45,21 @@ class ContentService:
         
         gemini_helper = GeminiHelper()
 
+        # Check if there are existing media files for this topic
+        existing_media = self.media_repo.get_media_by_content_id(topic_id)
+        media_placeholders = ""
+        
+        if include_media_placeholders and existing_media:
+            media_placeholders = self._generate_media_placeholders(existing_media)
+
         prompt = f"""
             
     Generate detailed, in-depth content as well as a tutorial for the topic "{topic_name}", under the chapter "{chapter_name}",
     under the subject "{subject_name}" for the course "{course_name}"
     using topic id {topic_id}. Do not include the topic id in the content.
+    
+    {media_placeholders}
+    
     The content should adhere to the following detailed approach:
     Delve deeply into the core concepts related to the topic, defining key terms, principles, and theories. Include any historical context or real-world relevance to ground the material.
     Examples: Include relevant examples to illustrate the concepts. The examples should be diverse, including:
@@ -97,9 +110,140 @@ class ContentService:
         response = gemini_helper.generate_content(prompt)
         content = Content(topic_id=topic_id, content=response)
         content.content = extract_markdown(content.content)
+        
+        # Process media placeholders if they exist
+        if include_media_placeholders and existing_media:
+            content.content = self._process_media_placeholders(content.content, existing_media)
+        
         self.content_repo.add_content(content)
         return {"message": "Content generated successfully"}
-    
+
+    def _generate_media_placeholders(self, media_files):
+        """Generate media placeholder instructions for Gemini"""
+        placeholders = "\n\n**MEDIA PLACEMENT INSTRUCTIONS:**\n"
+        placeholders += "The following media files are available for this topic. Please integrate them naturally into the content where appropriate:\n\n"
+        
+        for i, media in enumerate(media_files, 1):
+            media_type = "image" if media.file_type == "image" else "video"
+            placeholders += f"{i}. **{media_type.title()}**: {media.file_name}"
+            if media.caption:
+                placeholders += f" - {media.caption}"
+            placeholders += f"\n   - Use placeholder: {{MEDIA_{media.id}}} where you want this {media_type} to appear\n"
+            placeholders += f"   - File URL: {media.file_url}\n"
+            if media.alt_text:
+                placeholders += f"   - Alt text: {media.alt_text}\n"
+            placeholders += "\n"
+        
+        placeholders += "**IMPORTANT**: Replace the placeholders {MEDIA_X} with appropriate markdown/HTML code for the media files. For images, use: ![alt_text](url). For videos, use: <video controls><source src='url'></video>\n\n"
+        return placeholders
+
+    def _process_media_placeholders(self, content, media_files):
+        """Replace media placeholders with actual embed codes"""
+        for media in media_files:
+            placeholder = f"{{MEDIA_{media.id}}}"
+            if placeholder in content:
+                embed_code = self._generate_embed_code(media)
+                content = content.replace(placeholder, embed_code)
+        return content
+
+    def _generate_embed_code(self, media):
+        """Generate appropriate embed code for media file"""
+        if media.file_type == "image":
+            embed_code = f"![{media.alt_text or media.file_name}]({media.file_url})"
+            if media.caption:
+                embed_code += f"\n*{media.caption}*"
+        else:  # video
+            embed_code = f'<video controls width="100%">\n  <source src="{media.file_url}" type="{media.mime_type or "video/mp4"}">\n  Your browser does not support the video tag.\n</video>'
+            if media.caption:
+                embed_code += f"\n*{media.caption}*"
+        return embed_code
+
+    def generate_content_with_media_suggestions(self, course_id, subject_id, chapter_id, topic_id):
+        """Generate content with suggestions for where media should be placed"""
+        topic = self.topic_repo.get_topic_by_id(topic_id)
+        if not topic:
+            raise Exception("Topic Not Found")
+        
+        gemini_helper = GeminiHelper()
+        
+        prompt = f"""
+        Analyze the topic "{topic.name}" and suggest where images or videos would be most beneficial for learning.
+        
+        Provide suggestions in the following format:
+        
+        ## Media Placement Suggestions
+        
+        ### 1. [Section Name]
+        **Suggested Media Type**: [image/video]
+        **Purpose**: [explain why this media would help learning]
+        **Recommended Content**: [describe what the media should show]
+        **Placement**: [where in the content this should appear]
+        
+        ### 2. [Section Name]
+        **Suggested Media Type**: [image/video]
+        **Purpose**: [explain why this media would help learning]
+        **Recommended Content**: [describe what the media should show]
+        **Placement**: [where in the content this should appear]
+        
+        Continue for 3-5 suggestions based on the topic content.
+        """
+        
+        response = gemini_helper.generate_content(prompt)
+        return {"media_suggestions": response}
+
+    def insert_media_at_position(self, topic_id, media_id, position, section_identifier=None):
+        """Insert a specific media file at a particular position in the content"""
+        content = self.content_repo.get_content_by_topic_id(topic_id)
+        if not content:
+            raise Exception("Content not found")
+        
+        media = self.media_repo.get_media_by_id(media_id)
+        if not media:
+            raise Exception("Media not found")
+        
+        # If section identifier is provided, find that section
+        if section_identifier:
+            content_text = self._insert_media_in_section(content.content, media, section_identifier)
+        else:
+            # Insert at specific position
+            content_text = self._insert_media_at_position(content.content, media, position)
+        
+        # Update the content
+        self.content_repo.update_content(topic_id, content_text)
+        return {"message": "Media inserted successfully"}
+
+    def _insert_media_in_section(self, content, media, section_identifier):
+        """Insert media within a specific section of the content"""
+        # Find the section (e.g., "## Introduction", "### Key Concepts")
+        section_pattern = rf"(^#+\s*{re.escape(section_identifier)}.*?)(?=^#+\s|$)"
+        match = re.search(section_pattern, content, re.MULTILINE | re.DOTALL)
+        
+        if match:
+            section_start = match.start()
+            section_end = match.end()
+            section_content = match.group(1)
+            
+            # Insert media at the end of the section
+            embed_code = self._generate_embed_code(media)
+            new_section = section_content.rstrip() + "\n\n" + embed_code + "\n"
+            
+            return content[:section_start] + new_section + content[section_end:]
+        else:
+            # If section not found, append to the end
+            embed_code = self._generate_embed_code(media)
+            return content + "\n\n" + embed_code
+
+    def _insert_media_at_position(self, content, media, position):
+        """Insert media at a specific character position"""
+        embed_code = self._generate_embed_code(media)
+        
+        if position >= len(content):
+            # Append to the end
+            return content + "\n\n" + embed_code
+        else:
+            # Insert at specific position
+            return content[:position] + "\n\n" + embed_code + "\n\n" + content[position:]
+
     def get_content_by_topic_id(self, topic_id):
       content = self.content_repo.get_content_by_topic_id(topic_id)
       if content:

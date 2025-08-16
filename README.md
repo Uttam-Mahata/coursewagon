@@ -1,7 +1,5 @@
 # CourseWagon
 
-## Executive Summary
-
 CourseWagon is an enterprise-grade educational platform that leverages generative AI to facilitate dynamic course content generation and comprehensive learning management. The platform integrates modern web technologies with advanced AI capabilities to deliver a scalable, secure, and user-centric educational experience.
 
 ##  Features

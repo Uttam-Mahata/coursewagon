@@ -1,0 +1,39 @@
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Line clamp for multi-line text truncation */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Media query helpers for specific behaviors */
+@media (max-width: 640px) {
+  .modal-buttons-reversed {
+    flex-direction: column-reverse;
+  }
+  
+  .modal-buttons-reversed button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}

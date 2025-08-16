@@ -1,0 +1,89 @@
+<h2 class="text-xl font-semibold mb-4">User Management</h2>
+
+<!-- Users List -->
+<div *ngIf="!loading && !error && users.length > 0" class="bg-white shadow-md rounded-lg overflow-hidden mb-6">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <tr *ngFor="let user of users">
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm font-medium text-gray-900">{{user.first_name}} {{user.last_name}}</div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm text-gray-500">{{user.email}}</div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm text-gray-500">{{user.created_at | date}}</div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span 
+            [class.bg-green-100]="user.is_active" 
+            [class.text-green-800]="user.is_active"
+            [class.bg-red-100]="!user.is_active" 
+            [class.text-red-800]="!user.is_active"
+            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+            {{user.is_active ? 'Active' : 'Inactive'}}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span 
+            [class.bg-purple-100]="user.is_admin" 
+            [class.text-purple-800]="user.is_admin"
+            [class.bg-gray-100]="!user.is_admin" 
+            [class.text-gray-800]="!user.is_admin"
+            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+            {{user.is_admin ? 'Admin' : 'User'}}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <button 
+            [class.text-red-600]="user.is_active"
+            [class.hover:text-red-900]="user.is_active"
+            [class.text-green-600]="!user.is_active"
+            [class.hover:text-green-900]="!user.is_active"
+            class="mr-3" 
+            (click)="onToggleUserStatus(user.id, !user.is_active)">
+            {{user.is_active ? 'Disable' : 'Enable'}}
+          </button>
+          <button 
+            [class.text-purple-600]="!user.is_admin"
+            [class.hover:text-purple-900]="!user.is_admin"
+            [class.text-gray-600]="user.is_admin"
+            [class.hover:text-gray-900]="user.is_admin"
+            (click)="onToggleAdminStatus(user.id, !user.is_admin)">
+            {{user.is_admin ? 'Remove Admin' : 'Make Admin'}}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Loading Indicator -->
+<div *ngIf="loading" class="flex justify-center items-center py-12">
+  <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+</div>
+
+<!-- Error Message -->
+<div *ngIf="error" class="bg-red-100 text-red-700 p-4 rounded-md mb-6">
+  <p>{{error}}</p>
+  <button 
+    class="mt-2 text-sm underline"
+    (click)="onRetryLoad()">
+    Retry
+  </button>
+</div>
+
+<!-- No Users Message -->
+<div *ngIf="!loading && !error && users.length === 0" class="text-center py-12 bg-white rounded-lg shadow">
+  <p class="text-gray-500">No users found in the system.</p>
+</div>

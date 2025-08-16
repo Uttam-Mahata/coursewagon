@@ -1,0 +1,115 @@
+<nav class="bg-gray-100 sticky top-0 z-50 shadow-md">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo and Brand -->
+      <a class="flex items-center gap-3" routerLink="/home" (click)="scrollToTop()">
+        <img src="/coursewagon.png" alt="Course Wagon Logo" class="h-10 w-auto">
+        <span class="font-bold text-xl text-blue-600 font-poppins">Course Wagon</span>
+      </a>
+
+      <!-- Mobile Menu Button -->
+      <div class="lg:hidden">
+        <button (click)="toggleNavbar()" class="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600" title="Toggle Navbar">
+          <fa-icon [icon]="isNavbarOpen ? faTimes : faBars" size="lg"></fa-icon>
+        </button>
+      </div>
+
+      <!-- Desktop Menu -->
+      <div class="hidden lg:flex lg:items-center lg:space-x-6">
+        <ul class="flex items-center space-x-6">
+          <!-- Show these items only when authenticated -->
+          <ng-container *ngIf="isAuthenticated">
+            <li>
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses" (click)="scrollToTop()">
+                <fa-icon [icon]="faGraduationCap" class="text-lg"></fa-icon> My Courses
+              </a>
+            </li>
+   
+            <!-- Admin Link - Only show for admin users -->
+            <li *ngIf="isAdmin">
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/admin" (click)="scrollToTop()">
+                <fa-icon [icon]="faUserShield" class="text-lg"></fa-icon> Admin
+              </a>
+            </li>
+   
+            <li>
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/profile" (click)="scrollToTop()">
+                <fa-icon [icon]="faUser" class="text-lg"></fa-icon> Profile
+              </a>
+            </li>
+            <li>
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins cursor-pointer" (click)="onLogout(); scrollToTop()">
+                <fa-icon [icon]="faPowerOff" class="text-lg"></fa-icon> Logout
+              </a>
+            </li>
+          </ng-container>
+
+          <!-- Show login/signup when not authenticated -->
+          <ng-container *ngIf="!isAuthenticated">
+            <li>
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins px-4 py-2 rounded-lg hover:bg-gray-200" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="scrollToTop()">
+                <fa-icon [icon]="faSignInAlt" class="text-lg"></fa-icon> Login
+              </a>
+            </li>
+            <li>
+              <a class="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 transition-colors font-poppins px-4 py-2 rounded-lg" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="scrollToTop()">
+                <fa-icon [icon]="faUserPlus" class="text-lg"></fa-icon> Sign Up
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Mobile Menu (Collapsible) -->
+    <div [ngClass]="{'block': isNavbarOpen, 'hidden': !isNavbarOpen}" class="lg:hidden pb-4">
+       <ul class="flex flex-col space-y-3 pt-3">
+          <!-- Show these items only when authenticated -->
+          <ng-container *ngIf="isAuthenticated">
+            <li>
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses" (click)="toggleNavbar(); scrollToTop()">
+                <fa-icon [icon]="faGraduationCap" class="text-lg w-5 text-center"></fa-icon> My Courses
+              </a>
+            </li>
+
+            <!-- Admin Link - Only show for admin users -->
+            <li *ngIf="isAdmin">
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/admin" (click)="toggleNavbar(); scrollToTop()">
+                <fa-icon [icon]="faUserShield" class="text-lg w-5 text-center"></fa-icon> Admin
+              </a>
+            </li>
+
+            <li>
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/profile" (click)="toggleNavbar(); scrollToTop()">
+                <fa-icon [icon]="faUser" class="text-lg w-5 text-center"></fa-icon> Profile
+              </a>
+            </li>
+            <li>
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins cursor-pointer" (click)="onLogout(); toggleNavbar(); scrollToTop()">
+                <fa-icon [icon]="faPowerOff" class="text-lg w-5 text-center"></fa-icon> Logout
+              </a>
+            </li>
+          </ng-container>
+
+          <!-- Mobile menu login/signup -->
+          <ng-container *ngIf="!isAuthenticated">
+            <li>
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="toggleNavbar(); scrollToTop()">
+                <fa-icon [icon]="faSignInAlt" class="text-lg w-5 text-center"></fa-icon> Login
+              </a>
+            </li>
+            <li>
+              <a class="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 transition-colors font-poppins px-4 py-2 rounded-lg" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="toggleNavbar(); scrollToTop()">
+                <fa-icon [icon]="faUserPlus" class="text-lg w-5 text-center"></fa-icon> Sign Up
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+    </div>
+  </div>
+</nav>
+
+<router-outlet></router-outlet>
+
+<app-footer></app-footer>
+

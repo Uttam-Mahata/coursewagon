@@ -1,0 +1,82 @@
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+  <div class="flex flex-col">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Admin Dashboard</h1>
+    
+    <!-- Tab Navigation -->
+    <div class="border-b border-gray-200 mb-6">
+      <ul class="flex flex-wrap -mb-px">
+        <li class="mr-2">
+          <button 
+            [class.text-blue-600]="activeTab === 'dashboard'"
+            [class.border-blue-600]="activeTab === 'dashboard'"
+            [class.border-transparent]="activeTab !== 'dashboard'"
+            class="inline-block p-4 border-b-2 font-medium" 
+            (click)="setActiveTab('dashboard')">
+            <fa-icon [icon]="faChartLine" class="mr-2"></fa-icon>
+            Dashboard
+          </button>
+        </li>
+        <li class="mr-2">
+          <button 
+            [class.text-blue-600]="activeTab === 'users'"
+            [class.border-blue-600]="activeTab === 'users'"
+            [class.border-transparent]="activeTab !== 'users'"
+            class="inline-block p-4 border-b-2 font-medium" 
+            (click)="setActiveTab('users')">
+            <fa-icon [icon]="faUsers" class="mr-2"></fa-icon>
+            User Management
+          </button>
+        </li>
+        <li>
+          <button 
+            [class.text-blue-600]="activeTab === 'testimonials'"
+            [class.border-blue-600]="activeTab === 'testimonials'"
+            [class.border-transparent]="activeTab !== 'testimonials'"
+            class="inline-block p-4 border-b-2 font-medium" 
+            (click)="setActiveTab('testimonials')">
+            <fa-icon [icon]="faStar" class="mr-2"></fa-icon>
+            Testimonials
+            <span 
+              *ngIf="dashboardStats.pending_testimonials" 
+              class="inline-flex items-center justify-center w-5 h-5 ml-2 text-xs font-semibold text-white bg-red-500 rounded-full">
+              {{dashboardStats.pending_testimonials}}
+            </span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Dashboard Content -->
+    <div [ngClass]="{'block': activeTab === 'dashboard', 'hidden': activeTab !== 'dashboard'}">
+      <app-admin-dashboard 
+        [dashboardStats]="dashboardStats"
+        [loading]="loading.dashboard"
+        [error]="error.dashboard">
+      </app-admin-dashboard>
+    </div>
+    
+    <!-- Users Management Tab -->
+    <div [ngClass]="{'block': activeTab === 'users', 'hidden': activeTab !== 'users'}">
+      <app-admin-users
+        [users]="users"
+        [loading]="loading.users"
+        [error]="error.users"
+        (toggleUserStatus)="toggleUserStatus($event)"
+        (toggleAdminStatus)="toggleAdminStatus($event)"
+        (retryLoad)="loadAllUsers()">
+      </app-admin-users>
+    </div>
+
+    <!-- Testimonials Tab -->
+    <div [ngClass]="{'block': activeTab === 'testimonials', 'hidden': activeTab !== 'testimonials'}">
+      <app-admin-testimonials
+        [testimonials]="pendingTestimonials"
+        [loading]="loading.testimonials"
+        [error]="error.testimonials"
+        (approveTestimonial)="approveTestimonial($event)"
+        (rejectTestimonial)="rejectTestimonial($event)"
+        (retryLoad)="loadPendingTestimonials()">
+      </app-admin-testimonials>
+    </div>
+  </div>
+</div>

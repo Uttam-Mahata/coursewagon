@@ -1,0 +1,102 @@
+.landing-page {
+  overflow-x: hidden;
+}
+
+/* Apply Inter font globally */
+:host {
+    font-family: 'Inter', sans-serif;
+}
+
+.animated-gradient {
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  background-image: linear-gradient(-45deg, #4f46e5, #7c3aed, #2563eb, #3b82f6);
+  background: linear-gradient(-45deg, #4f46e5, #7c3aed, #3b82f6, #6366f1);
+  animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover .feature-icon {
+  transform: scale(1.1);
+}
+
+.testimonial-card {
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.testimonial-card:hover {
+  transform: translateY(-5px) scale(1.02);
+}
+
+.cta-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: 0.6s;
+}
+
+.cta-button:hover::after {
+  transform: translateX(0);
+}
+
+/* Progress line for how it works section */
+.progress-line {
+    height: 1px;
+    background: #e0e7ff;
+}
+
+.progress-line-filled {
+    height: 100%;
+    background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+    width: 25%;
+}
+
+/* Quote styling */
+.quote-mark {
+    font-size: 4rem;
+    color: #e0e7ff;
+    font-family: serif;
+}

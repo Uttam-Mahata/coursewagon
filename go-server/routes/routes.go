@@ -25,7 +25,12 @@ func SetupRoutes(router *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 	emailService := services.NewEmailService()
 	authService := services.NewAuthService(userRepo, cfg, emailService)
 	courseService := services.NewCourseService(courseRepo, subjectRepo)
+	subjectService := services.NewSubjectService(subjectRepo, courseRepo)
+	chapterService := services.NewChapterService(chapterRepo, subjectRepo, courseRepo)
+	topicService := services.NewTopicService(topicRepo, chapterRepo, subjectRepo, courseRepo)
 	contentService := services.NewContentService(contentRepo, topicRepo, chapterRepo, subjectRepo, courseRepo)
+	testimonialService := services.NewTestimonialService(testimonialRepo, userRepo)
+	imageService := services.NewImageService(courseRepo, subjectRepo)
 
 	// Auth routes (no auth required)
 	authGroup := router.Group("/auth")
@@ -36,25 +41,28 @@ func SetupRoutes(router *gin.RouterGroup, db *gorm.DB, cfg *config.Config) {
 	protected.Use(middleware.AuthMiddleware(cfg))
 	{
 		// Course routes
-		SetupCourseRoutes(protected.Group("/courses"), courseService, subjectRepo, chapterRepo, topicRepo)
+		SetupCourseRoutes(protected.Group("/courses"), courseService, subjectService, chapterService, topicService)
 
 		// Content routes  
 		SetupContentRoutes(protected.Group("/content"), contentService)
 
 		// Subject routes
-		SetupSubjectRoutes(protected.Group("/subjects"), subjectRepo, chapterRepo, courseRepo)
+		SetupSubjectRoutes(protected.Group("/subjects"), subjectService, chapterService)
 
 		// Chapter routes
-		SetupChapterRoutes(protected.Group("/chapters"), chapterRepo, topicRepo, subjectRepo)
+		SetupChapterRoutes(protected.Group("/chapters"), chapterService, topicService)
 
 		// Topic routes
-		SetupTopicRoutes(protected.Group("/topics"), topicRepo, chapterRepo)
+		SetupTopicRoutes(protected.Group("/topics"), topicService)
 
 		// User profile routes
 		SetupUserRoutes(protected.Group("/users"), authService)
 
 		// Testimonial routes
-		SetupTestimonialRoutes(protected.Group("/testimonials"), testimonialRepo)
+		SetupTestimonialRoutes(protected.Group("/testimonials"), testimonialService)
+
+		// Image routes
+		SetupImageRoutes(protected.Group("/images"), imageService)
 	}
 
 	// Public routes (optional auth)

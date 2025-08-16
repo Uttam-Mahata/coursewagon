@@ -14,6 +14,10 @@ require (
 	github.com/go-playground/validator/v10 v10.15.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/google/uuid v1.4.0
+	github.com/Azure/azure-storage-blob-go v0.15.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.2.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.4.0
+	net/smtp v0.0.0-20221123151120-f5532d2a87b3
 )
 
 require (

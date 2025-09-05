@@ -87,7 +87,7 @@
             {{ course.subjects?.length || 0 }} Subjects
           </span>
           <span class="text-xs opacity-75">
-            Created {{ formatDate(course.created_at) }}
+            Created {{ course.created_at | date:'short' }}
           </span>
         </div>
       </div>

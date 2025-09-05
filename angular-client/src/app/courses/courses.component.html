@@ -67,55 +67,37 @@
     </button>
   </div>
 
-  <!-- Courses List with Horizontal Cards -->
-  <div *ngIf="!isLoading && courses.length > 0" class="flex flex-col gap-6">
+  <!-- Courses List with Glassmorphic Cards -->
+  <div *ngIf="!isLoading && courses.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
     <div *ngFor="let course of courses; let i = index" 
          [ngClass]="'animate-fadeInUp animation-delay-' + i"
-         class="group bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1 hover:border-blue-200 flex flex-col md:flex-row course-card">
+         class="glass-morphism group hover:scale-[1.02] transition-all duration-500 course-card overflow-hidden">
       
-      <!-- Course Image - Full width on mobile, partial on desktop -->
-      <div class="course-image-container w-full md:w-1/5 md:min-w-[250px]">
-        <div *ngIf="!course.image_url" class="image-placeholder min-h-[200px] md:h-full">
-          <fa-icon [icon]="faBook" class="text-gray-300 text-4xl"></fa-icon>
+      <!-- Course Header Section -->
+      <div class="p-6 bg-gradient-to-r from-blue-50/50 to-purple-50/50 border-b border-white/20">
+        <h3 class="font-bold text-xl sm:text-2xl bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-indigo-800 transition-all duration-300 mb-3">{{ course.name }}</h3>
+        
+        <!-- Description -->
+        <p class="text-gray-600 text-sm course-description leading-relaxed">{{ course.description || 'No description available.' }}</p>
+        
+        <!-- Course Stats -->
+        <div class="flex items-center justify-between mt-4 text-sm text-gray-500">
+          <span class="glass-button px-3 py-1 rounded-full flex items-center">
+            <fa-icon [icon]="faBook" class="mr-1"></fa-icon>
+            {{ course.subjects?.length || 0 }} Subjects
+          </span>
+          <span class="text-xs opacity-75">
+            Created {{ formatDate(course.created_at) }}
+          </span>
         </div>
-        
-        <img *ngIf="course.image_url" 
-             [src]="course.image_url" 
-             [alt]="course.name" 
-             class="course-image w-full h-[200px] md:h-full object-cover"
-             [ngClass]="{'loading': course.isGeneratingImage}"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        
-        <!-- Fallback if image fails to load -->
-        <div class="image-placeholder min-h-[200px] md:h-full" style="display:none;">
-          <fa-icon [icon]="faBook" class="text-gray-300 text-4xl"></fa-icon>
-        </div>
-        
-        <!-- Image generation button -->
-        <!-- <div 
-          class="generate-image-btn" 
-          (click)="generateCourseImage(course.id, $event)" 
-          *ngIf="userHasApiKey"
-          [ngClass]="{'opacity-100': course.isGeneratingImage}">
-          <fa-icon [icon]="course.isGeneratingImage ? faSpinner : faImage" [class.fa-spin]="course.isGeneratingImage"></fa-icon>
-        </div> -->
       </div>
       
-      <!-- Card Content - Hidden on small mobile, below image on larger screens -->
-      <div class="course-content-container flex-grow px-4 py-3">
-        <!-- Course Title with larger size -->
-        <h3 class="font-bold text-xl sm:text-2xl bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-indigo-800 transition-all duration-300 mb-3 p-2">{{ course.name }}</h3>
-        
-        <!-- Description - Hidden on mobile, visible on larger screens -->
-        <p class="text-gray-600 text-sm course-description p-2 hidden sm:block">{{ course.description || 'No description available.' }}</p>
-      </div>
-      
-      <!-- Action Buttons - Below content on mobile, on right side on desktop -->
-      <div class="course-action-container flex flex-col justify-between items-center md:items-end p-4 md:min-w-[280px]">
+      <!-- Action Buttons Section -->
+      <div class="course-action-container p-4">
         <!-- Edit and Delete Buttons -->
-        <div class="flex space-x-3 mb-4 edit-delete-btn-container w-full justify-center md:justify-end">
+        <div class="flex space-x-3 mb-4 edit-delete-btn-container justify-center">
           <button 
-            class="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-full transition-all duration-300 flex items-center"
+            class="glass-button text-blue-600 hover:text-blue-800 px-4 py-2 hover:bg-blue-50/50 rounded-lg transition-all duration-300 flex items-center group/btn"
             (click)="openEditModal(course)">
             <fa-icon [icon]="faEdit" class="mr-1"></fa-icon> Edit
           </button>
@@ -163,37 +145,37 @@
   </div>
 </div>
 
-<!-- Edit Course Modal with Glassmorphism -->
+<!-- Edit Course Modal with Enhanced Glassmorphism -->
 <div *ngIf="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
-  <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" (click)="closeEditModal()"></div>
-  <div class="bg-white bg-opacity-95 rounded-2xl p-6 w-full max-w-md shadow-xl relative z-10 transform transition-all animate-zoomIn">
-    <h2 class="text-xl font-bold mb-5 text-gray-800 border-b pb-2">Edit Course</h2>
-    <div class="mb-4">
-      <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="closeEditModal()"></div>
+  <div class="glass-modal w-full max-w-md relative z-10 transform transition-all animate-zoomIn">
+    <h2 class="text-xl font-bold mb-6 text-gray-800 border-b border-white/20 pb-3">Edit Course</h2>
+    <div class="mb-6">
+      <label for="courseName" class="block text-sm font-medium text-gray-700 mb-2">Course Name</label>
       <input 
         type="text" 
         id="courseName" 
         [(ngModel)]="editingCourse.name" 
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+        class="glass-input w-full px-4 py-3 placeholder-gray-500 focus:outline-none transition-all duration-200"
         placeholder="Enter course name">
     </div>
     <div class="mb-6">
-      <label for="courseDescription" class="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+      <label for="courseDescription" class="block text-sm font-medium text-gray-700 mb-2">Description (optional)</label>
       <textarea 
         id="courseDescription" 
         [(ngModel)]="editingCourse.description" 
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+        class="glass-input w-full px-4 py-3 placeholder-gray-500 focus:outline-none transition-all duration-200"
         placeholder="Enter course description"
         rows="3"></textarea>
     </div>
     <div class="flex justify-end space-x-3">
       <button 
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+        class="glass-button px-6 py-2 text-gray-700 hover:bg-gray-50/50 transition-all duration-300"
         (click)="closeEditModal()">
         Cancel
       </button>
       <button 
-        class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg"
+        class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
         (click)="updateCourse()">
         Save Changes
       </button>

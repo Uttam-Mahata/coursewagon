@@ -1,5 +1,183 @@
 @import "tailwindcss";
 
+/* ====================================
+   GLASSMORPHIC DESIGN SYSTEM
+   ==================================== */
+
+/* CSS Custom Properties for Glassmorphic Design */
+:root {
+  /* Glass Background Colors */
+  --glass-white: rgba(255, 255, 255, 0.25);
+  --glass-white-strong: rgba(255, 255, 255, 0.35);
+  --glass-white-subtle: rgba(255, 255, 255, 0.15);
+  --glass-dark: rgba(0, 0, 0, 0.25);
+  --glass-dark-strong: rgba(0, 0, 0, 0.35);
+  --glass-blue: rgba(79, 70, 229, 0.25);
+  --glass-purple: rgba(124, 58, 237, 0.25);
+  
+  /* Glass Borders */
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-border-dark: rgba(255, 255, 255, 0.2);
+  
+  /* Blur and Shadow Values */
+  --glass-blur: 16px;
+  --glass-blur-strong: 24px;
+  --glass-blur-subtle: 8px;
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+  --glass-shadow-hover: 0 8px 40px rgba(31, 38, 135, 0.5);
+}
+
+/* Base Glass Card Component */
+.glass-morphism {
+  background: var(--glass-white);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-morphism:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--glass-shadow-hover);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Glass Variations */
+.glass-strong {
+  background: var(--glass-white-strong);
+  backdrop-filter: blur(var(--glass-blur-strong));
+  -webkit-backdrop-filter: blur(var(--glass-blur-strong));
+}
+
+.glass-subtle {
+  background: var(--glass-white-subtle);
+  backdrop-filter: blur(var(--glass-blur-subtle));
+  -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
+}
+
+.glass-dark {
+  background: var(--glass-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.glass-gradient {
+  background: linear-gradient(135deg, var(--glass-white), var(--glass-blue));
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* Glass Navigation */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Glass Button */
+.glass-button {
+  background: var(--glass-white);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.25);
+  background: var(--glass-white-strong);
+}
+
+.glass-button:active {
+  transform: translateY(0);
+}
+
+/* Glass Input */
+.glass-input {
+  background: var(--glass-white-subtle);
+  backdrop-filter: blur(var(--glass-blur-subtle));
+  -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  background: var(--glass-white);
+  border-color: rgba(79, 70, 229, 0.4);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Glass Modal */
+.glass-modal {
+  background: var(--glass-white-strong);
+  backdrop-filter: blur(var(--glass-blur-strong));
+  -webkit-backdrop-filter: blur(var(--glass-blur-strong));
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* Modern Animations */
+@keyframes glass-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glass-glow {
+  0%, 100% { box-shadow: var(--glass-shadow); }
+  50% { box-shadow: var(--glass-shadow-hover); }
+}
+
+.glass-float {
+  animation: glass-float 3s ease-in-out infinite;
+}
+
+.glass-glow {
+  animation: glass-glow 2s ease-in-out infinite;
+}
+
+/* Responsive Glass Effects */
+@media (max-width: 768px) {
+  .glass-morphism {
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
+  }
+}
+
+/* Accessibility Support */
+@media (prefers-reduced-motion: reduce) {
+  .glass-morphism,
+  .glass-button,
+  .glass-input {
+    transition: none;
+  }
+  
+  .glass-float,
+  .glass-glow {
+    animation: none;
+  }
+}
+
+/* Support for browsers without backdrop-filter */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-morphism {
+    background: rgba(255, 255, 255, 0.9);
+  }
+  
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.95);
+  }
+}
+
 /* Add these styles for better markdown content rendering */
 
 .markdown-content {

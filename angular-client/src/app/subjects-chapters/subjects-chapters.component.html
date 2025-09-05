@@ -1,53 +1,65 @@
-<div class="container mx-auto px-4 py-8 max-w-7xl">
-  <!-- Breadcrumb -->
-  <nav class="mb-6">
-    <ol class="flex items-center space-x-2 text-sm">
-      <li class="flex items-center">
-        <a routerLink="/home" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-          <fa-icon [icon]="faHome" class="mr-1"></fa-icon> Home
-        </a>
-      </li>
-      <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <a routerLink="/courses" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-          <fa-icon [icon]="faBook" class="mr-1"></fa-icon> Courses
-        </a>
-      </li>
-      <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <span class="text-gray-700 flex items-center">
-          <fa-icon [icon]="faLayerGroup" class="mr-1"></fa-icon> {{ courseName }}
-        </span>
-      </li>
-    </ol>
-  </nav>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50 relative overflow-hidden">
+  <!-- Background Elements -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400 to-purple-600 rounded-full opacity-10 blur-3xl"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full opacity-10 blur-3xl"></div>
+  </div>
 
-  <!-- Page Title -->
-  <h1 class="text-2xl font-bold text-gray-800 mb-8">{{ courseName }}</h1>
+  <div class="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+    <!-- Breadcrumb -->
+    <nav class="mb-6">
+      <div class="glass-morphism p-4 bg-white/20">
+        <ol class="flex items-center space-x-2 text-sm">
+          <li class="flex items-center">
+            <a routerLink="/home" class="glass-button text-blue-600 hover:text-blue-800 flex items-center transition duration-200 px-3 py-1 rounded-lg">
+              <fa-icon [icon]="faHome" class="mr-1"></fa-icon> Home
+            </a>
+          </li>
+          <li class="flex items-center">
+            <span class="mx-2 text-gray-500">/</span>
+            <a routerLink="/courses" class="glass-button text-blue-600 hover:text-blue-800 flex items-center transition duration-200 px-3 py-1 rounded-lg">
+              <fa-icon [icon]="faBook" class="mr-1"></fa-icon> Courses
+            </a>
+          </li>
+          <li class="flex items-center">
+            <span class="mx-2 text-gray-500">/</span>
+            <span class="text-gray-700 flex items-center font-medium">
+              <fa-icon [icon]="faLayerGroup" class="mr-1"></fa-icon> {{ courseName }}
+            </span>
+          </li>
+        </ol>
+      </div>
+    </nav>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <!-- Subjects Column -->
-    <div class="lg:col-span-4">
-      <div class="bg-white rounded-xl shadow-md p-4 mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-          <div class="h-6 w-1 bg-blue-600 rounded mr-2"></div>
-          Subjects
-        </h2>
+    <!-- Page Title -->
+    <div class="glass-morphism p-6 mb-8 bg-white/30">
+      <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">{{ courseName }}</h1>
+      <p class="text-gray-600 mt-2">Explore subjects and chapters for this course</p>
+    </div>
 
-        <div *ngFor="let subject of subjects" class="mb-4">
-          <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-200">
-            <h3 class="text-lg font-medium text-gray-800 mb-2">{{ subject.name }}</h3>
-            <div class="flex justify-between">
-              <!-- If chapters exist, show both View and Update buttons -->
-              <ng-container *ngIf="subject.has_chapters; else generateSubjectOnly">
-                <button 
-                  class="flex items-center bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-md text-sm transition duration-200"
-                  (click)="viewChapters(subject.id)">
-                  <fa-icon [icon]="faEye" class="mr-1.5"></fa-icon> View Chapters
-                </button>
-                <button 
-                  class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200"
-                  [disabled]="isGenerating && generatingSubjectId === subject.id"
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Subjects Column -->
+      <div class="lg:col-span-4">
+        <div class="glass-morphism p-6 mb-6 bg-white/25">
+          <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+            <div class="h-6 w-1 bg-gradient-to-b from-blue-600 to-purple-600 rounded mr-3"></div>
+            Subjects
+          </h2>
+
+          <div *ngFor="let subject of subjects; trackBy: trackSubject" class="mb-4">
+            <div class="glass-morphism p-5 hover:scale-[1.02] transition-all duration-300 group bg-white/20">
+              <h3 class="text-lg font-medium text-gray-800 mb-4 group-hover:text-blue-700 transition-colors">{{ subject.name }}</h3>
+              <div class="flex flex-col space-y-2">
+                <!-- If chapters exist, show both View and Update buttons -->
+                <ng-container *ngIf="subject.has_chapters; else generateSubjectOnly">
+                  <button 
+                    class="glass-button flex items-center justify-center text-blue-600 hover:text-blue-800 px-4 py-2 rounded-lg text-sm transition-all duration-300 border border-blue-200"
+                    (click)="viewChapters(subject.id)">
+                    <fa-icon [icon]="faEye" class="mr-2"></fa-icon> View Chapters
+                  </button>
+                  <button 
+                    class="flex items-center justify-center bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 py-2 rounded-lg text-sm transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    [disabled]="isGenerating && generatingSubjectId === subject.id"
                   [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating && generatingSubjectId === subject.id}"
                   (click)="generateChapters(subject.id)">
                   <div *ngIf="isGenerating && generatingSubjectId === subject.id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>

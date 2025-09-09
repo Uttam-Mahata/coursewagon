@@ -1,0 +1,38 @@
+#!/bin/bash
+
+echo "🔐 GitHub Secrets Setup Guide for Firebase Deployment"
+echo "=================================================="
+echo ""
+echo "Go to: https://github.com/Uttam-Mahata/coursewagon/settings/secrets/actions"
+echo ""
+echo "Add these Repository Secrets:"
+echo ""
+
+echo "📱 ANGULAR APPLICATION SECRETS:"
+echo "ANGULAR_API_URL=https://coursewagon-api-188702930872.us-central1.run.app/api"
+echo "ANGULAR_API_BASE_URL=https://coursewagon-api-188702930872.us-central1.run.app/api"
+echo "ANGULAR_COURSE_API_URL=https://coursewagon-api-188702930872.us-central1.run.app/api/courses"
+echo "ANGULAR_AUTH_API_URL=https://coursewagon-api-188702930872.us-central1.run.app/api/auth"
+echo ""
+
+echo "🔥 FIREBASE CLIENT SECRETS:"
+echo "FIREBASE_API_KEY=AIzaSyD5u3QaEWZXboUOeU1w-ETRf0EMyGESAYs"
+echo "FIREBASE_AUTH_DOMAIN=coursewagon.firebaseapp.com"
+echo "FIREBASE_PROJECT_ID=coursewagon"
+echo "FIREBASE_STORAGE_BUCKET=coursewagon.firebasestorage.app"
+echo "FIREBASE_MESSAGING_SENDER_ID=623320490056"
+echo "FIREBASE_APP_ID=1:623320490056:web:e66cd9f8b82dd885d2f87d"
+echo ""
+
+echo "🛠️ FIREBASE SERVICE ACCOUNT:"
+echo "FIREBASE_SERVICE_ACCOUNT_KEY="
+echo "   👆 This should contain the Firebase service account JSON key"
+echo "   You can get this from: https://console.firebase.google.com/project/coursewagon/settings/serviceaccounts/adminsdk"
+echo "   Click 'Generate new private key' and copy the entire JSON content"
+echo ""
+
+echo "📋 How to add secrets:"
+echo "1. Go to GitHub repo → Settings → Secrets and variables → Actions"
+echo "2. Click 'New repository secret'"
+echo "3. Add each secret name and value"
+echo "4. Make sure to copy JSON content exactly for FIREBASE_SERVICE_ACCOUNT_KEY"

@@ -46,18 +46,16 @@ export class ForgotPasswordComponent {
     this.errorMessage = '';
     this.successMessage = '';
     
-    // Get current frontend URL to include in the request
-    const frontendUrl = window.location.origin;
-    
     this.authService.forgotPassword(this.forgotPasswordForm.value.email)
       .subscribe({
         next: (response) => {
-          this.successMessage = response.message;
+          this.successMessage = response.message || "If your email exists in our system, you will receive a password reset link shortly.";
           this.isLoading = false;
           this.forgotPasswordForm.reset();
           this.submitted = false;
         },
         error: (error) => {
+          console.error('Forgot password error:', error);
           // Always show generic message for security
           this.successMessage = "If your email exists in our system, you will receive a password reset link shortly.";
           this.isLoading = false;

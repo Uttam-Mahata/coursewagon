@@ -4,15 +4,11 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'python-server/**'
   pull_request:
     branches:
       - main
     types:
       - closed
-    paths:
-      - 'python-server/**'
   workflow_dispatch:
 
 env:
@@ -34,18 +30,42 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+
+    - name: Check for Python server changes
+      id: changes
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "Manual trigger - deploying"
+          echo "deploy=true" >> $GITHUB_OUTPUT
+        elif [ "${{ github.event_name }}" == "push" ]; then
+          if git diff --name-only HEAD~1 HEAD | grep -q "^python-server/"; then
+            echo "Python server changes detected - deploying"
+            echo "deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "No Python server changes - skipping deployment"
+            echo "deploy=false" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "PR merge - deploying"
+          echo "deploy=true" >> $GITHUB_OUTPUT
+        fi
 
     - name: Setup Google Cloud SDK
+      if: steps.changes.outputs.deploy == 'true'
       uses: google-github-actions/setup-gcloud@v2
       with:
         version: 'latest'
 
     - name: Authenticate to Google Cloud
+      if: steps.changes.outputs.deploy == 'true'
       uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
 
     - name: Build and Push with Cloud Build
+      if: steps.changes.outputs.deploy == 'true'
       run: |
         cd python-server
         # Build and push image using Cloud Build with substitutions
@@ -71,6 +91,7 @@ jobs:
         fi
 
     - name: Deploy to Cloud Run
+      if: steps.changes.outputs.deploy == 'true'
       run: |
         gcloud run deploy $SERVICE_NAME \
           --image=$REGION-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO/$IMAGE_NAME:$GITHUB_SHA \
@@ -117,11 +138,13 @@ jobs:
           --update-secrets=COURSEWAGON-CORS-ORIGINS=COURSEWAGON-CORS-ORIGINS:latest
 
     - name: Get Cloud Run URL
+      if: steps.changes.outputs.deploy == 'true'
       run: |
         URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)')
         echo "Service deployed at: $URL"
         
     - name: Health Check
+      if: steps.changes.outputs.deploy == 'true'
       run: |
         URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)')
         echo "Checking health at: $URL/api/health"

@@ -113,6 +113,6 @@ jobs:
       run: |
         URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)')
         echo "Checking health at: $URL/api/health"
-        # Wait a bit for the service to be ready
+        # Wait a  bit for the service to be ready
         sleep 30
         curl -f "$URL/api/health" || echo "Health check failed, but deployment completed"

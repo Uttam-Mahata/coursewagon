@@ -200,7 +200,7 @@ class AuthService:
         self.user_repository.update_user(user, password=new_password)
         
         # Mark token as used
-        reset.use_token()
+        self.password_reset_repository.invalidate_token(token)
         
         # Send confirmation email asynchronously
         logger.info(f"Scheduling password changed email for user ID: {user.id}")

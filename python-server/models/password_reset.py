@@ -41,8 +41,12 @@ class PasswordReset(Base):
         """Check if the token is valid (not expired and not used)"""
         return not self.used and not self.is_expired()
     
-    def use_token(self):
+    def use_token(self, session=None):
         """Mark the token as used"""
         self.used = True
-        db.session.commit()
+        if session:
+            session.commit()
+        else:
+            # Fallback to db.session for backward compatibility
+            db.session.commit()
         return True

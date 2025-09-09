@@ -14,10 +14,20 @@ class PasswordResetRepository:
         # Invalidate any existing active tokens first
         self.invalidate_user_tokens(user.id)
         
-        # Create a new token
-        reset_token = PasswordReset.create_for_user(user, expires_in_hours)
+        # Create a new token directly in this session
+        token = PasswordReset.generate_token()
+        reset = PasswordReset(
+            user_id=user.id,
+            token=token,
+            expires_at=datetime.utcnow() + timedelta(hours=expires_in_hours)
+        )
+        
+        self.db.add(reset)
+        self.db.commit()
+        self.db.refresh(reset)
+        
         logger.info(f"Created password reset token for user ID {user.id}")
-        return reset_token
+        return reset
     
     def get_by_token(self, token):
         """Get a password reset entry by token"""
@@ -32,6 +42,10 @@ class PasswordResetRepository:
             logger.info(f"Invalidated password reset token for user ID {reset.user_id}")
             return True
         return False
+    
+    def use_token(self, token):
+        """Mark a token as used (alias for invalidate_token)"""
+        return self.invalidate_token(token)
     
     def invalidate_user_tokens(self, user_id):
         """Invalidate all active tokens for a user"""

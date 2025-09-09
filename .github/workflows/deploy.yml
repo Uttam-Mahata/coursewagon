@@ -60,7 +60,8 @@ jobs:
 
     - name: Configure Docker for Google Cloud
       if: steps.changes.outputs.deploy == 'true'
-      run: gcloud auth configure-docker
+      run: |
+        gcloud auth configure-docker gcr.io
 
     - name: Build Docker image
       if: steps.changes.outputs.deploy == 'true'
@@ -87,46 +88,11 @@ jobs:
           --max-instances=10 \
           --min-instances=0 \
           --timeout=3600 \
-          --set-secrets=/app/gcs-service-account.json=COURSEWAGON-GCS-SERVICE-ACCOUNT:latest \
-          --set-secrets=/app/firebase-admin-sdk.json=COURSEWAGON-FIREBASE-ADMIN-SDK:latest \
-          --set-env-vars="GOOGLE_APPLICATION_CREDENTIALS=/app/gcs-service-account.json" \
-          --set-env-vars="FIREBASE_ADMIN_SDK_PATH=/app/firebase-admin-sdk.json" \
-          --update-secrets=COURSEWAGON-SECRET-KEY=COURSEWAGON-SECRET-KEY:latest \
-          --update-secrets=COURSEWAGON-MYSQL-HOST=COURSEWAGON-MYSQL-HOST:latest \
-          --update-secrets=COURSEWAGON-MYSQL-USER=COURSEWAGON-MYSQL-USER:latest \
-          --update-secrets=COURSEWAGON-MYSQL-PASSWORD=COURSEWAGON-MYSQL-PASSWORD:latest \
-          --update-secrets=COURSEWAGON-MYSQL-DATABASE=COURSEWAGON-MYSQL-DATABASE:latest \
-          --update-secrets=COURSEWAGON-JWT-SECRET-KEY=COURSEWAGON-JWT-SECRET-KEY:latest \
-          --update-secrets=COURSEWAGON-JWT-ALGORITHM=COURSEWAGON-JWT-ALGORITHM:latest \
-          --update-secrets=COURSEWAGON-ACCESS-TOKEN-EXPIRE-MINUTES=COURSEWAGON-ACCESS-TOKEN-EXPIRE-MINUTES:latest \
-          --update-secrets=COURSEWAGON-MAIL-USERNAME=COURSEWAGON-MAIL-USERNAME:latest \
-          --update-secrets=COURSEWAGON-MAIL-PASSWORD=COURSEWAGON-MAIL-PASSWORD:latest \
-          --update-secrets=COURSEWAGON-MAIL-FROM=COURSEWAGON-MAIL-FROM:latest \
-          --update-secrets=COURSEWAGON-MAIL-PORT=COURSEWAGON-MAIL-PORT:latest \
-          --update-secrets=COURSEWAGON-MAIL-SERVER=COURSEWAGON-MAIL-SERVER:latest \
-          --update-secrets=COURSEWAGON-MAIL-STARTTLS=COURSEWAGON-MAIL-STARTTLS:latest \
-          --update-secrets=COURSEWAGON-MAIL-SSL-TLS=COURSEWAGON-MAIL-SSL-TLS:latest \
-          --update-secrets=COURSEWAGON-USE-CREDENTIALS=COURSEWAGON-USE-CREDENTIALS:latest \
-          --update-secrets=COURSEWAGON-VALIDATE-CERTS=COURSEWAGON-VALIDATE-CERTS:latest \
-          --update-secrets=COURSEWAGON-AZURE-STORAGE-ACCOUNT-NAME=COURSEWAGON-AZURE-STORAGE-ACCOUNT-NAME:latest \
-          --update-secrets=COURSEWAGON-AZURE-STORAGE-ACCOUNT-KEY=COURSEWAGON-AZURE-STORAGE-ACCOUNT-KEY:latest \
-          --update-secrets=COURSEWAGON-AZURE-STORAGE-CONNECTION-STRING=COURSEWAGON-AZURE-STORAGE-CONNECTION-STRING:latest \
-          --update-secrets=COURSEWAGON-AZURE-CONTAINER-NAME=COURSEWAGON-AZURE-CONTAINER-NAME:latest \
-          --update-secrets=COURSEWAGON-GCS-BUCKET-NAME=COURSEWAGON-GCS-BUCKET-NAME:latest \
-          --update-secrets=COURSEWAGON-GCS-PROJECT-ID=COURSEWAGON-GCS-PROJECT-ID:latest \
-          --update-secrets=COURSEWAGON-FIREBASE-DATABASE-URL=COURSEWAGON-FIREBASE-DATABASE-URL:latest \
-          --update-secrets=COURSEWAGON-FIREBASE-STORAGE-BUCKET=COURSEWAGON-FIREBASE-STORAGE-BUCKET:latest \
-          --update-secrets=COURSEWAGON-STORAGE-PROVIDER=COURSEWAGON-STORAGE-PROVIDER:latest \
-          --update-secrets=COURSEWAGON-DEBUG=COURSEWAGON-DEBUG:latest \
-          --update-secrets=COURSEWAGON-CORS-ORIGINS=COURSEWAGON-CORS-ORIGINS:latest
+          --concurrency=80 \
+          --set-env-vars="GOOGLE_APPLICATION_CREDENTIALS=/etc/secrets/gcs-service-account.json,FIREBASE_ADMIN_SDK_PATH=/etc/secrets/firebase-admin-sdk.json" \
+          --set-secrets="/etc/secrets/gcs-service-account.json=COURSEWAGON-GCS-SERVICE-ACCOUNT-JSON:latest,/etc/secrets/firebase-admin-sdk.json=COURSEWAGON-FIREBASE-ADMIN-JSON:latest,SECRET_KEY=COURSEWAGON-SECRET-KEY:latest,DB_HOST=COURSEWAGON-MYSQL-HOST:latest,DB_USER=COURSEWAGON-MYSQL-USER:latest,DB_PASS=COURSEWAGON-MYSQL-PASSWORD:latest,DB_NAME=COURSEWAGON-MYSQL-DATABASE:latest,JWT_SECRET_KEY=COURSEWAGON-JWT-SECRET-KEY:latest,MAIL_USERNAME=COURSEWAGON-MAIL-USERNAME:latest,MAIL_PASSWORD=COURSEWAGON-MAIL-PASSWORD:latest,MAIL_SERVER=COURSEWAGON-MAIL-SERVER:latest,MAIL_PORT=COURSEWAGON-MAIL-PORT:latest,GCS_BUCKET_NAME=COURSEWAGON-GCS-BUCKET-NAME:latest,GCP_PROJECT_ID=COURSEWAGON-GCS-PROJECT-ID:latest,AZURE_STORAGE_ACCOUNT_NAME=COURSEWAGON-AZURE-STORAGE-ACCOUNT-NAME:latest,AZURE_STORAGE_CONNECTION_STRING=COURSEWAGON-AZURE-STORAGE-CONNECTION-STRING:latest,AZURE_STORAGE_CONTAINER_NAME=COURSEWAGON-AZURE-CONTAINER-NAME:latest,API_KEY=COURSEWAGON-API-KEY:latest,GEMINI_API_KEY=COURSEWAGON-GEMINI-API-KEY:latest"
 
-    - name: Get Cloud Run URL
-      if: steps.changes.outputs.deploy == 'true'
-      run: |
-        URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)')
-        echo "Service deployed at: $URL"
-        
-    - name: Health Check
+    - name: Test health endpoint
       if: steps.changes.outputs.deploy == 'true'
       run: |
         sleep 30

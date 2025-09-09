@@ -147,6 +147,8 @@ app.include_router(test_auth_router, prefix="/api")
 async def health_check():
     return {"status": "healthy"}
 
+    
+
 
 if __name__ == '__main__':
     import uvicorn

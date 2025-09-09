@@ -72,3 +72,9 @@ coursewagon-firebase-adminsdk*.json
 firebase-adminsdk*.json
 serviceAccountKey.json
 firebase-credentials.json
+
+# Google Cloud Service Account Keys
+*gcs-service-account*.json
+coursewagon-gcs-service-account.json
+google-cloud-service-account.json
+gcp-service-account*.json

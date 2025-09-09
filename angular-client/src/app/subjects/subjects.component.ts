@@ -4,6 +4,8 @@ import { CourseService } from '../services/course.service';
 import { SubjectService } from '../services/subject.service';
 import { faHome, faBook, faLayerGroup, faEye, faMagic, faInfoCircle, faChevronRight, faEdit, faTrash, faPlus, faImage, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../services/auth/auth.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 @Component({
   selector: 'app-subjects',
   templateUrl: './subjects.component.html',
@@ -11,7 +13,9 @@ import { AuthService } from '../services/auth/auth.service';
   standalone: false
 })
 export class SubjectsComponent implements OnInit {
-  // FontAwesome icons
+  createSubjectForm: FormGroup;
+  editSubjectForm: FormGroup;
+
   faHome = faHome;
   faBook = faBook;
   faLayerGroup = faLayerGroup;
@@ -35,31 +39,35 @@ export class SubjectsComponent implements OnInit {
   isLoading: boolean = true;
   userHasApiKey: boolean = false;
   
-  // CRUD operations state
   showEditSubjectModal: boolean = false;
   showDeleteSubjectModal: boolean = false;
   showCreateSubjectModal: boolean = false;
-  editingSubject: any = null;
   isDeletingSubject: boolean = false;
-  newSubjectName: string = '';
+
+  private editingSubject: any = null;
 
   constructor(
     private courseService: CourseService,
     private subjectService: SubjectService,
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private formBuilder: FormBuilder
   ) {
     this.courseId = +this.route.snapshot.paramMap.get('course_id')!;
+    this.createSubjectForm = this.formBuilder.group({
+      name: ['', Validators.required]
+    });
+    this.editSubjectForm = this.formBuilder.group({
+      name: ['', Validators.required]
+    });
   }
 
   ngOnInit() {
-    // Check if user has API key
     this.authService.currentUser$.subscribe(user => {
       this.userHasApiKey = !!user?.has_api_key;
     });
     
-    // Load course details
     this.courseService.getCourseDetails(this.courseId).subscribe({
       next: (course) => {
         this.courseName = course.name;
@@ -67,7 +75,6 @@ export class SubjectsComponent implements OnInit {
       error: (err) => console.error('Error loading course details:', err)
     });
 
-    // Load subjects for this course
     this.loadSubjects();
   }
 
@@ -95,7 +102,7 @@ export class SubjectsComponent implements OnInit {
     this.subjectService.generateSubjects(this.courseId).subscribe({
       next: () => {
         this.isGenerating = false;
-        this.loadSubjects(); // Refresh subjects after generation
+        this.loadSubjects();
       },
       error: (error) => {
         this.isGenerating = false;
@@ -110,7 +117,6 @@ export class SubjectsComponent implements OnInit {
   }
   
   generateSubjectImage(subjectId: number, event?: Event) {
-    // Stop click from bubbling to parent
     if (event) {
       event.stopPropagation();
       event.preventDefault();
@@ -121,7 +127,6 @@ export class SubjectsComponent implements OnInit {
       return;
     }
     
-    // Find the subject and mark it as generating an image
     const subject = this.subjects.find(s => s.id === subjectId);
     if (subject) {
       subject.isGeneratingImage = true;
@@ -129,29 +134,24 @@ export class SubjectsComponent implements OnInit {
     
     this.subjectService.generateSubjectImage(this.courseId, subjectId).subscribe({
       next: (updatedSubject) => {
-        // Update the subject in our array with new image URL
         const index = this.subjects.findIndex(s => s.id === subjectId);
         if (index !== -1) {
-          // Add timestamp to prevent caching
           const timestamp = new Date().getTime();
           const imageUrlWithTimestamp = updatedSubject.image_url.includes('?') 
             ? `${updatedSubject.image_url}&t=${timestamp}` 
             : `${updatedSubject.image_url}?t=${timestamp}`;
 
-          // Create a new subject object to trigger change detection
           this.subjects[index] = { 
             ...this.subjects[index],
             image_url: imageUrlWithTimestamp,
             isGeneratingImage: false
           };
           
-          // Force Angular to detect changes (create a new array reference)
           this.subjects = [...this.subjects];
         }
       },
       error: (error) => {
         console.error('Error generating subject image:', error);
-        // Update status regardless of error
         if (subject) {
           subject.isGeneratingImage = false;
         }
@@ -170,22 +170,18 @@ export class SubjectsComponent implements OnInit {
       return;
     }
     
-    // Mark all subjects as generating images
     this.subjects.forEach(subject => {
       subject.isGeneratingImage = true;
     });
     
     this.subjectService.generateAllSubjectImages(this.courseId).subscribe({
       next: (response) => {
-        // Update all subjects with their new image URLs
         if (response && response.results && Array.isArray(response.results)) {
           const timestamp = new Date().getTime();
           
-          // Create a map of updated subjects by id for quick lookup
           const updatedSubjectsMap = new Map();
           response.results.forEach((updatedSubject: any) => {
             if (updatedSubject && updatedSubject.id && updatedSubject.image_url) {
-              // Add timestamp to prevent caching
               const imageUrlWithTimestamp = updatedSubject.image_url.includes('?') 
                 ? `${updatedSubject.image_url}&t=${timestamp}` 
                 : `${updatedSubject.image_url}?t=${timestamp}`;
@@ -197,7 +193,6 @@ export class SubjectsComponent implements OnInit {
             }
           });
           
-          // Update subjects with new data
           this.subjects = this.subjects.map(subject => {
             const updatedSubject = updatedSubjectsMap.get(subject.id);
             if (updatedSubject) {
@@ -206,7 +201,6 @@ export class SubjectsComponent implements OnInit {
             return { ...subject, isGeneratingImage: false };
           });
         } else {
-          // Just reset the generating flags if no results
           this.subjects = this.subjects.map(subject => ({ 
             ...subject, 
             isGeneratingImage: false 
@@ -215,7 +209,6 @@ export class SubjectsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error generating all subject images:', error);
-        // Update status regardless of error
         this.subjects = this.subjects.map(subject => ({ 
           ...subject, 
           isGeneratingImage: false 
@@ -231,7 +224,6 @@ export class SubjectsComponent implements OnInit {
   }
   
   viewSubjectContent(subjectId: number) {
-    // Navigate to the course content view for this subject
     this.router.navigate([`/courses/${this.courseId}/subjects/${subjectId}/content`]);
   }
   
@@ -239,26 +231,23 @@ export class SubjectsComponent implements OnInit {
     this.router.navigate(['/courses']);
   }
   
-  // CRUD Operations for Subjects
-  
-  // Create new subject methods
   openCreateSubjectModal() {
-    this.newSubjectName = '';
+    this.createSubjectForm.reset();
     this.showCreateSubjectModal = true;
   }
   
   closeCreateSubjectModal() {
     this.showCreateSubjectModal = false;
-    this.newSubjectName = '';
   }
   
   submitNewSubject() {
-    if (!this.newSubjectName || !this.newSubjectName.trim()) {
+    if (this.createSubjectForm.invalid) {
       this.errorMessage = 'Subject name is required';
       return;
     }
     
-    this.subjectService.createSubject(this.courseId, this.newSubjectName).subscribe({
+    const newSubjectName = this.createSubjectForm.value.name;
+    this.subjectService.createSubject(this.courseId, newSubjectName).subscribe({
       next: (newSubject) => {
         this.subjects.push(newSubject);
         this.closeCreateSubjectModal();
@@ -270,38 +259,34 @@ export class SubjectsComponent implements OnInit {
     });
   }
   
-  // Create new subject - old method to be replaced
-  createNewSubject() {
-    this.openCreateSubjectModal();
-  }
-  
-  // Edit subject
   openEditSubjectModal(subject: any) {
     this.editingSubject = { ...subject };
+    this.editSubjectForm.setValue({ name: subject.name });
     this.showEditSubjectModal = true;
   }
 
   closeEditSubjectModal() {
     this.showEditSubjectModal = false;
     this.editingSubject = null;
+    this.editSubjectForm.reset();
   }
 
   updateSubject() {
-    if (!this.editingSubject || !this.editingSubject.name.trim()) {
+    if (this.editSubjectForm.invalid) {
       this.errorMessage = 'Subject name is required';
       return;
     }
 
+    const updatedName = this.editSubjectForm.value.name;
     this.subjectService.updateSubject(
       this.courseId,
       this.editingSubject.id,
-      this.editingSubject.name
+      updatedName
     ).subscribe({
       next: () => {
-        // Update local subject data
         const index = this.subjects.findIndex(s => s.id === this.editingSubject.id);
         if (index !== -1) {
-          this.subjects[index].name = this.editingSubject.name;
+          this.subjects[index].name = updatedName;
         }
         this.closeEditSubjectModal();
       },
@@ -312,7 +297,6 @@ export class SubjectsComponent implements OnInit {
     });
   }
   
-  // Delete subject
   openDeleteSubjectModal(subject: any) {
     this.editingSubject = subject;
     this.showDeleteSubjectModal = true;
@@ -333,7 +317,6 @@ export class SubjectsComponent implements OnInit {
       this.editingSubject.id
     ).subscribe({
       next: () => {
-        // Remove subject from local data
         this.subjects = this.subjects.filter(s => s.id !== this.editingSubject.id);
         this.closeDeleteSubjectModal();
         this.isDeletingSubject = false;

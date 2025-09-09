@@ -7,6 +7,7 @@ import {
   faChalkboardTeacher, faBrain, faTasks, faMobileAlt, faClock, faKey,
   faMicrophone, faStop, faPlay, faTrash, faCheckCircle
 } from '@fortawesome/free-solid-svg-icons';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-course',
@@ -15,7 +16,10 @@ import {
     standalone: false
 })
 export class CourseComponent implements OnInit {
-  // FontAwesome icons
+  courseForm: FormGroup;
+  isLoading: boolean = false;
+  errorMessage: string = '';
+
   faExclamationTriangle = faExclamationTriangle;
   faExclamationCircle = faExclamationCircle;
   faBook = faBook;
@@ -32,11 +36,6 @@ export class CourseComponent implements OnInit {
   faTrash = faTrash;
   faCheckCircle = faCheckCircle;
 
-  courseName: string = '';
-  isLoading: boolean = false;
-  errorMessage: string = '';
-
-  // Audio recording properties
   isRecording: boolean = false;
   mediaRecorder: MediaRecorder | null = null;
   audioBlob: Blob | null = null;
@@ -45,18 +44,22 @@ export class CourseComponent implements OnInit {
   constructor(
     private courseService: CourseService, 
     private router: Router,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private formBuilder: FormBuilder
+  ) {
+    this.courseForm = this.formBuilder.group({
+      courseName: ['', Validators.required]
+    });
+  }
 
   ngOnInit() {
-    // Check if browser supports audio recording
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       console.warn('Audio recording not supported in this browser');
     }
   }
 
   generateCourse() {
-    if (!this.courseName.trim()) {
+    if (this.courseForm.invalid) {
       this.errorMessage = 'Course name is required';
       return;
     }
@@ -64,7 +67,8 @@ export class CourseComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.courseService.addCourse(this.courseName).subscribe({
+    const courseName = this.courseForm.value.courseName;
+    this.courseService.addCourse(courseName).subscribe({
       next: () => {
         this.isLoading = false;
         this.router.navigate(['/courses']);

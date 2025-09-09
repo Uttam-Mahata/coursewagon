@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
 import { faHome, faBook, faPlus, faExclamationTriangle, faExclamationCircle, faMagic, faEye, faEdit, faTrash, faImage, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-courses',
@@ -13,7 +14,14 @@ import { Subscription } from 'rxjs';
     standalone: false
 })
 export class CoursesComponent implements OnInit, OnDestroy {
-  // FontAwesome icons
+  editCourseForm: FormGroup;
+  courses: any[] = [];
+  isLoading: boolean = true;
+  errorMessage: string | null = null;
+  showEditModal: boolean = false;
+  showDeleteModal: boolean = false;
+  deletingCourse: any = null;
+
   faHome = faHome;
   faBook = faBook;
   faPlus = faPlus;
@@ -26,48 +34,36 @@ export class CoursesComponent implements OnInit, OnDestroy {
   faImage = faImage;
   faSpinner = faSpinner;
 
-  courses: any[] = [];
-  isLoading: boolean = true;
-  errorMessage: string | null = null;
-  
-  // CRUD modals
-  showEditModal: boolean = false;
-  showDeleteModal: boolean = false;
-  
-  // CRUD data
-  editingCourse: any = null;
-  deletingCourse: any = null;
-
-  // Track subscriptions to prevent memory leaks
   private subscriptions: Subscription[] = [];
+  private editingCourseId: number | null = null;
 
   constructor(
     private courseService: CourseService, 
     private subjectService: SubjectService,
     private router: Router,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private formBuilder: FormBuilder
+  ) {
+    this.editCourseForm = this.formBuilder.group({
+      name: ['', Validators.required],
+      description: ['']
+    });
+  }
 
   ngOnInit() {
-    // Subscribe to auth changes to detect new logins
     this.subscriptions.push(
       this.authService.currentUser$.subscribe(user => {
         if (user) {
-          // Force refresh courses when user changes
           this.loadCourses(true);
         } else {
-          // Clear courses when logged out
           this.courses = [];
         }
       })
     );
-    
-    // Initial load
     this.loadCourses();
   }
   
   ngOnDestroy() {
-    // Clean up subscriptions
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
@@ -94,18 +90,16 @@ export class CoursesComponent implements OnInit, OnDestroy {
     const course = this.courses.find(c => c.id === courseId);
     const actionVerb = course && course.has_subjects ? 'updating' : 'generating';
     
-    // Show that we're generating content for this course
-    course.isGenerating = true;
+    if (course) {
+      course.isGenerating = true;
+    }
     
     this.subjectService.generateSubjects(courseId).subscribe({
       next: () => {
         if (course) {
-          // Update the local course data to reflect that it now has subjects
           course.has_subjects = true;
           course.isGenerating = false;
         }
-        
-        // Navigate only if we're generating for the first time, otherwise stay on the page
         if (actionVerb === 'generating') {
           this.router.navigate([`/courses/${courseId}/subjects`]);
         }
@@ -125,7 +119,6 @@ export class CoursesComponent implements OnInit, OnDestroy {
   }
   
   viewSubjects(courseId: number) {
-    // Navigate to the new subjects component
     this.router.navigate([`/courses/${courseId}/subjects`]);
   }
   
@@ -137,33 +130,36 @@ export class CoursesComponent implements OnInit, OnDestroy {
     this.router.navigate(['/profile']);
   }
 
-  // Course CRUD Operations
-  
-  // Update
   openEditModal(course: any) {
-    this.editingCourse = { ...course };
+    this.editingCourseId = course.id;
+    this.editCourseForm.setValue({
+      name: course.name,
+      description: course.description
+    });
     this.showEditModal = true;
   }
 
   closeEditModal() {
     this.showEditModal = false;
-    this.editingCourse = null;
+    this.editingCourseId = null;
+    this.editCourseForm.reset();
   }
 
   updateCourse() {
-    if (!this.editingCourse || !this.editingCourse.name.trim()) {
+    if (this.editCourseForm.invalid) {
       this.errorMessage = 'Course name is required';
       return;
     }
 
-    this.courseService.updateCourse(
-      this.editingCourse.id, 
-      this.editingCourse.name, 
-      this.editingCourse.description
-    ).subscribe({
+    if (this.editingCourseId === null) {
+      return;
+    }
+
+    const { name, description } = this.editCourseForm.value;
+    this.courseService.updateCourse(this.editingCourseId, name, description).subscribe({
       next: () => {
         this.closeEditModal();
-        this.loadCourses(); // Refresh courses list
+        this.loadCourses();
       },
       error: (err) => {
         console.error('Error updating course:', err);

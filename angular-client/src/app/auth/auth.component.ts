@@ -4,6 +4,7 @@ import { AuthService } from '../services/auth/auth.service';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faEnvelope, faLock, faUser, faUserPlus, faSignInAlt, faKey, faExclamationTriangle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-auth',
@@ -11,7 +12,13 @@ import { faGoogle } from '@fortawesome/free-brands-svg-icons';
     standalone: false
 })
 export class AuthComponent implements OnInit {
-  // FontAwesome icons
+  loginForm: FormGroup;
+  registerForm: FormGroup;
+  isLoginMode = true;
+  errorMessage = '';
+  successMessage = '';
+  isGoogleLoading = false;
+
   faEnvelope = faEnvelope;
   faLock = faLock;
   faUser = faUser;
@@ -21,30 +28,13 @@ export class AuthComponent implements OnInit {
   faExclamationTriangle = faExclamationTriangle;
   faCheckCircle = faCheckCircle;
   faGoogle = faGoogle;
-  
-  isLoginMode = true;
-  errorMessage = '';
-  successMessage = '';
-  isGoogleLoading = false;
-  
-  loginData = {
-    email: '',
-    password: '',
-    rememberMe: false  // Add remember me field
-  };
-
-  registerData = {
-    email: '',
-    password: '',
-    first_name: '',
-    last_name: ''
-  };
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute, // Add ActivatedRoute to access query params
-    private faLibrary: FaIconLibrary
+    private route: ActivatedRoute,
+    private faLibrary: FaIconLibrary,
+    private formBuilder: FormBuilder
   ) {
     faLibrary.addIcons(
       faEnvelope, faLock, faUser, faUserPlus, faSignInAlt, faKey, faExclamationTriangle, faCheckCircle, faGoogle
@@ -52,7 +42,19 @@ export class AuthComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Check if user is already logged in
+    this.loginForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+      rememberMe: [false]
+    });
+
+    this.registerForm = this.formBuilder.group({
+      first_name: ['', Validators.required],
+      last_name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
+    });
+
     this.authService.isLoggedIn$.subscribe(
       (isLoggedIn: boolean) => {
         if (isLoggedIn) {
@@ -62,7 +64,6 @@ export class AuthComponent implements OnInit {
       }
     );
 
-    // Check for mode in query parameters
     this.route.queryParams.subscribe(params => {
       const mode = params['mode'];
       if (mode === 'signup') {
@@ -70,7 +71,6 @@ export class AuthComponent implements OnInit {
       } else if (mode === 'login') {
         this.isLoginMode = true;
       }
-      // If no mode is specified, default to login mode (already set)
     });
   }
 
@@ -90,18 +90,15 @@ export class AuthComponent implements OnInit {
   }
 
   onLogin(): void {
-    if (!this.loginData.email || !this.loginData.password) {
-      this.errorMessage = 'Please enter both email and password';
+    if (this.loginForm.invalid) {
+      this.errorMessage = 'Please enter a valid email and password';
       return;
     }
     
-    console.log('Attempting login with email:', this.loginData.email, 'Remember me:', this.loginData.rememberMe);
+    const { email, password, rememberMe } = this.loginForm.value;
+    console.log('Attempting login with email:', email, 'Remember me:', rememberMe);
     
-    this.authService.login(
-      this.loginData.email, 
-      this.loginData.password, 
-      this.loginData.rememberMe  // Pass the remember me value
-    )
+    this.authService.login(email, password, rememberMe)
       .subscribe({
         next: (response) => {
           console.log('Login successful, response:', response);
@@ -117,18 +114,18 @@ export class AuthComponent implements OnInit {
   }
 
   onRegister(): void {
-    this.authService.register(this.registerData)
+    if (this.registerForm.invalid) {
+      this.errorMessage = 'Please fill out all fields correctly.';
+      return;
+    }
+
+    this.authService.register(this.registerForm.value)
       .subscribe({
         next: () => {
           this.successMessage = 'Registration successful! Please check your email for a welcome message and then login.';
           this.isLoginMode = true;
-          this.loginData.email = this.registerData.email;
-          this.registerData = {
-            email: '',
-            password: '',
-            first_name: '',
-            last_name: ''
-          };
+          this.loginForm.patchValue({ email: this.registerForm.value.email });
+          this.registerForm.reset();
         },
         error: (error) => {
           this.errorMessage = error.error.error || 'An unexpected error occurred';

@@ -156,24 +156,24 @@
 <!-- Create Subject Modal - Improved for small screens -->
 <div *ngIf="showCreateSubjectModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
   <div class="absolute inset-0 bg-black bg-opacity-50" (click)="closeCreateSubjectModal()"></div>
-  <div class="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10">
+  <div class="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10" [formGroup]="createSubjectForm">
     <h2 class="text-lg font-bold mb-4">Create New Subject</h2>
     <div class="mb-4">
       <label for="newSubjectName" class="block text-sm font-medium text-gray-700 mb-1">Subject Name</label>
-      <input 
-        type="text" 
-        id="newSubjectName" 
-        [(ngModel)]="newSubjectName" 
+      <input
+        type="text"
+        id="newSubjectName"
+        formControlName="name"
         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         placeholder="Enter subject name">
     </div>
     <div class="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
-      <button 
+      <button
         class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors order-2 sm:order-1"
         (click)="closeCreateSubjectModal()">
         Cancel
       </button>
-      <button 
+      <button
         class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors order-1 sm:order-2"
         (click)="submitNewSubject()">
         Create Subject
@@ -185,24 +185,24 @@
 <!-- Edit Subject Modal - Improved for small screens -->
 <div *ngIf="showEditSubjectModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
   <div class="absolute inset-0 bg-black bg-opacity-50" (click)="closeEditSubjectModal()"></div>
-  <div class="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10">
+  <div class="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10" [formGroup]="editSubjectForm">
     <h2 class="text-lg font-bold mb-4">Edit Subject</h2>
     <div class="mb-4">
       <label for="subjectName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-      <input 
-        type="text" 
-        id="subjectName" 
-        [(ngModel)]="editingSubject.name" 
+      <input
+        type="text"
+        id="subjectName"
+        formControlName="name"
         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         placeholder="Enter subject name">
     </div>
     <div class="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
-      <button 
+      <button
         class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors order-2 sm:order-1"
         (click)="closeEditSubjectModal()">
         Cancel
       </button>
-      <button 
+      <button
         class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors order-1 sm:order-2"
         (click)="updateSubject()">
         Save Changes

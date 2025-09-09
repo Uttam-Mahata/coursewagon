@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { faStar, faStarHalfAlt, faPen, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
 import { TestimonialService } from '../services/testimonial.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-write-review',
@@ -10,7 +11,8 @@ import { TestimonialService } from '../services/testimonial.service';
   styleUrl: './write-review.component.css'
 })
 export class WriteReviewComponent implements OnInit {
-  // FontAwesome icons
+  testimonialForm: FormGroup;
+
   faStar = faStar;
   farStar = farStar;
   faStarHalfAlt = faStarHalfAlt;
@@ -18,24 +20,24 @@ export class WriteReviewComponent implements OnInit {
   faCheck = faCheck;
   faTimes = faTimes;
   
-  // Input and Output properties
   @Input() userTestimonial: any = null;
   @Output() testimonialUpdated = new EventEmitter<any>();
   @Output() testimonialDeleted = new EventEmitter<void>();
   
-  // Form data
   showForm: boolean = false;
-  newTestimonial = {
-    quote: '',
-    rating: 5
-  };
-  
-  // Form states
   isSubmitting: boolean = false;
   formError: string | null = null;
   formSuccess: string | null = null;
 
-  constructor(private testimonialService: TestimonialService) {}
+  constructor(
+    private testimonialService: TestimonialService,
+    private formBuilder: FormBuilder
+  ) {
+    this.testimonialForm = this.formBuilder.group({
+      quote: ['', Validators.required],
+      rating: [5, Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     if (this.userTestimonial) {
@@ -54,20 +56,21 @@ export class WriteReviewComponent implements OnInit {
   }
   
   prepopulateForm(): void {
-    this.newTestimonial.quote = this.userTestimonial.quote;
-    this.newTestimonial.rating = this.userTestimonial.rating;
+    this.testimonialForm.setValue({
+      quote: this.userTestimonial.quote,
+      rating: this.userTestimonial.rating
+    });
   }
 
   submitTestimonial(): void {
-    if (!this.newTestimonial.quote.trim()) {
-      this.formError = 'Please enter your testimonial';
+    if (this.testimonialForm.invalid) {
+      this.formError = 'Please enter your testimonial and provide a rating.';
       return;
     }
 
     this.isSubmitting = true;
     this.formError = null;
     
-    // Determine if creating new or updating existing
     if (this.userTestimonial) {
       this.updateTestimonial();
     } else {
@@ -76,10 +79,8 @@ export class WriteReviewComponent implements OnInit {
   }
 
   createTestimonial(): void {
-    this.testimonialService.createTestimonial(
-      this.newTestimonial.quote,
-      this.newTestimonial.rating
-    ).subscribe({
+    const { quote, rating } = this.testimonialForm.value;
+    this.testimonialService.createTestimonial(quote, rating).subscribe({
       next: (response) => {
         this.testimonialUpdated.emit(response);
         this.formSuccess = 'Your testimonial has been submitted for approval!';
@@ -95,10 +96,11 @@ export class WriteReviewComponent implements OnInit {
   }
 
   updateTestimonial(): void {
+    const { quote, rating } = this.testimonialForm.value;
     this.testimonialService.updateTestimonial(
       this.userTestimonial.id,
-      this.newTestimonial.quote,
-      this.newTestimonial.rating
+      quote,
+      rating
     ).subscribe({
       next: (response) => {
         this.testimonialUpdated.emit(response);

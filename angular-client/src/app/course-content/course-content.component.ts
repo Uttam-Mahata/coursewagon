@@ -12,7 +12,9 @@ import {
   faFileAlt, faSpinner, faInfoCircle, faChevronLeft, faList,
   faEdit, faTrash, faPlus
 } from '@fortawesome/free-solid-svg-icons';
-import { Subscription, forkJoin } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 @Component({
   selector: 'app-course-content',
   standalone: false,
@@ -20,7 +22,50 @@ import { Subscription, forkJoin } from 'rxjs';
   styleUrls: ['./course-content.component.css'],
 })
 export class CourseContentComponent implements OnInit, OnDestroy, AfterViewChecked {
-  // FontAwesome icons
+  editChapterForm: FormGroup;
+  editTopicForm: FormGroup;
+  editContentForm: FormGroup;
+  newChapterForm: FormGroup;
+  newTopicForm: FormGroup;
+  newContentForm: FormGroup;
+
+  courseId: number;
+  courseName: string = '';
+  subjectId: number;
+  subjectName: string = '';
+  subjects: any[] = [];
+  chapters: any[] = [];
+  expandedChapterId: number | null = null;
+  topics: { [chapterId: number]: any[] } = {};
+  selectedTopicId: number | null = null;
+  selectedTopic: any = null;
+  content: string | null = null;
+  processedContent: string | null = null;
+  isGeneratingChapters: boolean = false;
+  isGeneratingTopics: boolean = false;
+  generatingChapterId: number | null = null;
+  isGeneratingContent: boolean = false;
+  errorMessage: string = '';
+  isSidebarOpen: boolean = true;
+  isLoadingSubjects: boolean = false;
+  isLoadingChapters: boolean = false;
+  isLoadingContent: boolean = false;
+  showEditChapterModal: boolean = false;
+  showDeleteChapterModal: boolean = false;
+  showEditTopicModal: boolean = false;
+  showDeleteTopicModal: boolean = false;
+  showEditContentModal: boolean = false;
+  showDeleteContentConfirm: boolean = false;
+  isDeletingChapter: boolean = false;
+  isDeletingTopic: boolean = false;
+  isDeletingContent: boolean = false;
+  showNewChapterModal: boolean = false;
+  showNewTopicModal: boolean = false;
+  showNewContentModal: boolean = false;
+  isAddingChapter: boolean = false;
+  isAddingTopic: boolean = false;
+  isAddingContent: boolean = false;
+
   faHome = faHome;
   faBook = faBook;
   faLayerGroup = faLayerGroup;
@@ -39,68 +84,10 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   faTrash = faTrash;
   faPlus = faPlus;
 
-  // Course data
-  courseId: number;
-  courseName: string = '';
-  subjectId: number;
-  subjectName: string = '';
-  subjects: any[] = [];
-  
-  // Chapter data
-  chapters: any[] = [];
-  expandedChapterId: number | null = null;
-  
-  // Topic data
-  topics: { [chapterId: number]: any[] } = {};
-  selectedTopicId: number | null = null;
-  selectedTopic: any = null;
-  
-  // Content
-  content: string | null = null;
-  processedContent: string | null = null; // New property for processed content
-  
-  // UI state
-  isGeneratingChapters: boolean = false;
-  isGeneratingTopics: boolean = false;
-  generatingChapterId: number | null = null;
-  isGeneratingContent: boolean = false;
-  errorMessage: string = '';
-  isSidebarOpen: boolean = true; // For mobile responsiveness
-  
-  // Loading states
-  isLoadingSubjects: boolean = false;
-  isLoadingChapters: boolean = false;
-  isLoadingContent: boolean = false;
-  
   private subscriptions = new Subscription();
-
-  // UI state for edit/delete operations
-  editingChapter: any = null;
-  editingTopic: any = null;
-  editingContent: string | null = null;
-  showEditChapterModal: boolean = false;
-  showDeleteChapterModal: boolean = false;
-  showEditTopicModal: boolean = false;
-  showDeleteTopicModal: boolean = false;
-  showEditContentModal: boolean = false;
-  showDeleteContentConfirm: boolean = false;
-  isDeletingChapter: boolean = false;
-  isDeletingTopic: boolean = false;
-  isDeletingContent: boolean = false;
-
-  // New properties for modal forms
-  showNewChapterModal: boolean = false;
-  showNewTopicModal: boolean = false;
-  showNewContentModal: boolean = false;
-  newChapterName: string = '';
-  newTopicName: string = '';
-  newContentText: string = '';
-  isAddingChapter: boolean = false;
-  isAddingTopic: boolean = false;
-  isAddingContent: boolean = false;
-
-  // Flag to track if MathJax needs rendering
   private needsMathJaxUpdate = false;
+  private editingChapter: any = null;
+  private editingTopic: any = null;
 
   constructor(
     private courseService: CourseService,
@@ -111,56 +98,71 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     public mathRendererService: MathRendererService,
     private route: ActivatedRoute,
     private router: Router,
+    private formBuilder: FormBuilder
   ) {
     this.courseId = +this.route.snapshot.paramMap.get('course_id')!;
     this.subjectId = +this.route.snapshot.paramMap.get('subject_id')!;
+
+    this.editChapterForm = this.formBuilder.group({
+      name: ['', Validators.required]
+    });
+
+    this.editTopicForm = this.formBuilder.group({
+      name: ['', Validators.required]
+    });
+
+    this.editContentForm = this.formBuilder.group({
+      content: ['', Validators.required]
+    });
+
+    this.newChapterForm = this.formBuilder.group({
+      name: ['', Validators.required]
+    });
+
+    this.newTopicForm = this.formBuilder.group({
+      name: ['', Validators.required]
+    });
+
+    this.newContentForm = this.formBuilder.group({
+      content: ['', Validators.required]
+    });
   }
 
   ngOnInit() {
     this.loadInitialData();
     
-    // Subscribe to route parameter changes
     this.subscriptions.add(
       this.route.paramMap.subscribe(params => {
         const newCourseId = +params.get('course_id')!;
         const newSubjectId = +params.get('subject_id')!;
         const topicId = params.get('topic_id');
         
-        // Check if course or subject has changed
         if (newCourseId !== this.courseId || newSubjectId !== this.subjectId) {
           this.courseId = newCourseId;
           this.subjectId = newSubjectId;
           this.loadInitialData();
         }
         
-        // If a topic ID is provided in the URL, select that topic
         if (topicId) {
           this.selectTopicById(+topicId);
         }
       })
     );
     
-    // Auto-close sidebar on small screens when component initializes
     this.adjustSidebarForScreenSize();
-    
-    // Add window resize listener
     window.addEventListener('resize', this.adjustSidebarForScreenSize.bind(this));
   }
   
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
-    
-    // Remove resize listener when component is destroyed
     window.removeEventListener('resize', this.adjustSidebarForScreenSize.bind(this));
   }
   
   ngAfterViewChecked() {
-    // Render MathJax if needed
     if (this.needsMathJaxUpdate) {
       this.mathRendererService.renderMathJax();
       this.needsMathJaxUpdate = false;
       
-      // Trigger another update after a delay to catch any equations that might have loaded later
       setTimeout(() => {
         this.mathRendererService.renderMathJax();
       }, 500);
@@ -170,7 +172,6 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   loadInitialData() {
     this.isLoadingSubjects = true;
     
-    // Load course details
     this.subscriptions.add(
       this.courseService.getCourseDetails(this.courseId).subscribe({
         next: (course) => {
@@ -180,7 +181,6 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       })
     );
     
-    // Load subject details to get the subject name
     this.subscriptions.add(
       this.subjectService.getSubjectDetails(this.courseId, this.subjectId).subscribe({
         next: (subject) => {
@@ -190,7 +190,6 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       })
     );
     
-    // Load chapters for the current subject
     this.loadChapters();
   }
   
@@ -205,12 +204,10 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
           this.chapters = chapters;
           this.isLoadingChapters = false;
           
-          // If there's a chapter with topics, expand it
           const chapterWithTopics = this.chapters.find(c => c.has_topics);
           if (chapterWithTopics) {
             this.toggleChapter(chapterWithTopics.id);
           } else if (this.chapters.length > 0) {
-            // Otherwise expand the first chapter
             this.toggleChapter(this.chapters[0].id);
           }
         },
@@ -223,7 +220,6 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   }
   
   toggleChapter(chapterId: number) {
-    // If chapter is already expanded, collapse it
     if (this.expandedChapterId === chapterId) {
       this.expandedChapterId = null;
       return;
@@ -231,19 +227,16 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     
     this.expandedChapterId = chapterId;
     
-    // Check if we already loaded topics for this chapter
     if (this.topics[chapterId]) {
       return;
     }
     
-    // Load topics for this chapter
     this.loadTopics(chapterId);
   }
   
   loadTopics(chapterId: number) {
     const chapter = this.chapters.find(c => c.id === chapterId);
     
-    // If chapter has no topics yet, generate them
     if (!chapter?.has_topics) {
       this.generateTopics(chapterId);
       return;
@@ -254,7 +247,6 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
         next: (topics) => {
           this.topics[chapterId] = topics;
           
-          // If no topic is selected yet and we have topics, select the first one
           if (!this.selectedTopicId && topics.length > 0) {
             this.selectTopic(topics[0]);
           }
@@ -269,14 +261,11 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     this.selectedTopic = topic;
     this.loadContent(topic.id);
     
-    // Update URL without navigation
     this.updateUrlWithTopicId(topic.id);
     
-    // Hide sidebar on mobile when a topic is selected
     if (window.innerWidth < 768) {
       this.isSidebarOpen = false;
       
-      // Scroll to top when selecting a new topic
       setTimeout(() => {
         window.scrollTo(0, 0);
       }, 100);
@@ -284,7 +273,6 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   }
   
   selectTopicById(topicId: number) {
-    // Find the topic in our loaded topics
     for (const chapterId in this.topics) {
       const topic = this.topics[chapterId].find(t => t.id === topicId);
       if (topic) {
@@ -294,16 +282,12 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       }
     }
     
-    // If topic not found in loaded topics, we need to find which chapter it belongs to
-    // and load that chapter's topics
     this.findChapterForTopic(topicId);
   }
   
   findChapterForTopic(topicId: number) {
-    // We'll check each chapter one by one to find which one contains this topic
     const checkNextChapter = (index: number) => {
       if (index >= this.chapters.length) {
-        // Topic not found in any chapter
         console.error('Topic not found in any chapter:', topicId);
         return;
       }
@@ -314,23 +298,19 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
         next: (topics) => {
           const topic = topics.find((t: any) => t.id === topicId);
           if (topic) {
-            // Found the topic in this chapter
             this.topics[chapter.id] = topics;
             this.expandedChapterId = chapter.id;
             this.selectTopic(topic);
           } else {
-            // Check the next chapter
             checkNextChapter(index + 1);
           }
         },
         error: () => {
-          // Check the next chapter on error
           checkNextChapter(index + 1);
         }
       });
     };
     
-    // Start checking from the first chapter
     checkNextChapter(0);
   }
   
@@ -344,15 +324,13 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
         next: (content) => {
           this.content = content;
           
-          // Process content for LaTeX equations
           if (content) {
             this.processedContent = this.mathRendererService.processContent(content);
-            this.needsMathJaxUpdate = true; // Mark for MathJax rendering
+            this.needsMathJaxUpdate = true;
           }
           
           this.isLoadingContent = false;
           
-          // If we received content, mark this topic as having content
           if (content && this.selectedTopic) {
             this.selectedTopic.has_content = true;
           }
@@ -373,7 +351,7 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       this.chapterService.generateChapters(this.courseId, this.subjectId).subscribe({
         next: () => {
           this.isGeneratingChapters = false;
-          this.loadChapters(); // Refresh chapters
+          this.loadChapters();
         },
         error: (err) => {
           console.error('Error generating chapters:', err);
@@ -394,19 +372,16 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     this.subscriptions.add(
       this.topicService.generateTopics(this.courseId, this.subjectId, chapterId).subscribe({
         next: () => {
-          // Mark chapter as having topics
           if (chapter) {
             chapter.has_topics = true;
           }
           
-          // Load the generated topics
           this.topicService.getTopics(this.courseId, this.subjectId, chapterId).subscribe({
             next: (topics) => {
               this.topics[chapterId] = topics;
               this.isGeneratingTopics = false;
               this.generatingChapterId = null;
               
-              // Select first topic if available
               if (topics.length > 0) {
                 this.selectTopic(topics[0]);
               }
@@ -444,12 +419,10 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
         this.selectedTopicId
       ).subscribe({
         next: () => {
-          // Mark topic as having content
           if (this.selectedTopic) {
             this.selectedTopic.has_content = true;
           }
           
-          // Load the generated content
           this.contentService.getContent(
             this.courseId, 
             this.subjectId, 
@@ -459,10 +432,9 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
             next: (content) => {
               this.content = content;
               
-              // Process content for LaTeX equations
               if (content) {
                 this.processedContent = this.mathRendererService.processContent(content);
-                this.needsMathJaxUpdate = true; // Mark for MathJax rendering
+                this.needsMathJaxUpdate = true;
               }
               
               this.isGeneratingContent = false;
@@ -483,7 +455,6 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   }
   
   updateUrlWithTopicId(topicId: number) {
-    // Update URL without navigation for smoother experience
     const url = `/courses/${this.courseId}/subjects/${this.subjectId}/content/${topicId}`;
     window.history.replaceState({}, '', url);
   }
@@ -491,10 +462,8 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   toggleSidebar() {
     this.isSidebarOpen = !this.isSidebarOpen;
     
-    // When closing sidebar on mobile, add a small delay to allow animation to complete
     if (!this.isSidebarOpen && window.innerWidth < 768) {
       setTimeout(() => {
-        // Optional: scroll the content to the top for better UX
         const contentArea = document.querySelector('.flex-1.overflow-y-auto');
         if (contentArea) {
           contentArea.scrollTop = 0;
@@ -502,7 +471,6 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       }, 300);
     }
 
-    // When showing sidebar on mobile, scroll it to top
     if (this.isSidebarOpen && window.innerWidth < 768) {
       setTimeout(() => {
         const sidebar = document.querySelector('.bg-gray-900.text-white');
@@ -513,9 +481,7 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     }
   }
   
-  // Adjust sidebar visibility based on screen size
   adjustSidebarForScreenSize() {
-    // Auto-close sidebar on small screens (mobile)
     if (window.innerWidth < 768) {
       this.isSidebarOpen = false;
     } else {
@@ -523,23 +489,19 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     }
   }
   
-  // Helper function to prepare markdown content
   prepareMarkdownContent(content: string): string {
     if (!content) return '';
     
-    // Fix line breaks and spacing issues
     let formatted = content
-      .replace(/\$\$/g, '\n$$\n')       // Fix math expressions spacing
-      .replace(/\$\n\$/g, '$$ $$')       // Fix inline math expressions
-      .replace(/\n{3,}/g, '\n\n');       // Remove excessive line breaks
+      .replace(/\$\$/g, '\n$$\n')
+      .replace(/\$\n\$/g, '$$ $$')
+      .replace(/\n{3,}/g, '\n\n');
     
-    // Make sure each heading has a proper space after the # symbol
     formatted = formatted.replace(/^(#{1,6})([^ ])/gm, '$1 $2');
     
     return formatted;
   }
 
-  // Add these new methods to support topic navigation
   getPreviousTopic() {
     if (!this.selectedTopicId || !this.expandedChapterId) return null;
     
@@ -578,29 +540,29 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     }
   }
 
-  // Add this helper method to get a chapter name by ID
   getChapterNameById(chapterId: number | null): string {
     if (!chapterId || !this.chapters) return '';
     const chapter = this.chapters.find(c => c.id === chapterId);
     return chapter ? chapter.name : 'Course Outline';
   }
 
-  // CRUD operations for Chapters
   openEditChapterModal(chapter: any, event?: Event) {
     if (event) {
-      event.stopPropagation(); // Prevent chapter toggle
+      event.stopPropagation();
     }
     this.editingChapter = { ...chapter };
+    this.editChapterForm.setValue({ name: chapter.name });
     this.showEditChapterModal = true;
   }
 
   closeEditChapterModal() {
     this.showEditChapterModal = false;
     this.editingChapter = null;
+    this.editChapterForm.reset();
   }
 
   updateChapter() {
-    if (!this.editingChapter || !this.editingChapter.name.trim()) {
+    if (this.editChapterForm.invalid) {
       this.errorMessage = 'Chapter name is required';
       return;
     }
@@ -609,13 +571,12 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       this.courseId,
       this.subjectId,
       this.editingChapter.id,
-      this.editingChapter.name
+      this.editChapterForm.value.name
     ).subscribe({
       next: () => {
-        // Update local chapter data
         const index = this.chapters.findIndex(c => c.id === this.editingChapter.id);
         if (index !== -1) {
-          this.chapters[index].name = this.editingChapter.name;
+          this.chapters[index].name = this.editChapterForm.value.name;
         }
         this.closeEditChapterModal();
       },
@@ -628,7 +589,7 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
 
   openDeleteChapterModal(chapter: any, event?: Event) {
     if (event) {
-      event.stopPropagation(); // Prevent chapter toggle
+      event.stopPropagation();
     }
     this.editingChapter = chapter;
     this.showDeleteChapterModal = true;
@@ -650,10 +611,8 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       this.editingChapter.id
     ).subscribe({
       next: () => {
-        // Remove chapter from local data
         this.chapters = this.chapters.filter(c => c.id !== this.editingChapter.id);
         
-        // If we deleted the expanded chapter, clear selection
         if (this.expandedChapterId === this.editingChapter.id) {
           this.expandedChapterId = null;
           this.selectedTopicId = null;
@@ -672,22 +631,23 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
-  // CRUD operations for Topics
   openEditTopicModal(topic: any, event?: Event) {
     if (event) {
-      event.stopPropagation(); // Prevent topic selection
+      event.stopPropagation();
     }
     this.editingTopic = { ...topic };
+    this.editTopicForm.setValue({ name: topic.name });
     this.showEditTopicModal = true;
   }
 
   closeEditTopicModal() {
     this.showEditTopicModal = false;
     this.editingTopic = null;
+    this.editTopicForm.reset();
   }
 
   updateTopic() {
-    if (!this.editingTopic || !this.editingTopic.name.trim() || !this.expandedChapterId) {
+    if (this.editTopicForm.invalid || !this.expandedChapterId) {
       this.errorMessage = 'Topic name is required';
       return;
     }
@@ -697,19 +657,17 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       this.subjectId,
       this.expandedChapterId,
       this.editingTopic.id,
-      this.editingTopic.name
+      this.editTopicForm.value.name
     ).subscribe({
       next: () => {
-        // Update local topic data
         const topicsArray = this.topics[this.expandedChapterId!];
         if (topicsArray) {
           const index = topicsArray.findIndex((t: any) => t.id === this.editingTopic.id);
           if (index !== -1) {
-            topicsArray[index].name = this.editingTopic.name;
+            topicsArray[index].name = this.editTopicForm.value.name;
             
-            // If this was the selected topic, update that too
             if (this.selectedTopicId === this.editingTopic.id) {
-              this.selectedTopic.name = this.editingTopic.name;
+              this.selectedTopic.name = this.editTopicForm.value.name;
             }
           }
         }
@@ -724,7 +682,7 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
 
   openDeleteTopicModal(topic: any, event?: Event) {
     if (event) {
-      event.stopPropagation(); // Prevent topic selection
+      event.stopPropagation();
     }
     this.editingTopic = topic;
     this.showDeleteTopicModal = true;
@@ -747,19 +705,16 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       this.editingTopic.id
     ).subscribe({
       next: () => {
-        // Remove topic from local data
         if (this.topics[this.expandedChapterId!]) {
           this.topics[this.expandedChapterId!] = this.topics[this.expandedChapterId!]
             .filter((t: any) => t.id !== this.editingTopic.id);
         }
         
-        // If we deleted the selected topic, clear selection
         if (this.selectedTopicId === this.editingTopic.id) {
           this.selectedTopicId = null;
           this.selectedTopic = null;
           this.content = null;
           
-          // Try to select another topic
           if (this.topics[this.expandedChapterId!]?.length > 0) {
             this.selectTopic(this.topics[this.expandedChapterId!][0]);
           }
@@ -776,42 +731,39 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
-  // CRUD operations for Content
   openEditContentModal() {
     if (!this.content) return;
-    this.editingContent = this.content;
+    this.editContentForm.setValue({ content: this.content });
     this.showEditContentModal = true;
   }
 
   closeEditContentModal() {
     this.showEditContentModal = false;
-    this.editingContent = null;
+    this.editContentForm.reset();
   }
 
   updateContent() {
-    if (!this.editingContent || !this.selectedTopicId || !this.expandedChapterId) {
+    if (this.editContentForm.invalid || !this.selectedTopicId || !this.expandedChapterId) {
       this.errorMessage = 'Content is required';
       return;
     }
 
+    const newContent = this.editContentForm.value.content;
     this.contentService.updateContent(
       this.courseId,
       this.subjectId,
       this.expandedChapterId,
       this.selectedTopicId,
-      this.editingContent
+      newContent
     ).subscribe({
       next: (response) => {
-        // Update local content data
-        this.content = response.content || this.editingContent;
+        this.content = response.content || newContent;
         
-        // Process content for LaTeX equations
         if (this.content) {
           this.processedContent = this.mathRendererService.processContent(this.content);
-          this.needsMathJaxUpdate = true; // Mark for MathJax rendering
+          this.needsMathJaxUpdate = true;
         }
         
-        // Update topic has_content flag
         if (this.selectedTopic) {
           this.selectedTopic.has_content = true;
         }
@@ -845,10 +797,8 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       this.selectedTopicId
     ).subscribe({
       next: () => {
-        // Clear content
         this.content = null;
         
-        // Update topic has_content flag
         if (this.selectedTopic) {
           this.selectedTopic.has_content = false;
         }
@@ -864,19 +814,17 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
-  // Modal methods for new chapter
   openNewChapterModal() {
-    this.newChapterName = '';
+    this.newChapterForm.reset();
     this.showNewChapterModal = true;
   }
 
   closeNewChapterModal() {
     this.showNewChapterModal = false;
-    this.newChapterName = '';
   }
 
   createNewChapter() {
-    if (!this.newChapterName || !this.newChapterName.trim()) {
+    if (this.newChapterForm.invalid) {
       this.errorMessage = 'Chapter name is required';
       return;
     }
@@ -884,10 +832,10 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     this.isAddingChapter = true;
     this.errorMessage = '';
     
-    this.chapterService.createChapter(this.courseId, this.subjectId, this.newChapterName.trim()).subscribe({
+    const newChapterName = this.newChapterForm.value.name;
+    this.chapterService.createChapter(this.courseId, this.subjectId, newChapterName).subscribe({
       next: (newChapter) => {
         this.chapters.push(newChapter);
-        // Optionally expand the new chapter
         this.toggleChapter(newChapter.id);
         this.closeNewChapterModal();
         this.isAddingChapter = false;
@@ -900,19 +848,17 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
-  // Modal methods for new topic
   openNewTopicModal() {
     if (!this.expandedChapterId) {
       this.errorMessage = 'Please select a chapter first';
       return;
     }
-    this.newTopicName = '';
+    this.newTopicForm.reset();
     this.showNewTopicModal = true;
   }
 
   closeNewTopicModal() {
     this.showNewTopicModal = false;
-    this.newTopicName = '';
   }
 
   createNewTopic() {
@@ -921,7 +867,7 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       return;
     }
     
-    if (!this.newTopicName || !this.newTopicName.trim()) {
+    if (this.newTopicForm.invalid) {
       this.errorMessage = 'Topic name is required';
       return;
     }
@@ -929,22 +875,20 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     this.isAddingTopic = true;
     this.errorMessage = '';
     
-    this.topicService.createTopic(this.courseId, this.subjectId, this.expandedChapterId, this.newTopicName.trim()).subscribe({
+    const newTopicName = this.newTopicForm.value.name;
+    this.topicService.createTopic(this.courseId, this.subjectId, this.expandedChapterId, newTopicName).subscribe({
       next: (newTopic) => {
-        // Initialize topics array for this chapter if it doesn't exist
         if (!this.topics[this.expandedChapterId!]) {
           this.topics[this.expandedChapterId!] = [];
         }
         
         this.topics[this.expandedChapterId!].push(newTopic);
         
-        // Update chapter to show it has topics
         const chapter = this.chapters.find(c => c.id === this.expandedChapterId);
         if (chapter) {
           chapter.has_topics = true;
         }
         
-        // Select the new topic
         this.selectTopic(newTopic);
         this.closeNewTopicModal();
         this.isAddingTopic = false;
@@ -957,19 +901,17 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     });
   }
 
-  // Modal methods for new content (when no content exists yet)
   openNewContentModal() {
     if (!this.selectedTopicId || !this.expandedChapterId) {
       this.errorMessage = 'Please select a topic first';
       return;
     }
-    this.newContentText = '';
+    this.newContentForm.reset();
     this.showNewContentModal = true;
   }
 
   closeNewContentModal() {
     this.showNewContentModal = false;
-    this.newContentText = '';
   }
 
   createNewContent() {
@@ -978,7 +920,7 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
       return;
     }
     
-    if (!this.newContentText || !this.newContentText.trim()) {
+    if (this.newContentForm.invalid) {
       this.errorMessage = 'Content is required';
       return;
     }
@@ -986,24 +928,22 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     this.isAddingContent = true;
     this.errorMessage = '';
     
+    const newContent = this.newContentForm.value.content;
     this.contentService.createContentManual(
       this.courseId,
       this.subjectId,
       this.expandedChapterId,
       this.selectedTopicId,
-      this.newContentText.trim()
+      newContent
     ).subscribe({
       next: (response) => {
-        // Update content display
-        this.content = response.content || this.newContentText;
+        this.content = response.content || newContent;
         
-        // Process content for LaTeX equations
         if (this.content) {
           this.processedContent = this.mathRendererService.processContent(this.content);
-          this.needsMathJaxUpdate = true; // Mark for MathJax rendering
+          this.needsMathJaxUpdate = true;
         }
         
-        // Mark topic as having content
         if (this.selectedTopic) {
           this.selectedTopic.has_content = true;
         }

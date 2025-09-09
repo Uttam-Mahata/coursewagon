@@ -112,3 +112,4 @@ coverage.xml
 
 # Dependencies
 node_modules/
+python-server/github-actions-key.json

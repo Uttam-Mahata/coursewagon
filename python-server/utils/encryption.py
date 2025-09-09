@@ -21,7 +21,12 @@ class EncryptionService:
             logger.critical("ENCRYPTION_KEY not found in environment variables!")
             raise ValueError("Encryption key not configured")
             
-        self.salt = os.environ.get('ENCRYPTION_SALT', b'coursewagon_salt').encode()
+        # Get salt from environment - handle both string and bytes
+        salt_value = os.environ.get('ENCRYPTION_SALT', 'coursewagon_salt')
+        if isinstance(salt_value, str):
+            self.salt = salt_value.encode()
+        else:
+            self.salt = salt_value
         
         # Derive a proper key using PBKDF2
         kdf = PBKDF2HMAC(

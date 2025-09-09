@@ -68,4 +68,7 @@ scripts/
 
 # Firebase Service Account Keys
 *firebase-adminsdk*.json
-coursewagon-firebase-adminsdk-*.json
+coursewagon-firebase-adminsdk*.json
+firebase-adminsdk*.json
+serviceAccountKey.json
+firebase-credentials.json

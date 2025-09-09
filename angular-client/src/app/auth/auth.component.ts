@@ -12,8 +12,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
     standalone: false
 })
 export class AuthComponent implements OnInit {
-  loginForm: FormGroup;
-  registerForm: FormGroup;
+  loginForm!: FormGroup;
+  registerForm! : FormGroup;
   isLoginMode = true;
   errorMessage = '';
   successMessage = '';
@@ -121,14 +121,16 @@ export class AuthComponent implements OnInit {
 
     this.authService.register(this.registerForm.value)
       .subscribe({
-        next: () => {
-          this.successMessage = 'Registration successful! Please check your email for a welcome message and then login.';
+        next: (response) => {
+          this.successMessage = 'Registration successful! Welcome email sent. Please login to continue.';
           this.isLoginMode = true;
           this.loginForm.patchValue({ email: this.registerForm.value.email });
           this.registerForm.reset();
+          console.log('Registration successful:', response);
         },
         error: (error) => {
-          this.errorMessage = error.error.error || 'An unexpected error occurred';
+          console.error('Registration error:', error);
+          this.errorMessage = error.error?.detail || error.error?.error || 'Registration failed. Please try again.';
         }
       });
   }
@@ -143,12 +145,23 @@ export class AuthComponent implements OnInit {
       const response = await this.authService.signInWithGoogle();
       console.log('Google sign-in successful:', response);
       
+      // Show success message
+      this.successMessage = 'Google sign-in successful! Redirecting...';
+      
       setTimeout(() => {
         this.router.navigate(['/courses']);
-      }, 100);
+      }, 1000);
     } catch (error: any) {
       console.error('Google sign-in error:', error);
-      this.errorMessage = error.message || 'Google sign-in failed. Please try again.';
+      
+      // Provide more detailed error messages
+      if (error.error?.detail) {
+        this.errorMessage = error.error.detail;
+      } else if (error.message) {
+        this.errorMessage = error.message;
+      } else {
+        this.errorMessage = 'Google sign-in failed. Please try again.';
+      }
     } finally {
       this.isGoogleLoading = false;
     }

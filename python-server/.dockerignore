@@ -27,3 +27,13 @@ htmlcov/
 .vscode/
 *.md
 !README*.md
+
+# JSON credential files (using Secret Manager instead)
+*.json
+
+# GitHub Actions and temporary files
+.github/
+tests/
+docs/
+tmp/
+*.tmp

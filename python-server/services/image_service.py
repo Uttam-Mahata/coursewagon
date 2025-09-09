@@ -1,6 +1,5 @@
 from utils.gemini_image_generation_helper import GeminiImageGenerator
-from utils.gemini_image_generation_helper import GeminiImageGenerator
-from utils.azure_storage_helper import AzureStorageHelper
+from utils.unified_storage_helper import storage_helper
 from repositories.course_repo import CourseRepository
 from repositories.subject_repo import SubjectRepository
 from sqlalchemy.orm import Session
@@ -12,7 +11,7 @@ class ImageService:
     def __init__(self, db: Session):
         self.course_repo = CourseRepository(db)
         self.subject_repo = SubjectRepository(db)
-        self.azure_storage = AzureStorageHelper()
+        self.storage_helper = storage_helper
         
     def generate_course_image(self, course_id):
         """Generate and store a cover image for a course"""
@@ -42,17 +41,17 @@ class ImageService:
             except Exception as save_err:
                 logger.warning(f"Could not save debug image: {str(save_err)}")
             
-            # Upload the image to Azure Storage
+            # Upload the image to storage (GCS primary, Azure/Firebase fallback)
             image_path = f"courses/{course_id}/cover"
-            logger.info(f"Uploading image to Azure Storage path: {image_path}")
-            image_url = self.azure_storage.upload_image(image_bytes, image_path)
-            logger.info(f"Image uploaded successfully, URL: {image_url}")
+            logger.info(f"Uploading image to storage path: {image_path}")
+            image_url = self.storage_helper.upload_image(image_bytes, image_path)
+            logger.info(f"Image uploaded successfully using {self.storage_helper.get_primary_provider_name()}, URL: {image_url}")
             
             # Delete old image if it exists
             old_image_url = self.course_repo.get_course_image_url(course_id)
             if old_image_url:
                 logger.info(f"Deleting old image: {old_image_url}")
-                self.azure_storage.delete_image(old_image_url)
+                self.storage_helper.delete_image(old_image_url)
             
             # Update the course with the new image URL
             logger.info(f"Updating course with new image URL: {image_url}")
@@ -85,16 +84,14 @@ class ImageService:
             if not image_bytes:
                 raise ValueError("Failed to generate image")
                 
-            # Upload the image to Azure Storage
-            image_path = f"courses/{course_id}/subjects/{subject_id}/cover"
-            image_url = self.azure_storage.upload_image(image_bytes, image_path)
-            
-            # Delete old image if it exists
-            old_image_url = self.subject_repo.get_subject_image_url(subject_id)
-            if old_image_url:
-                self.azure_storage.delete_image(old_image_url)
-            
-            # Update the subject with the new image URL
+                # Upload the image to storage (GCS primary, Azure/Firebase fallback)
+                image_path = f"courses/{course_id}/subjects/{subject_id}/cover"
+                image_url = self.storage_helper.upload_image(image_bytes, image_path)
+                
+                # Delete old image if it exists
+                old_image_url = self.subject_repo.get_subject_image_url(subject_id)
+                if old_image_url:
+                    self.storage_helper.delete_image(old_image_url)            # Update the subject with the new image URL
             updated_subject = self.subject_repo.update_subject_image(subject_id, image_url)
             
             return updated_subject.to_dict() if updated_subject else None

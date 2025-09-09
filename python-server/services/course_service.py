@@ -4,7 +4,7 @@ from models.course import Course
 from models.schemas import CourseContent
 from utils.gemini_helper import GeminiHelper
 from utils.gemini_image_generation_helper import GeminiImageGenerator
-from utils.azure_storage_helper import AzureStorageHelper
+from utils.unified_storage_helper import storage_helper
 from sqlalchemy.orm import Session
 import logging
 import asyncio
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class CourseService:
     def __init__(self, db: Session):
         self.course_repo = CourseRepository(db)
-        self.azure_storage = AzureStorageHelper()
+        self.storage_helper = storage_helper
 
     def add_course(self, course_name, user_id):
         try:
@@ -46,9 +46,9 @@ class CourseService:
                 image_bytes = image_generator.generate_course_image(created_course.name, created_course.description)
                 
                 if image_bytes:
-                    # Upload to Azure Storage
+                    # Upload to storage (GCS primary, Azure/Firebase fallback)
                     image_path = f"courses/{created_course.id}/cover"
-                    image_url = self.azure_storage.upload_image(image_bytes, image_path)
+                    image_url = self.storage_helper.upload_image(image_bytes, image_path)
                     
                     # Update course with image URL
                     self.course_repo.update_course_image(created_course.id, image_url)
@@ -94,9 +94,9 @@ class CourseService:
                 image_bytes = image_generator.generate_course_image(course.name, course.description)
                 
                 if image_bytes:
-                    # Upload to Azure Storage
+                    # Upload to storage (GCS primary, Azure/Firebase fallback)
                     image_path = f"courses/{course.id}/cover"
-                    image_url = self.azure_storage.upload_image(image_bytes, image_path)
+                    image_url = self.storage_helper.upload_image(image_bytes, image_path)
                     
                     # Update course with image URL
                     self.course_repo.update_course_image(course.id, image_url)
@@ -192,9 +192,9 @@ class CourseService:
                 image_bytes = image_generator.generate_course_image(created_course.name, created_course.description)
                 
                 if image_bytes:
-                    # Upload to Azure Storage
+                    # Upload to storage (GCS primary, Azure/Firebase fallback)
                     image_path = f"courses/{created_course.id}/cover"
-                    image_url = self.azure_storage.upload_image(image_bytes, image_path)
+                    image_url = self.storage_helper.upload_image(image_bytes, image_path)
                     
                     # Update course with image URL
                     self.course_repo.update_course_image(created_course.id, image_url)

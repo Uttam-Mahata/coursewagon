@@ -5,7 +5,7 @@ from models.schemas import SubjectContent
 from repositories.course_repo import CourseRepository
 from utils.gemini_helper import GeminiHelper, extract_sql_query
 from utils.gemini_image_generation_helper import GeminiImageGenerator
-from utils.azure_storage_helper import AzureStorageHelper
+from utils.unified_storage_helper import storage_helper
 from sqlalchemy.orm import Session
 import logging
 
@@ -15,7 +15,7 @@ class SubjectService:
     def __init__(self, db: Session):
         self.subject_repo = SubjectRepository(db)
         self.course_repo = CourseRepository(db)
-        self.azure_storage = AzureStorageHelper()
+        self.storage_helper = storage_helper
 
     def generate_subjects(self, course_id):
         course = self.course_repo.get_course_by_id(course_id)
@@ -63,7 +63,7 @@ class SubjectService:
                     if image_bytes:
                         # Upload to Azure Storage
                         image_path = f"courses/{course_id}/subjects/{created_subject.id}/cover"
-                        image_url = self.azure_storage.upload_image(image_bytes, image_path)
+                        image_url = self.storage_helper.upload_image(image_bytes, image_path)
                         
                         # Update subject with image URL
                         self.subject_repo.update_subject_image(created_subject.id, image_url)
@@ -110,7 +110,7 @@ class SubjectService:
                 if image_bytes:
                     # Upload to Azure Storage
                     image_path = f"courses/{course_id}/subjects/{subject.id}/cover"
-                    image_url = self.azure_storage.upload_image(image_bytes, image_path)
+                    image_url = self.storage_helper.upload_image(image_bytes, image_path)
                     
                     # Update subject with image URL
                     self.subject_repo.update_subject_image(subject.id, image_url)

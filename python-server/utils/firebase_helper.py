@@ -27,8 +27,8 @@ class FirebaseHelper:
         try:
             # Initialize Firebase if not already done
             if not firebase_admin._apps:
-                # Look for credentials file - try in utils folder first, then root
-                cred_path = os.environ.get('FIREBASE_CREDENTIALS_PATH', 'utils/coursewagon-firebase-adminsdk-biym7-69f7d55e79.json')
+                # Look for credentials file - check environment variables first
+                cred_path = os.environ.get('FIREBASE_ADMIN_SDK_PATH') or os.environ.get('FIREBASE_CREDENTIALS_PATH', 'utils/coursewagon-firebase-adminsdk-biym7-69f7d55e79.json')
                 
                 # If not found in first location, try root folder
                 if not os.path.exists(cred_path):

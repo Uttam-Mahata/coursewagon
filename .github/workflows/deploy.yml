@@ -1,4 +1,4 @@
-name: Deploy to Google Cloud Run
+name: Build and Deploy to Cloud Run
 
 on:
   push:
@@ -15,11 +15,9 @@ env:
   PROJECT_ID: mitra-348d9
   SERVICE_NAME: coursewagon-api
   REGION: us-central1
-  ARTIFACT_REGISTRY_REPO: coursewagon-repo
-  IMAGE_NAME: coursewagon-api
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     # Only run if it's a push to main OR a merged pull request to main
     if: |
@@ -28,7 +26,7 @@ jobs:
       (github.event_name == 'workflow_dispatch')
     
     steps:
-    - name: Checkout code
+    - name: Checkout source
       uses: actions/checkout@v4
       with:
         fetch-depth: 2
@@ -52,57 +50,42 @@ jobs:
           echo "deploy=true" >> $GITHUB_OUTPUT
         fi
 
-    - name: Setup Google Cloud SDK
+    - name: Set up Google Cloud SDK
       if: steps.changes.outputs.deploy == 'true'
       uses: google-github-actions/setup-gcloud@v2
       with:
-        version: 'latest'
+        project_id: ${{ env.PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
 
-    - name: Authenticate to Google Cloud
+    - name: Configure Docker for Google Cloud
       if: steps.changes.outputs.deploy == 'true'
-      uses: google-github-actions/auth@v2
-      with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
+      run: gcloud auth configure-docker
 
-    - name: Build and Push with Cloud Build
+    - name: Build Docker image
       if: steps.changes.outputs.deploy == 'true'
       run: |
         cd python-server
-        # Build and push image using Cloud Build with substitutions
-        gcloud builds submit \
-          --tag $REGION-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO/$IMAGE_NAME:$GITHUB_SHA \
-          --tag $REGION-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO/$IMAGE_NAME:latest \
-          --timeout=20m \
-          --machine-type=e2-highcpu-8 \
-          --async \
-          .
-        
-        # Wait for the build to complete and check status
-        echo "Waiting for build to complete..."
-        sleep 60
-        
-        # Get the latest build status
-        BUILD_STATUS=$(gcloud builds list --limit=1 --format="value(status)")
-        echo "Build status: $BUILD_STATUS"
-        
-        if [ "$BUILD_STATUS" != "SUCCESS" ]; then
-          echo "Build failed with status: $BUILD_STATUS"
-          exit 1
-        fi
+        docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} .
+
+    - name: Push Docker image
+      if: steps.changes.outputs.deploy == 'true'
+      run: |
+        docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }}
 
     - name: Deploy to Cloud Run
       if: steps.changes.outputs.deploy == 'true'
       run: |
         gcloud run deploy $SERVICE_NAME \
-          --image=$REGION-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO/$IMAGE_NAME:$GITHUB_SHA \
+          --image=gcr.io/$PROJECT_ID/$SERVICE_NAME:${{ github.sha }} \
           --platform=managed \
           --region=$REGION \
           --allow-unauthenticated \
+          --port=8000 \
           --memory=2Gi \
           --cpu=2 \
-          --min-instances=0 \
           --max-instances=10 \
-          --port=8000 \
+          --min-instances=0 \
           --timeout=3600 \
           --set-secrets=/app/gcs-service-account.json=COURSEWAGON-GCS-SERVICE-ACCOUNT:latest \
           --set-secrets=/app/firebase-admin-sdk.json=COURSEWAGON-FIREBASE-ADMIN-SDK:latest \
@@ -146,8 +129,5 @@ jobs:
     - name: Health Check
       if: steps.changes.outputs.deploy == 'true'
       run: |
-        URL=$(gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)')
-        echo "Checking health at: $URL/api/health"
-        # Wait a  bit for the service to be ready
         sleep 30
-        curl -f "$URL/api/health" || echo "Health check failed, but deployment completed"
+        curl --fail "https://$SERVICE_NAME-$REGION.a.run.app/health"

@@ -46,14 +46,14 @@ class Config:
         'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
     }
     
-    # Email configurations for Mailgun
-    MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.mailgun.org')
+    # Email configurations for Gmail SMTP
+    MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
     MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
     MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'True').lower() == 'true'
     MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', 'False').lower() == 'true'
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@coursewagon.live')
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')  # Gmail address
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')  # Gmail App Password
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', os.getenv('MAIL_USERNAME'))
     MAIL_CONTACT_EMAIL = os.getenv('MAIL_CONTACT_EMAIL', 'contact@coursewagon.live')
     
     # Frontend URL for links in emails
@@ -61,6 +61,11 @@ class Config:
     
     # Application name
     APP_NAME = os.getenv('APP_NAME', 'Course Wagon')
+    
+    # Firebase Admin SDK Configuration
+    FIREBASE_PROJECT_ID = os.getenv('FIREBASE_PROJECT_ID', 'coursewagon')
+    FIREBASE_CREDENTIALS_PATH = os.getenv('FIREBASE_CREDENTIALS_PATH', 'coursewagon-firebase-adminsdk.json')
+    FIREBASE_CLIENT_EMAIL = os.getenv('FIREBASE_CLIENT_EMAIL', 'firebase-adminsdk-biym7@coursewagon.iam.gserviceaccount.com')
     
     # Firebase configurations
     

@@ -23,9 +23,35 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("FastAPI application starting up")
+    
+    # Run database migrations
+    try:
+        from migrations.add_welcome_email_sent_column import add_welcome_email_sent_column
+        add_welcome_email_sent_column()
+        logger.info("Database migrations completed successfully")
+    except Exception as e:
+        logger.error(f"Database migration failed: {str(e)}")
+        # Don't fail startup for migration errors in production
+    
+    # Initialize background task service
+    try:
+        from services.background_task_service import background_task_service
+        logger.info("Background task service initialized")
+    except Exception as e:
+        logger.error(f"Failed to initialize background task service: {str(e)}")
+    
     yield
+    
     # Shutdown
     logger.info("FastAPI application shutting down")
+    
+    # Cleanup background task service
+    try:
+        from services.background_task_service import background_task_service
+        background_task_service.shutdown()
+        logger.info("Background task service shutdown completed")
+    except Exception as e:
+        logger.error(f"Error shutting down background task service: {str(e)}")
 
 # Import database and routers
 from extensions import db
@@ -39,6 +65,7 @@ from routes.testimonial_routes import testimonial_router
 from routes.image_routes import image_router
 from admin.routes import admin_router
 from routes.utility_routes import utility_router
+from routes.test_auth_routes import test_auth_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -113,6 +140,7 @@ app.include_router(testimonial_router, prefix="/api")
 app.include_router(image_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(utility_router, prefix="/api")
+app.include_router(test_auth_router, prefix="/api")
 
 # Health check endpoint
 @app.get("/health")

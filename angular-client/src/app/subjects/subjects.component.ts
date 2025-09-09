@@ -44,7 +44,7 @@ export class SubjectsComponent implements OnInit {
   showCreateSubjectModal: boolean = false;
   isDeletingSubject: boolean = false;
 
-  private editingSubject: any = null;
+  editingSubject: any = null;
 
   constructor(
     private courseService: CourseService,

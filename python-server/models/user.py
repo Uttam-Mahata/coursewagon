@@ -16,6 +16,7 @@ class User(Base):
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)  # New field for admin role
     last_login = db.Column(db.DateTime)
+    welcome_email_sent = db.Column(db.Boolean, default=False)  # Track if welcome email has been sent
     
     # Relationship with courses
     courses = db.relationship('Course', backref='creator', lazy=True)
@@ -41,5 +42,6 @@ class User(Base):
             'last_name': self.last_name,
             'created_at': self.created_at.isoformat(),
             'is_active': self.is_active,
-            'is_admin': self.is_admin
+            'is_admin': self.is_admin,
+            'welcome_email_sent': self.welcome_email_sent
         }

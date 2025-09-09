@@ -20,6 +20,7 @@ ecdsa
 email-validator
 fastapi
 fastapi-sqlalchemy
+firebase-admin
 google-api-core
 google-api-python-client
 google-auth

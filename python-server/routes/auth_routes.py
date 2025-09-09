@@ -61,8 +61,7 @@ class ProfileUpdate(BaseModel):
 async def register(
     user_data: UserRegister, 
     db: Session = Depends(get_db),
-    auth_service: AuthService = Depends(get_auth_service),
-    email_service: EmailService = Depends(get_email_service)
+    auth_service: AuthService = Depends(get_auth_service)
 ):
     try:
         user = auth_service.register_user(
@@ -72,14 +71,9 @@ async def register(
             last_name=user_data.last_name
         )
         
-        # Send welcome email
-        try:
-            email_service.send_welcome_email(user)
-            logger.info(f"Welcome email sent to {user.email}")
-        except Exception as e:
-            logger.error(f"Failed to send welcome email: {str(e)}")
-        
+        logger.info(f"User registered successfully: {user.email}")
         return {'message': 'User created successfully', 'user': user.to_dict()}
+        
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -245,6 +239,8 @@ async def google_auth(
             
         # Verify the Firebase token and process Google authentication
         result = auth_service.authenticate_google_user(google_data.firebase_token, google_data.user_data)
+        
+        logger.info(f"Google authentication successful for: {result['user']['email']}")
         
         return {
             'access_token': result['access_token'],

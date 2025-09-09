@@ -192,35 +192,18 @@ class EmailService:
     def send_welcome_email(self, user):
         """Send welcome email to newly registered user"""
         try:
-            # Handle both user object and dict
-            if hasattr(user, 'to_dict'):
-                user_data = user.to_dict()
-                user_email = user.email
-                user_first_name = user.first_name or 'User'
-            else:
-                user_data = user
-                user_email = user.get('email', '')
-                user_first_name = user.get('first_name', 'User')
-            
             context = {
-                'first_name': user_first_name,
-                'email': user_email,
-                'login_url': f"{self.frontend_url}/auth"
+                'user_name': user.get('name', 'User'),
+                'user_email': user.get('email', ''),
+                'login_url': f"{self.frontend_url}/login"
             }
             
-            result = self.send_template_email(
-                user_email,
+            return self.send_template_email(
+                user.get('email'),
                 "Welcome to Course Wagon!",
                 "welcome.html",
                 context
             )
-            
-            if result:
-                logger.info(f"Welcome email sent successfully to {user_email}")
-            else:
-                logger.error(f"Failed to send welcome email to {user_email}")
-                
-            return result
             
         except Exception as e:
             logger.error(f"Failed to send welcome email: {str(e)}")
@@ -234,34 +217,18 @@ class EmailService:
                 
             reset_url = f"{frontend_url}/reset-password?token={reset_token}"
             
-            # Handle both user object and dict
-            if hasattr(user, 'to_dict'):
-                user_email = user.email
-                user_first_name = user.first_name or 'User'
-            else:
-                user_email = user.get('email', '')
-                user_first_name = user.get('first_name', 'User')
-            
             context = {
-                'first_name': user_first_name,
-                'email': user_email,
-                'reset_link': reset_url,
-                'expires_in': '24 hours'
+                'user_name': user.get('name', 'User'),
+                'reset_url': reset_url,
+                'reset_token': reset_token
             }
             
-            result = self.send_template_email(
-                user_email,
+            return self.send_template_email(
+                user.get('email'),
                 "Password Reset Request",
                 "password_reset.html",
                 context
             )
-            
-            if result:
-                logger.info(f"Password reset email sent successfully to {user_email}")
-            else:
-                logger.error(f"Failed to send password reset email to {user_email}")
-                
-            return result
             
         except Exception as e:
             logger.error(f"Failed to send password reset email: {str(e)}")
@@ -270,33 +237,17 @@ class EmailService:
     def send_password_changed_email(self, user):
         """Send notification that password was changed"""
         try:
-            # Handle both user object and dict
-            if hasattr(user, 'to_dict'):
-                user_email = user.email
-                user_first_name = user.first_name or 'User'
-            else:
-                user_email = user.get('email', '')
-                user_first_name = user.get('first_name', 'User')
-            
             context = {
-                'first_name': user_first_name,
-                'email': user_email,
-                'login_url': f"{self.frontend_url}/auth"
+                'user_name': user.get('name', 'User'),
+                'login_url': f"{self.frontend_url}/login"
             }
             
-            result = self.send_template_email(
-                user_email,
+            return self.send_template_email(
+                user.get('email'),
                 "Password Changed Successfully",
                 "password_changed.html",
                 context
             )
-            
-            if result:
-                logger.info(f"Password changed email sent successfully to {user_email}")
-            else:
-                logger.error(f"Failed to send password changed email to {user_email}")
-                
-            return result
             
         except Exception as e:
             logger.error(f"Failed to send password changed email: {str(e)}")

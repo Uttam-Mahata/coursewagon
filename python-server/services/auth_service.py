@@ -4,6 +4,7 @@ from repositories.password_reset_repository import PasswordResetRepository
 from werkzeug.security import generate_password_hash
 from utils.encryption import EncryptionService
 from services.email_service import EmailService
+from services.background_task_service import background_task_service
 from middleware.auth_middleware import JWTAuth
 from sqlalchemy.orm import Session
 import logging
@@ -35,12 +36,31 @@ class AuthService:
         if self.user_repository.get_user_by_email(email):
             raise ValueError("Email already exists")
         
-        return self.user_repository.create_user(
+        # Create the user
+        user = self.user_repository.create_user(
             email=email,
             password=password,
             first_name=first_name,
             last_name=last_name
         )
+        
+        # Send welcome email asynchronously (non-blocking)
+        if user and not user.welcome_email_sent:
+            logger.info(f"Scheduling welcome email for new user: {email}")
+            background_task_service.send_email_async(
+                self.email_service, 
+                'send_welcome_email', 
+                user
+            )
+            
+            # Mark welcome email as sent to prevent duplicate emails
+            try:
+                self.user_repository.update_user(user, welcome_email_sent=True)
+                logger.debug(f"Marked welcome email as sent for user: {email}")
+            except Exception as e:
+                logger.error(f"Failed to update welcome email status: {str(e)}")
+        
+        return user
 
     def authenticate_user(self, email, password):
         user = self.user_repository.get_user_by_email(email)
@@ -130,15 +150,23 @@ class AuthService:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             logger.info(f"Password reset requested for non-existent email: {email}")
-            return False
+            # Return True for security (don't reveal if email exists)
+            return True
         
         # Create a password reset token
         reset = self.password_reset_repository.create_reset_token(user)
         
-        # Send the password reset email
+        # Send the password reset email asynchronously
         if reset:
-            self.email_service.send_password_reset_email(user, reset.token, frontend_url)
-            logger.info(f"Password reset email sent to: {email}")
+            logger.info(f"Scheduling password reset email for: {email}")
+            background_task_service.send_email_async(
+                self.email_service, 
+                'send_password_reset_email', 
+                user, 
+                reset.token, 
+                frontend_url
+            )
+            logger.info(f"Password reset email scheduled for: {email}")
             return True
         return False
     
@@ -174,8 +202,13 @@ class AuthService:
         # Mark token as used
         reset.use_token()
         
-        # Send confirmation email
-        self.email_service.send_password_changed_email(user)
+        # Send confirmation email asynchronously
+        logger.info(f"Scheduling password changed email for user ID: {user.id}")
+        background_task_service.send_email_async(
+            self.email_service, 
+            'send_password_changed_email', 
+            user
+        )
         
         logger.info(f"Password reset successful for user ID: {user.id}")
         return user
@@ -183,19 +216,24 @@ class AuthService:
     def authenticate_google_user(self, firebase_token, user_data):
         """Authenticate or register a user via Google Firebase token"""
         try:
-            # Import Google Auth libraries
-            from google.oauth2 import id_token
-            from google.auth.transport import requests
-            import os
+            # Import Firebase Admin service
+            from services.firebase_admin_service import firebase_admin_service
             
             # Verify the Firebase ID token
-            # Note: You would need to set up Firebase Admin SDK for proper verification
-            # For now, we'll trust the Firebase token from the frontend
-            # In production, you should verify the token server-side
+            firebase_user = firebase_admin_service.verify_id_token(firebase_token)
+            if not firebase_user:
+                raise ValueError("Invalid Firebase token")
             
-            email = user_data.get('email')
+            # Extract email from verified token
+            email = firebase_user.get('email')
             if not email:
                 raise ValueError("Email is required from Google authentication")
+            
+            # Ensure email matches the user data (security check)
+            if user_data.get('email') and user_data.get('email') != email:
+                raise ValueError("Email mismatch between token and user data")
+            
+            logger.info(f"Firebase token verified for email: {email}")
             
             # Check if user already exists
             user = self.user_repository.get_user_by_email(email)
@@ -204,11 +242,12 @@ class AuthService:
                 # User exists, update last login and return auth data
                 self.user_repository.update_last_login(user)
                 
-                # Update user info from Google if available
+                # Update user info from verified Firebase data if available
                 update_data = {}
-                if user_data.get('display_name') and not user.first_name:
+                firebase_name = firebase_user.get('name')
+                if firebase_name and not user.first_name:
                     # Parse display name into first and last name
-                    name_parts = user_data['display_name'].split(' ', 1)
+                    name_parts = firebase_name.split(' ', 1)
                     update_data['first_name'] = name_parts[0]
                     if len(name_parts) > 1:
                         update_data['last_name'] = name_parts[1]
@@ -218,9 +257,9 @@ class AuthService:
                 
                 logger.info(f"Google login successful for existing user: {email}")
             else:
-                # Create new user from Google data
-                display_name = user_data.get('display_name', '')
-                name_parts = display_name.split(' ', 1) if display_name else ['', '']
+                # Create new user from verified Firebase data
+                firebase_name = firebase_user.get('name') or user_data.get('displayName', '')
+                name_parts = firebase_name.split(' ', 1) if firebase_name else ['', '']
                 first_name = name_parts[0] if name_parts else ''
                 last_name = name_parts[1] if len(name_parts) > 1 else ''
                 
@@ -238,11 +277,21 @@ class AuthService:
                 
                 logger.info(f"Google registration successful for new user: {email}")
                 
-                # Send welcome email
-                try:
-                    self.email_service.send_welcome_email(user)
-                except Exception as e:
-                    logger.error(f"Failed to send welcome email to Google user: {str(e)}")
+                # Send welcome email asynchronously for new Google users
+                if user and not user.welcome_email_sent:
+                    logger.info(f"Scheduling welcome email for new Google user: {email}")
+                    background_task_service.send_email_async(
+                        self.email_service, 
+                        'send_welcome_email', 
+                        user
+                    )
+                    
+                    # Mark welcome email as sent
+                    try:
+                        self.user_repository.update_user(user, welcome_email_sent=True)
+                        logger.debug(f"Marked welcome email as sent for Google user: {email}")
+                    except Exception as e:
+                        logger.error(f"Failed to update welcome email status for Google user: {str(e)}")
             
             # Generate JWT tokens
             access_token = self._create_access_token(user.id)

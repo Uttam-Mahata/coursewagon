@@ -20,7 +20,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Application version for health checks
-APP_VERSION = "1.0.1"
+APP_VERSION = "1.0.3"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

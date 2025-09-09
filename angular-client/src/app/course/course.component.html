@@ -32,20 +32,42 @@
             <p class="text-gray-500">Author and organize your educational content with ease</p>
           </div>
           
-          <!-- Course Name Input Field -->
-          <div class="mb-6">
-            <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Description</label>
-            <div class="relative">
-              <fa-icon [icon]="faBook" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
-              <input 
-                id="courseName" 
-                type="text" 
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-                placeholder="Enter your course description or use voice input below..." 
-                [(ngModel)]="courseName"
-              />
+          <form [formGroup]="courseForm" (ngSubmit)="generateCourse()">
+            <!-- Course Name Input Field -->
+            <div class="mb-6">
+              <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Description</label>
+              <div class="relative">
+                <fa-icon [icon]="faBook" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></fa-icon>
+                <input
+                  id="courseName"
+                  type="text"
+                  class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                  placeholder="Enter your course description or use voice input below..."
+                  formControlName="courseName"
+                />
+              </div>
             </div>
-          </div>
+
+            <!-- Generate Course Button -->
+            <div class="text-center space-y-3">
+              <!-- Text-based generation -->
+              <button
+                type="submit"
+                *ngIf="!audioBlob"
+                [disabled]="isLoading || courseForm.invalid"
+                class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-6 rounded-lg font-medium transition duration-300 transform hover:-translate-y-0.5 shadow-md focus:ring-4 focus:ring-blue-300 focus:outline-none"
+                [ngClass]="{'opacity-75 cursor-not-allowed': isLoading || courseForm.invalid}">
+                <div *ngIf="isLoading" class="inline-flex items-center">
+                  <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                  <span>Generating...</span>
+                </div>
+                <div *ngIf="!isLoading" class="flex items-center justify-center">
+                  <fa-icon [icon]="faMagic" class="mr-2"></fa-icon>
+                  <span>Generate Course from Text</span>
+                </div>
+              </button>
+            </div>
+          </form>
 
           <!-- Audio Recording Section -->
           <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -105,22 +127,6 @@
   
           <!-- Generate Course Button -->
           <div class="text-center space-y-3">
-            <!-- Text-based generation -->
-            <button 
-              *ngIf="!audioBlob"
-              [disabled]="isLoading || !courseName.trim()" 
-              (click)="generateCourse()"
-              class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-6 rounded-lg font-medium transition duration-300 transform hover:-translate-y-0.5 shadow-md focus:ring-4 focus:ring-blue-300 focus:outline-none"
-              [ngClass]="{'opacity-75 cursor-not-allowed': isLoading || !courseName.trim()}">
-              <div *ngIf="isLoading" class="inline-flex items-center">
-                <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                <span>Generating...</span>
-              </div>
-              <div *ngIf="!isLoading" class="flex items-center justify-center">
-                <fa-icon [icon]="faMagic" class="mr-2"></fa-icon>
-                <span>Generate Course from Text</span>
-              </div>
-            </button>
             
             <!-- Audio-based generation -->
             <button 

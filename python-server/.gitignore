@@ -78,3 +78,4 @@ firebase-credentials.json
 coursewagon-gcs-service-account.json
 google-cloud-service-account.json
 gcp-service-account*.json
+github-actions-key.json

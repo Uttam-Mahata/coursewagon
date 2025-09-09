@@ -42,7 +42,21 @@ jobs:
           --tag $REGION-docker.pkg.dev/$PROJECT_ID/$ARTIFACT_REGISTRY_REPO/$IMAGE_NAME:latest \
           --timeout=20m \
           --machine-type=e2-highcpu-8 \
+          --async \
           .
+        
+        # Wait for the build to complete and check status
+        echo "Waiting for build to complete..."
+        sleep 60
+        
+        # Get the latest build status
+        BUILD_STATUS=$(gcloud builds list --limit=1 --format="value(status)")
+        echo "Build status: $BUILD_STATUS"
+        
+        if [ "$BUILD_STATUS" != "SUCCESS" ]; then
+          echo "Build failed with status: $BUILD_STATUS"
+          exit 1
+        fi
 
     - name: Deploy to Cloud Run
       run: |

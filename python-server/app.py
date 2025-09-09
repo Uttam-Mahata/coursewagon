@@ -19,6 +19,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Application version for health checks
+APP_VERSION = "1.0.0"
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -145,9 +148,9 @@ app.include_router(test_auth_router, prefix="/api")
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    return {"status": "healthy", "version": APP_VERSION}
 
-    
+
 
 
 if __name__ == '__main__':

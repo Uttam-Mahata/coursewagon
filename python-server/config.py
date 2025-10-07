@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Config:
     # Database configurations
     DB_HOST = os.getenv("DB_HOST")

@@ -1,0 +1,23 @@
+{
+     "mcpServers": {
+        "context7": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp"
+          ],
+          "env": {}
+        },
+        "firecrawl-mcp": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "firecrawl-mcp"
+          ],
+          "env": {
+            "FIRECRAWL_API_KEY": "fc-b46e59caddab47b68ce156867fedf795"
+          }
+        }
+      }
+}

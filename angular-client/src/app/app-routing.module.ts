@@ -19,6 +19,7 @@ import { AdminComponent } from './admin/admin.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { HowItWorksComponent } from './how-it-works/how-it-works.component';
+import { HelpCenterComponent } from './help-center/help-center.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -29,12 +30,13 @@ const routes: Routes = [
   { path: 'create-course', component: CourseComponent, canActivate: [AuthGuard] },
   { path: 'courses', component: CoursesComponent, canActivate: [AuthGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
-  
+
   // Legal pages - accessible without authentication
   { path: 'terms', component: TermsComponent },
   { path: 'privacy-policy', component: PrivacyPolicyComponent },
   { path: 'coming-soon', component: ComingSoonComponent },
   { path: 'how-it-works', component: HowItWorksComponent },
+  { path: 'help-center', component: HelpCenterComponent },
   
   // New subjects component route
   { 

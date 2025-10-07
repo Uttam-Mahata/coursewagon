@@ -18,6 +18,7 @@ import { WriteReviewComponent } from './write-review/write-review.component';
 import { AdminComponent } from './admin/admin.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { HowItWorksComponent } from './how-it-works/how-it-works.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -33,6 +34,7 @@ const routes: Routes = [
   { path: 'terms', component: TermsComponent },
   { path: 'privacy-policy', component: PrivacyPolicyComponent },
   { path: 'coming-soon', component: ComingSoonComponent },
+  { path: 'how-it-works', component: HowItWorksComponent },
   
   // New subjects component route
   { 

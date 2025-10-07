@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* Font Family Configuration */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
 /* Add these styles for better markdown content rendering */
 
 .markdown-content {
@@ -16,6 +25,7 @@
   margin-top: 1.5rem;
   margin-bottom: 1rem;
   font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .markdown-content h1 {

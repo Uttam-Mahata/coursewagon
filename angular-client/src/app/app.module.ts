@@ -39,6 +39,7 @@ import { AdminUsersComponent } from './admin/admin-users/admin-users.component';
 import { AdminTestimonialsComponent } from './admin/admin-testimonials/admin-testimonials.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { HowItWorksComponent } from './how-it-works/how-it-works.component';
 
 @NgModule({
   declarations: [
@@ -67,6 +68,7 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
     AdminTestimonialsComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
+    HowItWorksComponent,
   ],
   imports: [
     BrowserModule,

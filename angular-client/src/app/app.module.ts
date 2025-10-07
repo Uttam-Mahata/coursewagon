@@ -40,6 +40,7 @@ import { AdminTestimonialsComponent } from './admin/admin-testimonials/admin-tes
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { HowItWorksComponent } from './how-it-works/how-it-works.component';
+import { HelpCenterComponent } from './help-center/help-center.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import { HowItWorksComponent } from './how-it-works/how-it-works.component';
     ForgotPasswordComponent,
     ResetPasswordComponent,
     HowItWorksComponent,
+    HelpCenterComponent,
   ],
   imports: [
     BrowserModule,

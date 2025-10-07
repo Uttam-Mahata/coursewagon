@@ -1,0 +1,60 @@
+/* Fade-in animation for hero section */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* FAQ accordion transitions */
+.space-y-4 > div {
+  transition: all 0.3s ease;
+}
+
+/* Back to top button animation */
+button[aria-label="Back to top"] {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Search input focus ring */
+input[type="text"]:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Quick link cards hover effect */
+.cursor-pointer {
+  transition: transform 0.2s ease;
+}
+
+.cursor-pointer:hover {
+  transform: translateY(-2px);
+}
+
+/* Section scroll padding for smooth navigation */
+section > div[id] {
+  scroll-margin-top: 100px;
+}

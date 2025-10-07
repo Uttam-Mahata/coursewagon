@@ -77,7 +77,7 @@ jobs:
           --memory=2Gi \
           --cpu=2 \
           --max-instances=10 \
-          --min-instances=0 \
+          --min-instances=1 \
           --timeout=3600 \
           --concurrency=80 \
           --set-env-vars="GOOGLE_APPLICATION_CREDENTIALS=/etc/secrets/gcs/service-account.json,FIREBASE_ADMIN_SDK_PATH=/etc/secrets/firebase/admin-sdk.json" \

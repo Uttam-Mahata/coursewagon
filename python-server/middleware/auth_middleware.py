@@ -10,7 +10,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Security scheme for JWT Bearer token
-security = HTTPBearer()
+# auto_error=False allows function to check cookies when Authorization header is missing
+security = HTTPBearer(auto_error=False)
 
 # JWT Configuration
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-here')

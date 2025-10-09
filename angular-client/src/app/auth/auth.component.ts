@@ -4,9 +4,7 @@ import { AuthService } from '../services/auth/auth.service';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faEnvelope, faLock, faUser, faUserPlus, faSignInAlt, faKey, faExclamationTriangle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, AsyncValidatorFn } from '@angular/forms';
-import { Observable, of, forkJoin } from 'rxjs';
-import { map, catchError, debounceTime, switchMap, first } from 'rxjs/operators';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
     selector: 'app-auth',
@@ -20,7 +18,6 @@ export class AuthComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   isGoogleLoading = false;
-  isCheckingEmail = false;
   registeredEmail = '';
   showVerificationMessage = false;
   resendingVerification = false;
@@ -57,7 +54,7 @@ export class AuthComponent implements OnInit {
     this.registerForm = this.formBuilder.group({
       first_name: ['', Validators.required],
       last_name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email], [this.emailExistsValidator()]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
 
@@ -205,55 +202,5 @@ export class AuthComponent implements OnInit {
   clearMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
-  }
-
-  // Async validator to check if email already exists
-  emailExistsValidator(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      if (!control.value) {
-        return of(null);
-      }
-
-      this.isCheckingEmail = true;
-      
-      return of(control.value).pipe(
-        debounceTime(500), // Wait 500ms after user stops typing
-        switchMap(email => 
-          this.authService.checkEmailExists(email).pipe(
-            map(response => {
-              this.isCheckingEmail = false;
-              // If email exists, return error
-              return response.exists ? { emailExists: true } : null;
-            }),
-            catchError(() => {
-              this.isCheckingEmail = false;
-              // On error, allow the user to continue (fail open)
-              return of(null);
-            })
-          )
-        ),
-        first() // Complete after first emission
-      );
-    };
-  }
-
-  // Getter for easy access to email validation state
-  get emailControl() {
-    return this.registerForm.get('email');
-  }
-
-  get isEmailTaken(): boolean {
-    const emailControl = this.emailControl;
-    return emailControl ? emailControl.hasError('emailExists') && !this.isCheckingEmail : false;
-  }
-
-  get isEmailAvailable(): boolean {
-    const emailControl = this.emailControl;
-    return emailControl ? 
-      emailControl.valid && 
-      emailControl.dirty && 
-      emailControl.value && 
-      !this.isCheckingEmail : 
-      false;
   }
 }

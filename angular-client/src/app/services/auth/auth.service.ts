@@ -65,6 +65,10 @@ export class AuthService {
     return this.http.post(`${this.authUrl}/register`, userData);
   }
 
+  checkEmailExists(email: string): Observable<any> {
+    return this.http.post(`${this.authUrl}/check-email`, { email });
+  }
+
   logout(): void {
     // First notify subscribers that user is changing
     this.currentUserSource.next(null);

@@ -57,6 +57,27 @@ class ProfileUpdate(BaseModel):
     last_name: Optional[str] = None
     # Add other profile fields as needed
 
+class CheckEmail(BaseModel):
+    email: EmailStr
+
+@auth_router.post('/check-email')
+async def check_email(
+    email_data: CheckEmail,
+    db: Session = Depends(get_db)
+):
+    """Check if an email address is already registered"""
+    try:
+        user_repo = UserRepository(db)
+        user = user_repo.get_user_by_email(email_data.email)
+        
+        return {
+            'exists': user is not None,
+            'available': user is None
+        }
+    except Exception as e:
+        logger.error(f"Error checking email: {str(e)}")
+        raise HTTPException(status_code=500, detail='Internal server error')
+
 @auth_router.post('/register', status_code=status.HTTP_201_CREATED)
 async def register(
     user_data: UserRegister, 

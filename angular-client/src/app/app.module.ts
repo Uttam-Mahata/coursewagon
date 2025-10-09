@@ -41,6 +41,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { HowItWorksComponent } from './how-it-works/how-it-works.component';
 import { HelpCenterComponent } from './help-center/help-center.component';
+import { EmailVerificationComponent } from './email-verification/email-verification.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { HelpCenterComponent } from './help-center/help-center.component';
     ResetPasswordComponent,
     HowItWorksComponent,
     HelpCenterComponent,
+    EmailVerificationComponent,
   ],
   imports: [
     BrowserModule,

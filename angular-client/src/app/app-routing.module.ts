@@ -20,12 +20,14 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { HowItWorksComponent } from './how-it-works/how-it-works.component';
 import { HelpCenterComponent } from './help-center/help-center.component';
+import { EmailVerificationComponent } from './email-verification/email-verification.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'auth', component: AuthComponent, canActivate: [NonAuthGuard] },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'verify-email', component: EmailVerificationComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'create-course', component: CourseComponent, canActivate: [AuthGuard] },
   { path: 'courses', component: CoursesComponent, canActivate: [AuthGuard] },

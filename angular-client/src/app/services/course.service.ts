@@ -43,12 +43,12 @@ export class CourseService {
   // Refresh the courses cache
   refreshMyCourses() {
     // Only fetch courses if there's a logged-in user
-    if (!this.authService.getToken()) {
-      console.log('No auth token, skipping course refresh');
+    if (!this.authService.getCurrentUser()) {
+      console.log('No logged-in user, skipping course refresh');
       this.myCoursesSubject.next([]);
       return;
     }
-    
+
     this.http.get<any[]>(`${this.apiUrl}/my-courses`).subscribe({
       next: (courses) => {
         this.myCoursesSubject.next(courses);
@@ -84,10 +84,10 @@ export class CourseService {
   // Get only user's courses - either from cache or fresh from backend
   getMyCourses(forceRefresh = false): Observable<any> {
     // If not logged in, return empty array
-    if (!this.authService.getToken()) {
+    if (!this.authService.getCurrentUser()) {
       return of([]);
     }
-    
+
     if (forceRefresh || this.myCoursesSubject.value.length === 0) {
       this.refreshMyCourses();
     }

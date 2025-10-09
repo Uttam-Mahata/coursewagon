@@ -30,7 +30,10 @@ async def lifespan(app: FastAPI):
     # Run database migrations
     try:
         from migrations.add_welcome_email_sent_column import add_welcome_email_sent_column
+        from migrations.add_email_verification import run_migration as run_email_verification_migration
+
         add_welcome_email_sent_column()
+        run_email_verification_migration()
         logger.info("Database migrations completed successfully")
     except Exception as e:
         logger.error(f"Database migration failed: {str(e)}")
@@ -79,19 +82,28 @@ app = FastAPI(
 )
 
 # CORS configuration
+# Note: When allow_credentials=True, cannot use allow_origins=["*"]
+# Must specify exact origins for cookie-based authentication
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "*",
         "http://localhost:4200",
         "http://127.0.0.1:4200",
         "https://coursewagon-backend.victoriousforest-3a334815.southeastasia.azurecontainerapps.io",
         "https://www.coursewagon.live",
         "https://coursewagon.web.app"
     ],
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "Accept", "Origin"],
+    allow_credentials=True,  # Required for HttpOnly cookies
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=[
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Accept",
+        "Origin",
+        "Cookie"
+    ],
+    expose_headers=["Set-Cookie"]
 )
 
 # Database error handling middleware

@@ -33,7 +33,6 @@ export class ProfileComponent implements OnInit {
   isLoading: {[key: string]: boolean} = {
     passwordChange: false
   };
-  token: string | null = null;
   
   // Password change form
   passwordForm: FormGroup;
@@ -55,25 +54,24 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Store token for debugging
-    this.token = this.authService.getToken();
-    console.log('Profile component initialized, token:', this.token?.substring(0, 10) + '...');
-    
+    console.log('Profile component initialized');
+
     this.authService.currentUser$.subscribe(user => {
       this.user = user;
       console.log('Current user in profile:', user);
     });
-    
-    // Check if we have a valid token and immediately try to fetch current user
-    if (!this.token) {
-      console.log('No token found, redirecting to login');
+
+    // Check if user is logged in
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      console.log('No user found, redirecting to login');
       this.errorMessage = 'You need to log in first';
       setTimeout(() => {
         this.router.navigate(['/auth']);
       }, 2000);
     } else {
       // Get the current user
-      this.user = this.authService.getCurrentUser();
+      this.user = currentUser;
     }
   }
 

@@ -214,6 +214,3 @@ For support, email contact@coursewagon.live or open an issue in the GitHub repos
 
 - **Live Application**: [https://www.coursewagon.live](https://www.coursewagon.live)
 
----
-
-Built with d by the CourseWagon Team

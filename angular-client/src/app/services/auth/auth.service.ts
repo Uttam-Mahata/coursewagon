@@ -30,28 +30,20 @@ export class AuthService {
   }
 
   checkAuthState(): void {
-    // Check if user data exists in localStorage
-    // Token is now in HttpOnly cookie, not accessible to JavaScript
-    const user = this.getCurrentUser();
-
-    if (user) {
-      this.currentUserSource.next(user);
-      this.isLoggedInSource.next(true);
-      console.log('Auth state checked - User is logged in', {user});
-    } else {
-      // Try to fetch profile from backend (if cookie exists)
-      this.http.get(`${this.authUrl}/profile`, { withCredentials: true }).subscribe({
-        next: (userData: any) => {
-          this.storeUser(userData);
-          console.log('Auth state restored from server', {user: userData});
-        },
-        error: () => {
-          // No valid session - user not logged in
-          this.clearAuthData();
-          console.log('Auth state checked - User is not logged in');
-        }
-      });
-    }
+    // Always verify with backend to check if HttpOnly cookie is still valid
+    // Don't trust localStorage alone as cookies might have been deleted
+    this.http.get(`${this.authUrl}/profile`, { withCredentials: true }).subscribe({
+      next: (userData: any) => {
+        // Valid session - store/update user data
+        this.storeUser(userData);
+        console.log('Auth state checked - User is logged in', {user: userData});
+      },
+      error: () => {
+        // No valid session - clear any stale data
+        this.clearAuthData();
+        console.log('Auth state checked - User is not logged in');
+      }
+    });
   }
 
   login(email: string, password: string, rememberMe: boolean = false): Observable<any> {

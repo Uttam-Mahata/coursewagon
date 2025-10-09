@@ -5,7 +5,7 @@ import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
 import { faEnvelope, faLock, faUser, faUserPlus, faSignInAlt, faKey, faExclamationTriangle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, AsyncValidatorFn } from '@angular/forms';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { map, catchError, debounceTime, switchMap, first } from 'rxjs/operators';
 
 @Component({
@@ -21,6 +21,9 @@ export class AuthComponent implements OnInit {
   successMessage = '';
   isGoogleLoading = false;
   isCheckingEmail = false;
+  registeredEmail = '';
+  showVerificationMessage = false;
+  resendingVerification = false;
 
   faEnvelope = faEnvelope;
   faLock = faLock;
@@ -125,9 +128,9 @@ export class AuthComponent implements OnInit {
     this.authService.register(this.registerForm.value)
       .subscribe({
         next: (response) => {
-          this.successMessage = 'Registration successful! Welcome email sent. Please login to continue.';
-          this.isLoginMode = true;
-          this.loginForm.patchValue({ email: this.registerForm.value.email });
+          this.registeredEmail = this.registerForm.value.email;
+          this.showVerificationMessage = true;
+          this.successMessage = '';
           this.registerForm.reset();
           console.log('Registration successful:', response);
         },
@@ -136,6 +139,35 @@ export class AuthComponent implements OnInit {
           this.errorMessage = error.error?.detail || error.error?.error || 'Registration failed. Please try again.';
         }
       });
+  }
+
+  resendVerificationEmail(): void {
+    if (!this.registeredEmail) {
+      return;
+    }
+
+    this.resendingVerification = true;
+    this.errorMessage = '';
+
+    this.authService.resendVerificationEmail(this.registeredEmail)
+      .subscribe({
+        next: (response) => {
+          this.resendingVerification = false;
+          this.successMessage = 'Verification email resent! Please check your inbox.';
+          console.log('Verification email resent:', response);
+        },
+        error: (error) => {
+          this.resendingVerification = false;
+          console.error('Error resending verification:', error);
+          this.errorMessage = 'Failed to resend verification email. Please try again.';
+        }
+      });
+  }
+
+  backToRegister(): void {
+    this.showVerificationMessage = false;
+    this.registeredEmail = '';
+    this.isLoginMode = false;
   }
 
   // Google Sign-In method

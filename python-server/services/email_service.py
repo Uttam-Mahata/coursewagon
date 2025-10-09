@@ -277,29 +277,70 @@ class EmailService:
             else:
                 user_email = user.get('email', '')
                 user_first_name = user.get('first_name', 'User')
-            
+
             context = {
                 'first_name': user_first_name,
                 'email': user_email,
                 'login_url': f"{self.frontend_url}/auth"
             }
-            
+
             result = self.send_template_email(
                 user_email,
                 "Password Changed Successfully",
                 "password_changed.html",
                 context
             )
-            
+
             if result:
                 logger.info(f"Password changed email sent successfully to {user_email}")
             else:
                 logger.error(f"Failed to send password changed email to {user_email}")
-                
+
             return result
-            
+
         except Exception as e:
             logger.error(f"Failed to send password changed email: {str(e)}")
+            return False
+
+    def send_verification_email(self, user, verification_token, frontend_url=None):
+        """Send email verification link"""
+        try:
+            if frontend_url is None:
+                frontend_url = self.frontend_url
+
+            verification_url = f"{frontend_url}/verify-email?token={verification_token}"
+
+            # Handle both user object and dict
+            if hasattr(user, 'to_dict'):
+                user_email = user.email
+                user_first_name = user.first_name or 'User'
+            else:
+                user_email = user.get('email', '')
+                user_first_name = user.get('first_name', 'User')
+
+            context = {
+                'first_name': user_first_name,
+                'email': user_email,
+                'verification_link': verification_url,
+                'expires_in': '24 hours'
+            }
+
+            result = self.send_template_email(
+                user_email,
+                "Verify Your Email Address",
+                "verify_email.html",
+                context
+            )
+
+            if result:
+                logger.info(f"Verification email sent successfully to {user_email}")
+            else:
+                logger.error(f"Failed to send verification email to {user_email}")
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Failed to send verification email: {str(e)}")
             return False
 
     def send_simple_test_message(self, to_email="uttambav@gmail.com"):

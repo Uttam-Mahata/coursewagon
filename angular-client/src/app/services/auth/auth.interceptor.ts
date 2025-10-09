@@ -1,54 +1,85 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-  HttpErrorResponse
+  HttpErrorResponse,
+  HttpClient
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+  private isRefreshing = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private router: Router,
+    private injector: Injector
+  ) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const token = this.authService.getToken();
-    
-    // Only add the Authorization header if token exists
-    if (token) {
-      // Clone the request and add the Authorization header with proper format
-      const clonedRequest = request.clone({
-        headers: request.headers.set('Authorization', `Bearer ${token}`)
+    // Tokens are in HttpOnly cookies - browser sends them automatically
+    // Just ensure withCredentials is set for API requests
+    let modifiedRequest = request;
+
+    // Add withCredentials to API requests (so cookies are sent)
+    if (request.url.includes(environment.apiBaseUrl)) {
+      modifiedRequest = request.clone({
+        withCredentials: true
       });
-      
-      console.log(`Adding token to ${request.url}`);
-      return next.handle(clonedRequest).pipe(
-        catchError((error: HttpErrorResponse) => {
-          console.error('HTTP Error:', error);
-          if (error.status === 401) {
-            console.log('Authentication error detected, logging out...');
-            this.authService.logout();
-            this.router.navigate(['/auth']);
-          }
-          return throwError(() => error);
-        })
-      );
     }
-    
-    // Pass through the original request if no token
-    return next.handle(request).pipe(
+
+    return next.handle(modifiedRequest).pipe(
       catchError((error: HttpErrorResponse) => {
-        console.error('HTTP Error:', error);
         if (error.status === 401) {
-          this.router.navigate(['/auth']);
+          // Try to refresh token on 401
+          return this.handle401Error(modifiedRequest, next);
         }
         return throwError(() => error);
       })
     );
+  }
+
+  private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // Skip refresh for certain endpoints
+    if (request.url.includes('/refresh') || request.url.includes('/login') || request.url.includes('/register')) {
+      return throwError(() => new HttpErrorResponse({ status: 401 }));
+    }
+
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+
+      // Lazy inject HttpClient to avoid circular dependency
+      const http = this.injector.get(HttpClient);
+
+      // Try to refresh the token
+      return http.post(`${environment.authApiUrl}/refresh`, {}, { withCredentials: true }).pipe(
+        switchMap(() => {
+          this.isRefreshing = false;
+          // Retry the original request
+          return next.handle(request);
+        }),
+        catchError((error) => {
+          this.isRefreshing = false;
+          // Refresh failed - clear auth and redirect
+          console.log('Token refresh failed, clearing auth data and redirecting to login...');
+
+          // Clear user data from localStorage (tokens are in httpOnly cookies, cleared by backend)
+          localStorage.removeItem('current_user');
+
+          // Redirect to login page
+          this.router.navigate(['/auth']);
+
+          return throwError(() => error);
+        })
+      );
+    }
+
+    // If already refreshing, just retry the request
+    return next.handle(request);
   }
 }

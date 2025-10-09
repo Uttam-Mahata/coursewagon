@@ -19,8 +19,42 @@
         {{ successMessage }}
       </div>
 
+      <!-- Email Verification Message -->
+      <div *ngIf="showVerificationMessage" class="text-center">
+        <div class="mb-4">
+          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100">
+            <fa-icon [icon]="'envelope'" class="text-blue-600 text-2xl"></fa-icon>
+          </div>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Check Your Email</h3>
+        <p class="text-gray-600 mb-4">
+          We've sent a verification email to <strong>{{ registeredEmail }}</strong>.
+          Please click the link in the email to verify your account.
+        </p>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 text-sm text-left">
+          <p class="font-medium text-blue-900 mb-2">📬 What to do next:</p>
+          <ul class="list-disc list-inside text-blue-800 space-y-1">
+            <li>Check your inbox (and spam folder)</li>
+            <li>Click the verification link</li>
+            <li>Return here to log in</li>
+          </ul>
+        </div>
+        <button
+          (click)="resendVerificationEmail()"
+          [disabled]="resendingVerification"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg shadow transition mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="!resendingVerification">Resend Verification Email</span>
+          <span *ngIf="resendingVerification">Sending...</span>
+        </button>
+        <button
+          (click)="backToRegister()"
+          class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg shadow transition">
+          Back to Registration
+        </button>
+      </div>
+
       <!-- Login Form -->
-      <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      <form *ngIf="isLoginMode && !showVerificationMessage" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
           <div class="relative">
@@ -75,7 +109,7 @@
       </form>
 
       <!-- Register Form -->
-      <form *ngIf="!isLoginMode" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
+      <form *ngIf="!isLoginMode && !showVerificationMessage" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
         <div>
           <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
           <div class="relative">
@@ -161,15 +195,16 @@
       </form>
 
       <!-- Divider -->
-      <div class="my-6 flex items-center">
+      <div *ngIf="!showVerificationMessage" class="my-6 flex items-center">
         <div class="flex-1 border-t border-gray-300"></div>
         <span class="px-4 text-sm text-gray-500 bg-white">or</span>
         <div class="flex-1 border-t border-gray-300"></div>
       </div>
 
       <!-- Google Sign-In Button -->
-      <button 
-        type="button" 
+      <button
+        *ngIf="!showVerificationMessage"
+        type="button"
         class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-2 rounded-lg shadow transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         (click)="onGoogleSignIn()"
         [disabled]="isGoogleLoading">
@@ -185,9 +220,9 @@
         <span *ngIf="isGoogleLoading">Connecting...</span>
       </button>
 
-      <div class="mt-6 text-center">
-        <button 
-          type="button" 
+      <div *ngIf="!showVerificationMessage" class="mt-6 text-center">
+        <button
+          type="button"
           class="text-blue-600 hover:underline font-medium transition flex items-center justify-center gap-2"
           (click)="toggleMode()">
           <fa-icon [icon]="isLoginMode ? 'user-plus' : 'sign-in-alt'"></fa-icon>

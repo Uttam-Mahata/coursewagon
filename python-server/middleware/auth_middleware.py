@@ -52,25 +52,33 @@ class JWTAuth:
             raise HTTPException(status_code=401, detail="Invalid or expired token")
 
 def get_current_user_id(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    request: Request,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ) -> int:
     """
     FastAPI dependency to verify JWT token and return current user ID.
-    This replaces the Flask @require_auth decorator.
+    Reads token from HttpOnly cookie (preferred) or Authorization header (fallback).
     """
     try:
-        # Get the token from credentials
-        token = credentials.credentials
-        
+        # Try to get token from cookie first (HttpOnly - most secure)
+        token = request.cookies.get('access_token')
+
+        # Fallback to Authorization header for backward compatibility
+        if not token and credentials:
+            token = credentials.credentials
+
+        if not token:
+            raise HTTPException(status_code=401, detail="Authentication required")
+
         # Verify the JWT token
         user_id = JWTAuth.verify_token(token)
         logger.debug(f"Successfully authenticated user_id: {user_id}")
-        
+
         # Convert user_id back to int if it's a string from JWT
         user_id = int(user_id) if isinstance(user_id, str) else user_id
-        
+
         return user_id
-        
+
     except HTTPException:
         raise
     except Exception as e:
@@ -96,12 +104,20 @@ def get_current_user_optional(
     """
     FastAPI dependency to optionally verify JWT token.
     Returns user ID if valid token is provided, None otherwise.
+    Reads token from HttpOnly cookie (preferred) or Authorization header (fallback).
     """
-    if not credentials:
-        return None
-        
     try:
-        user_id = JWTAuth.verify_token(credentials.credentials)
+        # Try to get token from cookie first
+        token = request.cookies.get('access_token')
+
+        # Fallback to Authorization header
+        if not token and credentials:
+            token = credentials.credentials
+
+        if not token:
+            return None
+
+        user_id = JWTAuth.verify_token(token)
         return int(user_id) if isinstance(user_id, str) else user_id
     except Exception as e:
         logger.debug(f"Optional auth failed: {str(e)}")

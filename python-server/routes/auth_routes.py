@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Response, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from sqlalchemy.orm import Session
@@ -7,9 +8,18 @@ from services.auth_service import AuthService
 from services.email_service import EmailService
 from middleware.auth_middleware import get_current_user_id, JWTAuth
 from extensions import get_db
+from utils.email_validator import validate_email
+from datetime import timedelta
 import logging
+import os
 
 logger = logging.getLogger(__name__)
+
+# Cookie configuration
+IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
+COOKIE_SECURE = IS_PRODUCTION  # Only send over HTTPS in production
+COOKIE_SAMESITE = 'lax'  # CSRF protection
+FRONTEND_DOMAIN = os.environ.get('FRONTEND_DOMAIN', 'localhost')
 
 # Create FastAPI router
 auth_router = APIRouter(prefix="/auth", tags=["authentication"])
@@ -20,6 +30,50 @@ def get_auth_service(db: Session = Depends(get_db)):
 
 def get_email_service():
     return EmailService()
+
+def set_auth_cookies(response: Response, access_token: str, refresh_token: str, remember_me: bool = False):
+    """
+    Set secure HttpOnly cookies for authentication tokens
+
+    Args:
+        response: FastAPI Response object
+        access_token: JWT access token
+        refresh_token: JWT refresh token
+        remember_me: If True, set longer expiry for cookies
+    """
+    # Access token cookie (short-lived)
+    access_max_age = 2592000 if remember_me else 3600  # 30 days or 1 hour
+
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        max_age=access_max_age,
+        httponly=True,  # Cannot be accessed by JavaScript
+        secure=COOKIE_SECURE,  # Only send over HTTPS in production
+        samesite=COOKIE_SAMESITE,  # CSRF protection
+        path="/"
+    )
+
+    # Refresh token cookie (long-lived)
+    refresh_max_age = 2592000 if remember_me else 604800  # 30 days or 7 days
+
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        max_age=refresh_max_age,
+        httponly=True,
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
+        path="/api/auth/refresh"  # Only sent to refresh endpoint
+    )
+
+    logger.debug(f"Auth cookies set with remember_me={remember_me}")
+
+def clear_auth_cookies(response: Response):
+    """Clear authentication cookies on logout"""
+    response.delete_cookie(key="access_token", path="/")
+    response.delete_cookie(key="refresh_token", path="/api/auth/refresh")
+    logger.debug("Auth cookies cleared")
 
 # Pydantic models for request/response validation
 class UserRegister(BaseModel):
@@ -57,6 +111,66 @@ class ProfileUpdate(BaseModel):
     last_name: Optional[str] = None
     # Add other profile fields as needed
 
+class CheckEmail(BaseModel):
+    email: EmailStr
+
+class VerifyEmail(BaseModel):
+    token: str
+
+class ResendVerification(BaseModel):
+    email: EmailStr
+
+@auth_router.post('/check-email')
+async def check_email(
+    email_data: CheckEmail,
+    db: Session = Depends(get_db)
+):
+    """Check if an email address is already registered"""
+    try:
+        user_repo = UserRepository(db)
+        user = user_repo.get_user_by_email(email_data.email)
+
+        return {
+            'exists': user is not None,
+            'available': user is None
+        }
+    except Exception as e:
+        logger.error(f"Error checking email: {str(e)}")
+        raise HTTPException(status_code=500, detail='Internal server error')
+
+@auth_router.post('/validate-email')
+async def validate_email_endpoint(email_data: CheckEmail):
+    """
+    Validate if an email address is deliverable by checking:
+    - Email format
+    - DNS MX records
+    - Domain validity
+    - Not a disposable email service
+    """
+    try:
+        is_valid, error_message = validate_email(email_data.email, check_smtp=False)
+
+        if not is_valid:
+            return {
+                'valid': False,
+                'deliverable': False,
+                'message': error_message
+            }
+
+        return {
+            'valid': True,
+            'deliverable': True,
+            'message': 'Email address is valid and deliverable'
+        }
+    except Exception as e:
+        logger.error(f"Error validating email: {str(e)}")
+        # Don't fail validation on errors - allow registration
+        return {
+            'valid': True,
+            'deliverable': True,
+            'message': 'Email validation service unavailable'
+        }
+
 @auth_router.post('/register', status_code=status.HTTP_201_CREATED)
 async def register(
     user_data: UserRegister, 
@@ -81,27 +195,29 @@ async def register(
         raise HTTPException(status_code=500, detail='Internal server error')
 
 @auth_router.post('/login')
-async def login(login_data: UserLogin, db: Session = Depends(get_db)):
+async def login(login_data: UserLogin, response: Response, db: Session = Depends(get_db)):
     try:
         logger.debug(f"Login attempt for {login_data.email}, remember_me={login_data.remember_me}")
-        
+
         auth_service = AuthService(db)
         auth_data = auth_service.authenticate_user(
             email=login_data.email,
             password=login_data.password
         )
-        
-        # If remember_me is True, generate a longer-lived token
-        if login_data.remember_me:
-            from datetime import timedelta
-            # Create longer-lived token (30 days)
-            access_token = JWTAuth.create_access_token(
-                data={"sub": str(auth_data['user']['id'])},
-                expires_delta=timedelta(days=30)
-            )
-            auth_data['access_token'] = access_token
-            
-        return auth_data
+
+        # Set HttpOnly cookies with tokens
+        set_auth_cookies(
+            response=response,
+            access_token=auth_data['access_token'],
+            refresh_token=auth_data['refresh_token'],
+            remember_me=login_data.remember_me
+        )
+
+        # Return user data only (tokens are in cookies)
+        return {
+            'user': auth_data['user'],
+            'message': 'Login successful'
+        }
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
@@ -109,12 +225,45 @@ async def login(login_data: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail='Internal server error')
 
 @auth_router.post('/refresh')
-async def refresh():
+async def refresh_token_endpoint(request: Request, response: Response, db: Session = Depends(get_db)):
+    """
+    Refresh access token using refresh token from HttpOnly cookie
+    """
     try:
-        # For now, return an error as refresh tokens need to be implemented with proper token verification
-        raise HTTPException(status_code=501, detail="Refresh token endpoint needs to be updated for new JWT implementation")
-    except ValueError as e:
-        raise HTTPException(status_code=401, detail=str(e))
+        # Get refresh token from cookie
+        refresh_token = request.cookies.get('refresh_token')
+        if not refresh_token:
+            raise HTTPException(status_code=401, detail='Refresh token not found')
+
+        # Verify refresh token
+        try:
+            user_id = JWTAuth.verify_token(refresh_token)
+        except Exception as e:
+            logger.error(f"Refresh token verification failed: {str(e)}")
+            raise HTTPException(status_code=401, detail='Invalid or expired refresh token')
+
+        # Generate new access token
+        auth_service = AuthService(db)
+        new_access_token = auth_service.refresh_token(user_id)
+
+        # Set new access token in cookie
+        response.set_cookie(
+            key="access_token",
+            value=new_access_token,
+            max_age=3600,  # 1 hour
+            httponly=True,
+            secure=COOKIE_SECURE,
+            samesite=COOKIE_SAMESITE,
+            path="/"
+        )
+
+        return {'message': 'Token refreshed successfully'}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Token refresh error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail='Token refresh failed')
 
 @auth_router.get('/profile')
 async def get_profile(
@@ -226,9 +375,78 @@ async def change_password(
         logger.error(f"Error changing password: {str(e)}")
         raise HTTPException(status_code=500, detail='Internal server error')
 
+@auth_router.post('/verify-email')
+async def verify_email(verify_data: VerifyEmail, db: Session = Depends(get_db)):
+    """Verify user's email address with token"""
+    try:
+        if not verify_data.token:
+            raise HTTPException(status_code=400, detail='Token is required')
+
+        auth_service = AuthService(db)
+        user = auth_service.verify_email(verify_data.token)
+
+        return {
+            'message': 'Email verified successfully! You can now log in.',
+            'user': user.to_dict()
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error verifying email: {str(e)}")
+        raise HTTPException(status_code=500, detail='Email verification failed')
+
+@auth_router.post('/resend-verification')
+async def resend_verification(resend_data: ResendVerification, db: Session = Depends(get_db)):
+    """Resend verification email to user"""
+    try:
+        if not resend_data.email:
+            raise HTTPException(status_code=400, detail='Email is required')
+
+        auth_service = AuthService(db)
+        result = auth_service.resend_verification_email(resend_data.email)
+
+        # Always return success message (even if email doesn't exist) for security
+        return {'message': 'If an account with this email exists and is not verified, a verification email has been sent.'}
+    except Exception as e:
+        logger.error(f"Error resending verification: {str(e)}")
+        raise HTTPException(status_code=500, detail='Failed to resend verification email')
+
+@auth_router.get('/verification-status')
+async def verification_status(
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """Check if current user's email is verified"""
+    try:
+        user_repo = UserRepository(db)
+        user = user_repo.get_user_by_id(current_user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail='User not found')
+
+        return {
+            'email_verified': user.email_verified,
+            'email': user.email
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error checking verification status: {str(e)}")
+        raise HTTPException(status_code=500, detail='Internal server error')
+
+@auth_router.post('/logout')
+async def logout(response: Response):
+    """Logout user by clearing auth cookies"""
+    try:
+        clear_auth_cookies(response)
+        return {'message': 'Logged out successfully'}
+    except Exception as e:
+        logger.error(f"Logout error: {str(e)}")
+        raise HTTPException(status_code=500, detail='Logout failed')
+
 @auth_router.post('/google-auth')
 async def google_auth(
-    google_data: GoogleAuth, 
+    google_data: GoogleAuth,
+    response: Response,
     db: Session = Depends(get_db),
     auth_service: AuthService = Depends(get_auth_service)
 ):
@@ -236,19 +454,26 @@ async def google_auth(
     try:
         if not google_data.firebase_token or not google_data.user_data:
             raise HTTPException(status_code=400, detail='Firebase token and user data are required')
-            
+
         # Verify the Firebase token and process Google authentication
         result = auth_service.authenticate_google_user(google_data.firebase_token, google_data.user_data)
-        
+
         logger.info(f"Google authentication successful for: {result['user']['email']}")
-        
+
+        # Set HttpOnly cookies with tokens
+        set_auth_cookies(
+            response=response,
+            access_token=result['access_token'],
+            refresh_token=result['refresh_token'],
+            remember_me=False  # Google auth uses default expiry
+        )
+
+        # Return user data only (tokens are in cookies)
         return {
-            'access_token': result['access_token'],
-            'refresh_token': result['refresh_token'],
             'user': result['user'],
             'message': 'Google authentication successful'
         }
-        
+
     except ValueError as e:
         logger.error(f"Google auth validation error: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))

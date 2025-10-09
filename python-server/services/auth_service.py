@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 from repositories.user_repository import UserRepository
 from repositories.password_reset_repository import PasswordResetRepository
+from repositories.email_verification_repository import EmailVerificationRepository
 from werkzeug.security import generate_password_hash
 from utils.encryption import EncryptionService
+from utils.email_validator import validate_email
 from services.email_service import EmailService
 from services.background_task_service import background_task_service
 from middleware.auth_middleware import JWTAuth
@@ -18,6 +20,7 @@ class AuthService:
         self.user_repository = UserRepository(db_session)
         self.email_service = EmailService()
         self.password_reset_repository = PasswordResetRepository(db_session)
+        self.email_verification_repository = EmailVerificationRepository(db_session)
         try:
             self.encryption_service = EncryptionService()
         except ValueError as e:
@@ -33,33 +36,43 @@ class AuthService:
         return JWTAuth.create_refresh_token(data={"sub": str(user_id)})
 
     def register_user(self, email, password, first_name=None, last_name=None):
+        # Check if email is already registered
         if self.user_repository.get_user_by_email(email):
             raise ValueError("Email already exists")
-        
-        # Create the user
+
+        # Validate email deliverability
+        is_valid, error_message = validate_email(email, check_smtp=False)
+        if not is_valid:
+            logger.warning(f"Email validation failed for {email}: {error_message}")
+            raise ValueError(f"Invalid email address: {error_message}")
+
+        # Create the user with email_verified=False
         user = self.user_repository.create_user(
             email=email,
             password=password,
             first_name=first_name,
             last_name=last_name
         )
-        
-        # Send welcome email asynchronously (non-blocking)
-        if user and not user.welcome_email_sent:
-            logger.info(f"Scheduling welcome email for new user: {email}")
-            background_task_service.send_email_async(
-                self.email_service, 
-                'send_welcome_email', 
-                user
-            )
-            
-            # Mark welcome email as sent to prevent duplicate emails
+
+        # Create verification token and send verification email
+        if user:
             try:
-                self.user_repository.update_user(user, welcome_email_sent=True)
-                logger.debug(f"Marked welcome email as sent for user: {email}")
+                verification = self.email_verification_repository.create_verification_token(user)
+
+                logger.info(f"Scheduling verification email for new user: {email}")
+                background_task_service.send_email_async(
+                    self.email_service,
+                    'send_verification_email',
+                    user,
+                    verification.token
+                )
+
+                # Update email_verification_sent_at timestamp
+                self.user_repository.update_user(user, email_verification_sent_at=datetime.utcnow())
+                logger.debug(f"Verification email scheduled for user: {email}")
             except Exception as e:
-                logger.error(f"Failed to update welcome email status: {str(e)}")
-        
+                logger.error(f"Failed to send verification email: {str(e)}")
+
         return user
 
     def authenticate_user(self, email, password):
@@ -212,7 +225,81 @@ class AuthService:
         
         logger.info(f"Password reset successful for user ID: {user.id}")
         return user
-    
+
+    def verify_email(self, token):
+        """Verify a user's email using the verification token"""
+        verification = self.email_verification_repository.get_by_token(token)
+
+        # Check if token exists and is valid
+        if not verification:
+            raise ValueError("Invalid verification token")
+
+        if not verification.is_valid():
+            if verification.is_expired():
+                raise ValueError("This verification link has expired. Please request a new one.")
+            else:
+                raise ValueError("This verification link has already been used. Please request a new one.")
+
+        # Get the user
+        user = self.user_repository.get_user_by_id(verification.user_id)
+        if not user:
+            raise ValueError("User not found")
+
+        # Check if already verified
+        if user.email_verified:
+            logger.info(f"Email already verified for user ID: {user.id}")
+            return user
+
+        # Mark email as verified
+        self.user_repository.update_user(user, email_verified=True)
+
+        # Mark token as used
+        self.email_verification_repository.invalidate_token(token)
+
+        # Send welcome email after verification
+        logger.info(f"Scheduling welcome email for verified user: {user.email}")
+        background_task_service.send_email_async(
+            self.email_service,
+            'send_welcome_email',
+            user
+        )
+        self.user_repository.update_user(user, welcome_email_sent=True)
+
+        logger.info(f"Email verification successful for user ID: {user.id}")
+        return user
+
+    def resend_verification_email(self, email):
+        """Resend verification email to a user"""
+        user = self.user_repository.get_user_by_email(email)
+        if not user:
+            logger.info(f"Verification email requested for non-existent email: {email}")
+            # Return True for security (don't reveal if email exists)
+            return True
+
+        # Check if already verified
+        if user.email_verified:
+            logger.info(f"Verification email requested for already verified user: {email}")
+            return True
+
+        # Create a new verification token
+        verification = self.email_verification_repository.create_verification_token(user)
+
+        # Send the verification email asynchronously
+        if verification:
+            logger.info(f"Scheduling verification email resend for: {email}")
+            background_task_service.send_email_async(
+                self.email_service,
+                'send_verification_email',
+                user,
+                verification.token
+            )
+
+            # Update email_verification_sent_at timestamp
+            self.user_repository.update_user(user, email_verification_sent_at=datetime.utcnow())
+            logger.info(f"Verification email resent for: {email}")
+            return True
+        return False
+
     def authenticate_google_user(self, firebase_token, user_data):
         """Authenticate or register a user via Google Firebase token"""
         try:
@@ -235,9 +322,16 @@ class AuthService:
             
             logger.info(f"Firebase token verified for email: {email}")
             
-            # Check if user already exists
+            # Validate email deliverability (only for new users)
             user = self.user_repository.get_user_by_email(email)
-            
+
+            if not user:
+                # Validate email before creating new user
+                is_valid, error_message = validate_email(email, check_smtp=False)
+                if not is_valid:
+                    logger.warning(f"Email validation failed for Google user {email}: {error_message}")
+                    raise ValueError(f"Invalid email address: {error_message}")
+
             if user:
                 # User exists, update last login and return auth data
                 self.user_repository.update_last_login(user)
@@ -276,22 +370,24 @@ class AuthService:
                 )
                 
                 logger.info(f"Google registration successful for new user: {email}")
-                
-                # Send welcome email asynchronously for new Google users
-                if user and not user.welcome_email_sent:
-                    logger.info(f"Scheduling welcome email for new Google user: {email}")
-                    background_task_service.send_email_async(
-                        self.email_service, 
-                        'send_welcome_email', 
-                        user
-                    )
-                    
-                    # Mark welcome email as sent
-                    try:
+
+                # Google-authenticated users have verified emails (verified by Google)
+                # Mark as verified and send welcome email
+                try:
+                    self.user_repository.update_user(user, email_verified=True)
+                    logger.info(f"Marked email as verified for Google user: {email}")
+
+                    # Send welcome email for Google users (they don't need verification)
+                    if not user.welcome_email_sent:
+                        background_task_service.send_email_async(
+                            self.email_service,
+                            'send_welcome_email',
+                            user
+                        )
                         self.user_repository.update_user(user, welcome_email_sent=True)
-                        logger.debug(f"Marked welcome email as sent for Google user: {email}")
-                    except Exception as e:
-                        logger.error(f"Failed to update welcome email status for Google user: {str(e)}")
+                        logger.debug(f"Welcome email sent for Google user: {email}")
+                except Exception as e:
+                    logger.error(f"Failed to update email verification status for Google user: {str(e)}")
             
             # Generate JWT tokens
             access_token = self._create_access_token(user.id)

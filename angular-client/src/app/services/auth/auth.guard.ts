@@ -21,15 +21,15 @@ export class AuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    
-    // Check if we have a token
-    const token = this.authService.getToken();
-    
-    if (token) {
+
+    // Check if user is logged in
+    const user = this.authService.getCurrentUser();
+
+    if (user) {
       return true;
     }
-    
-    // If no token, redirect to login page
+
+    // If not logged in, redirect to login page
     this.router.navigate(['/auth'], { queryParams: { returnUrl: state.url } });
     return false;
   }
@@ -39,22 +39,22 @@ export class AuthGuard implements CanActivate {
   providedIn: 'root'
 })
 export class NonAuthGuard implements CanActivate {
-  
+
   constructor(private authService: AuthService, private router: Router) {}
-  
+
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-    
-    // Check if we have a token
-    const token = this.authService.getToken();
-    
-    if (!token) {
+
+    // Check if user is logged in
+    const user = this.authService.getCurrentUser();
+
+    if (!user) {
       return true;
     }
-    
-    // If token exists, redirect to courses page
+
+    // If user is logged in, redirect to courses page
     this.router.navigate(['/courses']);
     return false;
   }

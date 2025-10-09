@@ -12,14 +12,19 @@ from utils.email_validator import validate_email
 from datetime import timedelta
 import logging
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 # Cookie configuration
 IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
-COOKIE_SECURE = IS_PRODUCTION  # Only send over HTTPS in production
-COOKIE_SAMESITE = 'lax'  # CSRF protection
-FRONTEND_DOMAIN = os.environ.get('FRONTEND_DOMAIN', 'localhost')
+# For cross-site cookies (frontend on different domain than backend), we need:
+# - SameSite='none' to allow cross-site cookies
+# - Secure=True (required when SameSite='none', works because both frontend and backend use HTTPS)
+COOKIE_SECURE = True  # Always True for production (HTTPS required for cross-site cookies)
+COOKIE_SAMESITE = 'none'  # Allow cross-site cookies (frontend and backend on different domains)
+FRONTEND_DOMAIN = os.environ.get('FRONTEND_URL', 'localhost')
 
 # Create FastAPI router
 auth_router = APIRouter(prefix="/auth", tags=["authentication"])
@@ -71,8 +76,19 @@ def set_auth_cookies(response: Response, access_token: str, refresh_token: str, 
 
 def clear_auth_cookies(response: Response):
     """Clear authentication cookies on logout"""
-    response.delete_cookie(key="access_token", path="/")
-    response.delete_cookie(key="refresh_token", path="/api/auth/refresh")
+    # Must match the same attributes used when setting cookies
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE
+    )
+    response.delete_cookie(
+        key="refresh_token",
+        path="/api/auth/refresh",
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE
+    )
     logger.debug("Auth cookies cleared")
 
 # Pydantic models for request/response validation

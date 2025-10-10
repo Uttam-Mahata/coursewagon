@@ -194,8 +194,15 @@ export class AuthComponent implements OnInit {
   }
 
   private getErrorMessage(error: any): string {
+    console.log('Processing error:', error);
+    
+    // Handle null or undefined error
+    if (!error) {
+      return 'An unexpected error occurred. Please try again.';
+    }
+
     // Handle different error response structures from backend
-    if (error.error) {
+    if (error.error !== null && error.error !== undefined) {
       // Backend API error responses
       if (typeof error.error === 'string') {
         return error.error;
@@ -217,7 +224,19 @@ export class AuthComponent implements OnInit {
     }
     
     // Firebase authentication errors
-    if (error.message) {
+    if (error.message && typeof error.message === 'string') {
+      // Check for technical error messages that shouldn't be shown to users
+      if (error.message.includes('Http failure response for (unknown url)')) {
+        // This is a CORS or network error
+        if (error.status === 401) {
+          return 'Login failed. Please check your email and password.';
+        }
+        if (error.status === 0) {
+          return 'Cannot connect to the server. Please check your internet connection.';
+        }
+        return 'Connection error. Please check your internet connection and try again.';
+      }
+      
       if (error.message.includes('auth/user-not-found')) {
         return 'No account found with this email. Please sign up first.';
       }
@@ -248,10 +267,14 @@ export class AuthComponent implements OnInit {
       if (error.message.includes('auth/cancelled-popup-request')) {
         return 'Sign-in cancelled. Please try again.';
       }
-      return error.message;
+      
+      // Don't return technical error messages
+      if (!error.message.includes('Http failure') && !error.message.includes('Unknown Error')) {
+        return error.message;
+      }
     }
     
-    // HTTP status-based messages
+    // HTTP status-based messages (fallback for when error.error is null)
     if (error.status === 0) {
       return 'Cannot connect to the server. Please check your internet connection.';
     }
@@ -259,10 +282,10 @@ export class AuthComponent implements OnInit {
       return 'Invalid request. Please check your input and try again.';
     }
     if (error.status === 401) {
-      return 'Invalid credentials. Please check your email and password.';
+      return 'Login failed. Please check your email and password.';
     }
     if (error.status === 403) {
-      return 'Access denied. Your account may be inactive.';
+      return 'Access denied. Your account may be inactive or you may not have permission.';
     }
     if (error.status === 404) {
       return 'Service not found. Please try again later.';

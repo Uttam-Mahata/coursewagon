@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CourseService } from '../services/course.service';
 import { AuthService } from '../services/auth/auth.service';
 import { 
@@ -7,13 +7,16 @@ import {
   faChalkboardTeacher, faBrain, faTasks, faMobileAlt, faClock, faKey,
   faMicrophone, faStop, faPlay, faTrash, faCheckCircle
 } from '@fortawesome/free-solid-svg-icons';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'app-course',
     templateUrl: './course.component.html',
     styleUrls: ['./course.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, RouterModule]
 })
 export class CourseComponent implements OnInit {
   courseForm: FormGroup;

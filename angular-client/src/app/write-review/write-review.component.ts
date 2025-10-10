@@ -2,11 +2,14 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { faStar, faStarHalfAlt, faPen, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
 import { TestimonialService } from '../services/testimonial.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-write-review',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule],
   templateUrl: './write-review.component.html',
   styleUrl: './write-review.component.css'
 })

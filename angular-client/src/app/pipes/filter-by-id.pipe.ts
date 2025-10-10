@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'filterById',
-  standalone: false
+  standalone: true
 })
 export class FilterByIdPipe implements PipeTransform {
   transform(items: any[] | null, id: number | null): any {

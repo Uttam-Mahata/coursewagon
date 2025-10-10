@@ -31,9 +31,11 @@ async def lifespan(app: FastAPI):
     try:
         from migrations.add_welcome_email_sent_column import add_welcome_email_sent_column
         from migrations.add_email_verification import run_migration as run_email_verification_migration
+        from migrations.add_learner_functionality import run_all_migrations
 
         add_welcome_email_sent_column()
         run_email_verification_migration()
+        run_all_migrations()  # New learner functionality migrations
         logger.info("Database migrations completed successfully")
     except Exception as e:
         logger.error(f"Database migration failed: {str(e)}")
@@ -69,6 +71,8 @@ from routes.content_routes import content_router
 from routes.auth_routes import auth_router
 from routes.testimonial_routes import testimonial_router
 from routes.image_routes import image_router
+from routes.enrollment_routes import enrollment_router
+from routes.learning_routes import learning_router
 from admin.routes import admin_router
 from routes.utility_routes import utility_router
 from routes.test_auth_routes import test_auth_router
@@ -84,15 +88,29 @@ app = FastAPI(
 # CORS configuration
 # Note: When allow_credentials=True, cannot use allow_origins=["*"]
 # Must specify exact origins for cookie-based authentication
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:4200",
-        "http://127.0.0.1:4200",
-        "https://coursewagon-backend.victoriousforest-3a334815.southeastasia.azurecontainerapps.io",
+# SECURITY: Different origins for production vs development to prevent cookie theft
+IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
+
+if IS_PRODUCTION:
+    # Production: ONLY allow production domains (NO localhost!)
+    allowed_origins = [
         "https://www.coursewagon.live",
         "https://coursewagon.web.app"
-    ],
+    ]
+    logger.info("CORS configured for PRODUCTION - localhost access disabled")
+else:
+    # Development: Allow localhost for local testing
+    allowed_origins = [
+        "http://localhost:4200",
+        "http://127.0.0.1:4200",
+        "https://www.coursewagon.live",
+        "https://coursewagon.web.app"
+    ]
+    logger.info("CORS configured for DEVELOPMENT - localhost access enabled")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
     allow_credentials=True,  # Required for HttpOnly cookies
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=[
@@ -153,6 +171,8 @@ app.include_router(content_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(testimonial_router, prefix="/api")
 app.include_router(image_router, prefix="/api")
+app.include_router(enrollment_router, prefix="/api")
+app.include_router(learning_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(utility_router, prefix="/api")
 app.include_router(test_auth_router, prefix="/api")

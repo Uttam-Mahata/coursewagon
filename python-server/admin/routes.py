@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 # Create FastAPI router instead of Flask blueprint
 admin_router = APIRouter(prefix="/admin", tags=["admin"])
 
-# Use dependency injection for database session
+# Dependency injection for services with database session
 def get_admin_service(db: Session = Depends(get_db)):
     return AdminService(db)
 

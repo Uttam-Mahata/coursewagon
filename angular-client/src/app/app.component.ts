@@ -1,20 +1,32 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService } from './services/auth/auth.service';
 import { NavigationService } from './services/navigation.service';
-import { faBars, faTimes, faGraduationCap, faShoppingCart, faBook, faUser, faPowerOff, faSignInAlt, faUserPlus, faUserShield } from '@fortawesome/free-solid-svg-icons'; // Import admin icon
+import {
+  faBars, faTimes, faGraduationCap, faShoppingCart, faBook, faUser,
+  faPowerOff, faSignInAlt, faUserPlus, faUserShield, faChartLine,
+  faBookOpen, faSearch
+} from '@fortawesome/free-solid-svg-icons';
+import { FooterComponent } from './footer/footer.component';
+import { ToastContainerComponent } from './toast-container/toast-container.component';
 
 @Component({
     selector: 'app-root',
-    standalone: false,
+    standalone: true,
+    imports: [CommonModule, RouterModule, FontAwesomeModule, FooterComponent, ToastContainerComponent],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
-    
+
 })
 export class AppComponent implements OnInit {
   title = 'CourseWagon';
   isAuthenticated = false;
   isNavbarOpen = false;
   isAdmin = false;
+  isCreator = false;
+  isLearner = false;
 
   // Assign icons to properties
   faBars = faBars;
@@ -22,11 +34,14 @@ export class AppComponent implements OnInit {
   faGraduationCap = faGraduationCap;
   faShoppingCart = faShoppingCart;
   faBook = faBook;
+  faBookOpen = faBookOpen;
+  faSearch = faSearch;
   faUser = faUser;
   faPowerOff = faPowerOff;
   faSignInAlt = faSignInAlt;
   faUserPlus = faUserPlus;
-  faUserShield = faUserShield; // Add admin icon
+  faUserShield = faUserShield;
+  faChartLine = faChartLine;
 
   constructor(
     private authService: AuthService,
@@ -39,13 +54,17 @@ export class AppComponent implements OnInit {
       (isAuth: boolean) => {
         console.log('App component - authentication state changed:', isAuth);
         this.isAuthenticated = isAuth;
-        
-        // Check if the user is an admin
+
+        // Check user roles
         if (isAuth) {
           const user = this.authService.getCurrentUser();
           this.isAdmin = user && user.is_admin;
+          this.isCreator = this.authService.isCreator();
+          this.isLearner = this.authService.isLearner();
         } else {
           this.isAdmin = false;
+          this.isCreator = false;
+          this.isLearner = false;
         }
       }
     );

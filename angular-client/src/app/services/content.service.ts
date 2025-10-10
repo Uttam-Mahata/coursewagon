@@ -17,7 +17,7 @@ export class ContentService {
   }
   
   getContent(courseId: number, subjectId: number, chapterId: number, topicId: number): Observable<any> {
-    console.log(`Fetching content for course: ${courseId}, subject: ${subjectId}, chapter: ${chapterId}, topic: ${topicId}`);
+    console.log(`[ContentService] Fetching content for course: ${courseId}, subject: ${subjectId}, chapter: ${chapterId}, topic: ${topicId}`);
     return this.http.get(`${this.apiUrl}/${courseId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/content`);
   }
   

@@ -132,6 +132,18 @@ export class AuthService {
     }, { withCredentials: true });
   }
 
+  updateProfile(profileData: any): Observable<any> {
+    return this.http.put(`${this.authUrl}/profile`, profileData, { withCredentials: true }).pipe(
+      tap((response: any) => {
+        // Update stored user data with new profile information
+        const currentUser = this.getCurrentUser();
+        if (currentUser && response.user) {
+          this.storeUser(response.user);
+        }
+      })
+    );
+  }
+
   // Google Authentication Methods
   async signInWithGoogle(): Promise<any> {
     try {
@@ -187,5 +199,39 @@ export class AuthService {
     localStorage.removeItem(this.userKey);
     this.currentUserSource.next(null);
     this.isLoggedInSource.next(false);
+  }
+
+  // Role-based methods for learner functionality
+
+  /**
+   * Get user's role (creator, learner, or both)
+   */
+  getUserRole(): string {
+    const user = this.getCurrentUser();
+    return user?.role || 'both';
+  }
+
+  /**
+   * Check if user is a creator
+   */
+  isCreator(): boolean {
+    const role = this.getUserRole();
+    return role === 'creator' || role === 'both';
+  }
+
+  /**
+   * Check if user is a learner
+   */
+  isLearner(): boolean {
+    const role = this.getUserRole();
+    return role === 'learner' || role === 'both';
+  }
+
+  /**
+   * Check if user is admin
+   */
+  isAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return user?.is_admin === true;
   }
 }

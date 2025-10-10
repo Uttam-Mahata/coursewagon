@@ -1,0 +1,207 @@
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center py-20">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6">
+    <p>{{ error }}</p>
+    <button
+      (click)="loadCoursePreview()"
+      class="mt-2 text-sm underline hover:text-red-900">
+      Retry
+    </button>
+  </div>
+
+  <!-- Course Preview Content -->
+  <div *ngIf="!loading && !error && coursePreview">
+    <!-- Back Button -->
+    <button
+      (click)="goBack()"
+      class="mb-6 text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
+      <fa-icon [icon]="faArrowLeft" class="mr-2"></fa-icon>
+      Back to Catalog
+    </button>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content (Left Column) -->
+      <div class="lg:col-span-2">
+        <!-- Course Header -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+          <!-- Course Image -->
+          <div class="h-64 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden">
+            <img *ngIf="coursePreview.course.image_url"
+                 [src]="coursePreview.course.image_url"
+                 [alt]="coursePreview.course.name"
+                 class="w-full h-full object-cover">
+            <fa-icon *ngIf="!coursePreview.course.image_url"
+                     [icon]="faBook"
+                     size="4x"
+                     class="text-white opacity-80"></fa-icon>
+          </div>
+
+          <!-- Course Info -->
+          <div class="p-6">
+            <!-- Category Badge -->
+            <div *ngIf="coursePreview.course.category" class="mb-3">
+              <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded">
+                {{ coursePreview.course.category }}
+              </span>
+            </div>
+
+            <!-- Course Title -->
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">
+              {{ coursePreview.course.name }}
+            </h1>
+
+            <!-- Course Description -->
+            <p class="text-gray-600 mb-6">
+              {{ coursePreview.course.description }}
+            </p>
+
+            <!-- Course Meta -->
+            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+              <!-- Difficulty -->
+              <span *ngIf="coursePreview.course.difficulty_level"
+                    [class]="'px-3 py-1 rounded font-semibold ' + getDifficultyColor(coursePreview.course.difficulty_level)">
+                <fa-icon [icon]="faSignal" class="mr-1"></fa-icon>
+                {{ coursePreview.course.difficulty_level }}
+              </span>
+
+              <!-- Duration -->
+              <span *ngIf="coursePreview.course.estimated_duration_hours">
+                <fa-icon [icon]="faClock" class="mr-1"></fa-icon>
+                {{ formatDuration(coursePreview.course.estimated_duration_hours) }}
+              </span>
+
+              <!-- Enrollment Count -->
+              <span>
+                <fa-icon [icon]="faUsers" class="mr-1"></fa-icon>
+                {{ coursePreview.course.enrollment_count }} enrolled
+              </span>
+
+              <!-- Topics Count -->
+              <span>
+                <fa-icon [icon]="faListUl" class="mr-1"></fa-icon>
+                {{ totalTopics }} topics
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Structure -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-800">Course Content</h2>
+          </div>
+
+          <div class="p-6">
+            <!-- Subjects/Topics List -->
+            <div *ngFor="let subject of coursePreview.structure; let i = index" class="mb-6 last:mb-0">
+              <!-- Subject Header -->
+              <div class="flex items-start mb-3">
+                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold text-sm mr-3">
+                  {{ i + 1 }}
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-lg font-semibold text-gray-800">{{ subject.name }}</h3>
+                  <p *ngIf="subject.description" class="text-sm text-gray-600 mt-1">{{ subject.description }}</p>
+                </div>
+              </div>
+
+              <!-- Topics List -->
+              <div *ngIf="subject.topics && subject.topics.length > 0" class="ml-11">
+                <div *ngFor="let topic of subject.topics; let j = index"
+                     class="flex items-center py-2 text-gray-700 hover:text-blue-600 transition duration-150">
+                  <fa-icon [icon]="faBookOpen" class="mr-3 text-gray-400 text-sm"></fa-icon>
+                  <span class="text-sm">{{ topic.name }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!coursePreview.structure || coursePreview.structure.length === 0"
+                 class="text-center py-8 text-gray-500">
+              Course structure not available
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar (Right Column) -->
+      <div class="lg:col-span-1">
+        <!-- Enrollment Card -->
+        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-4">
+          <!-- Enrolled Status -->
+          <div *ngIf="isEnrolled" class="mb-4">
+            <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-lg flex items-center">
+              <fa-icon [icon]="faCheckCircle" class="mr-2"></fa-icon>
+              You're enrolled in this course
+            </div>
+          </div>
+
+          <!-- Enrollment Error -->
+          <div *ngIf="enrollmentError" class="mb-4">
+            <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg text-sm">
+              {{ enrollmentError }}
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="space-y-3">
+            <!-- Start Learning (if enrolled) -->
+            <button *ngIf="isEnrolled"
+              (click)="startLearning()"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center transition duration-200 font-semibold">
+              <fa-icon [icon]="faPlay" class="mr-2"></fa-icon>
+              Continue Learning
+            </button>
+
+            <!-- Enroll Button (if not enrolled) -->
+            <button *ngIf="!isEnrolled && isAuthenticated && isLearner"
+              (click)="enrollInCourse()"
+              [disabled]="enrolling"
+              class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg flex items-center justify-center transition duration-200 font-semibold">
+              <fa-icon *ngIf="enrolling" [icon]="faSpinner" animation="spin" class="mr-2"></fa-icon>
+              <span *ngIf="!enrolling">Enroll Now</span>
+              <span *ngIf="enrolling">Enrolling...</span>
+            </button>
+
+            <!-- Login to Enroll (if not authenticated) -->
+            <button *ngIf="!isAuthenticated"
+              (click)="enrollInCourse()"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center transition duration-200 font-semibold">
+              Login to Enroll
+            </button>
+
+            <!-- Not a Learner (if authenticated but not learner) -->
+            <div *ngIf="isAuthenticated && !isLearner && !isEnrolled"
+                 class="w-full bg-gray-100 border border-gray-300 text-gray-600 px-6 py-3 rounded-lg text-center text-sm">
+              Only learners can enroll in courses
+            </div>
+          </div>
+
+          <!-- Course Stats -->
+          <div class="mt-6 pt-6 border-t border-gray-200">
+            <h3 class="text-sm font-semibold text-gray-700 mb-3">Course includes:</h3>
+            <ul class="space-y-2 text-sm text-gray-600">
+              <li class="flex items-center">
+                <fa-icon [icon]="faBookOpen" class="mr-2 text-blue-600"></fa-icon>
+                {{ coursePreview.structure.length || 0 }} subjects
+              </li>
+              <li class="flex items-center">
+                <fa-icon [icon]="faListUl" class="mr-2 text-blue-600"></fa-icon>
+                {{ totalTopics }} topics
+              </li>
+              <li *ngIf="coursePreview.course.estimated_duration_hours" class="flex items-center">
+                <fa-icon [icon]="faClock" class="mr-2 text-blue-600"></fa-icon>
+                {{ formatDuration(coursePreview.course.estimated_duration_hours) }} of content
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

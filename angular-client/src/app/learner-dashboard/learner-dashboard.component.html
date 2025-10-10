@@ -1,0 +1,223 @@
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+        <fa-icon [icon]="faGraduationCap" class="mr-3 text-blue-600"></fa-icon>
+        My Learning Dashboard
+      </h1>
+      <p class="text-gray-600 mt-2">Track your learning progress and continue your courses</p>
+    </div>
+    <button
+      (click)="browseCourses()"
+      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition duration-200 shadow-md">
+      <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
+      Browse Courses
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center py-20">
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6">
+    <p>{{ error }}</p>
+    <button
+      (click)="loadEnrollments()"
+      class="mt-2 text-sm underline hover:text-red-900">
+      Retry
+    </button>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && !error">
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Total Enrollments -->
+      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between mb-3">
+          <fa-icon [icon]="faBook" size="2x" class="opacity-80"></fa-icon>
+          <span class="text-3xl font-bold">{{ totalEnrollments }}</span>
+        </div>
+        <div class="text-sm opacity-90">Total Courses</div>
+      </div>
+
+      <!-- In Progress -->
+      <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between mb-3">
+          <fa-icon [icon]="faBookOpen" size="2x" class="opacity-80"></fa-icon>
+          <span class="text-3xl font-bold">{{ inProgressCourses }}</span>
+        </div>
+        <div class="text-sm opacity-90">In Progress</div>
+      </div>
+
+      <!-- Completed -->
+      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between mb-3">
+          <fa-icon [icon]="faTrophy" size="2x" class="opacity-80"></fa-icon>
+          <span class="text-3xl font-bold">{{ completedCourses }}</span>
+        </div>
+        <div class="text-sm opacity-90">Completed</div>
+      </div>
+
+      <!-- Time Spent -->
+      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between mb-3">
+          <fa-icon [icon]="faClock" size="2x" class="opacity-80"></fa-icon>
+          <span class="text-3xl font-bold">{{ formatTimeSpent(totalTimeSpent) }}</span>
+        </div>
+        <div class="text-sm opacity-90">Time Spent</div>
+      </div>
+    </div>
+
+    <!-- Active Courses Section -->
+    <div *ngIf="activeEnrollments.length > 0" class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-800">Continue Learning</h2>
+      </div>
+
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div *ngFor="let enrollment of activeEnrollments"
+               class="border border-gray-200 rounded-lg hover:shadow-lg transition duration-200 overflow-hidden">
+            <!-- Course Image -->
+            <div class="h-40 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden">
+              <img *ngIf="enrollment.course?.image_url"
+                   [src]="enrollment.course.image_url"
+                   [alt]="enrollment.course?.name"
+                   class="w-full h-full object-cover">
+              <fa-icon *ngIf="!enrollment.course?.image_url"
+                       [icon]="faBook"
+                       size="3x"
+                       class="text-white opacity-80"></fa-icon>
+            </div>
+
+            <!-- Course Info -->
+            <div class="p-4">
+              <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                {{ enrollment.course?.name || 'Course' }}
+              </h3>
+
+              <!-- Progress Bar -->
+              <div class="mb-3">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-xs font-medium text-gray-600">
+                    {{ getProgressLabel(enrollment.progress_percentage || 0) }}
+                  </span>
+                  <span class="text-xs font-bold text-gray-700">
+                    {{ enrollment.progress_percentage || 0 }}%
+                  </span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    [class]="getProgressColor(enrollment.progress_percentage || 0) + ' h-2 rounded-full transition-all duration-500'"
+                    [style.width.%]="enrollment.progress_percentage || 0">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Metadata -->
+              <div class="flex justify-between items-center text-xs text-gray-500 mb-4">
+                <span>
+                  <fa-icon [icon]="faClock" class="mr-1"></fa-icon>
+                  {{ formatTimeSpent(enrollment.totalTimeSpent || 0) }}
+                </span>
+                <span>Last: {{ formatDate(enrollment.last_accessed_at) }}</span>
+              </div>
+
+              <!-- Action Button -->
+              <button
+                (click)="continueLearning(enrollment)"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition duration-200">
+                <fa-icon [icon]="faPlay" class="mr-2"></fa-icon>
+                Continue Learning
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Courses Section -->
+    <div *ngIf="completedEnrollments.length > 0" class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-800">Completed Courses</h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Course
+              </th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Completed
+              </th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Time Spent
+              </th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let enrollment of completedEnrollments" class="hover:bg-gray-50 transition duration-150">
+              <td class="px-6 py-4">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-12 w-12 mr-4">
+                    <div *ngIf="enrollment.course?.image_url"
+                         class="h-12 w-12 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center overflow-hidden">
+                      <img [src]="enrollment.course.image_url"
+                           [alt]="enrollment.course.name"
+                           class="w-full h-full object-cover">
+                    </div>
+                    <div *ngIf="!enrollment.course?.image_url"
+                         class="h-12 w-12 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                      <fa-icon [icon]="faTrophy" class="text-white"></fa-icon>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-gray-900">{{ enrollment.course?.name }}</div>
+                    <div class="text-sm text-gray-500">Enrolled: {{ formatDate(enrollment.enrolled_at) }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <span class="text-sm text-gray-600">{{ formatDate(enrollment.completed_at!) }}</span>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <span class="inline-flex items-center justify-center px-3 py-1 text-sm font-semibold text-purple-800 bg-purple-100 rounded-full">
+                  {{ formatTimeSpent(enrollment.totalTimeSpent || 0) }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <button
+                  (click)="viewCoursePreview(enrollment.course_id)"
+                  class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center transition duration-200">
+                  <fa-icon [icon]="faBookOpen" class="mr-2"></fa-icon>
+                  Review
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="enrollments.length === 0 && !loading" class="bg-white rounded-xl shadow-lg p-12 text-center">
+      <fa-icon [icon]="faGraduationCap" size="3x" class="text-gray-300 mb-4"></fa-icon>
+      <p class="text-gray-500 text-lg mb-4">You haven't enrolled in any courses yet</p>
+      <button
+        (click)="browseCourses()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg inline-flex items-center transition duration-200">
+        <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
+        Browse Available Courses
+      </button>
+    </div>
+  </div>
+</div>

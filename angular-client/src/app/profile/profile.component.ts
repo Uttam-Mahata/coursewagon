@@ -1,19 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth/auth.service';
-import { Router } from '@angular/router';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { 
-  faEnvelope, faCheckCircle, faTimesCircle, 
+import { Router, RouterModule } from '@angular/router';
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  faEnvelope, faCheckCircle, faTimesCircle,
   faExclamationCircle, faTimes,
-  faEye, faEyeSlash, faLock, faSave
+  faEye, faEyeSlash, faLock, faSave, faUser,
+  faCalendar, faShieldAlt, faEdit, faCamera, faUserTag
 } from '@fortawesome/free-solid-svg-icons';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'app-profile',
     
     templateUrl: './profile.component.html',
     styleUrls: ['./profile.component.scss'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, RouterModule]
 })
 export class ProfileComponent implements OnInit {
   // FontAwesome icons
@@ -26,19 +30,30 @@ export class ProfileComponent implements OnInit {
   faEyeSlash = faEyeSlash;
   faLock = faLock;
   faSave = faSave;
+  faUser = faUser;
+  faCalendar = faCalendar;
+  faShieldAlt = faShieldAlt;
+  faEdit = faEdit;
+  faCamera = faCamera;
+  faUserTag = faUserTag;
 
   user: any = null;
   successMessage: string = '';
   errorMessage: string = '';
   isLoading: {[key: string]: boolean} = {
-    passwordChange: false
+    passwordChange: false,
+    profileUpdate: false
   };
-  
-  // Password change form
+
+  // Forms
   passwordForm: FormGroup;
+  profileForm: FormGroup;
+
+  // UI State
   showCurrentPassword = false;
   showNewPassword = false;
   showConfirmPassword = false;
+  isEditingProfile = false;
 
   constructor(
     private authService: AuthService,
@@ -51,6 +66,14 @@ export class ProfileComponent implements OnInit {
       newPassword: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]]
     }, { validator: this.passwordMatchValidator });
+
+    // Initialize profile edit form
+    this.profileForm = this.fb.group({
+      first_name: ['', [Validators.required]],
+      last_name: ['', [Validators.required]],
+      bio: [''],
+      role: ['both', [Validators.required]]
+    });
   }
 
   ngOnInit(): void {
@@ -59,6 +82,16 @@ export class ProfileComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.user = user;
       console.log('Current user in profile:', user);
+
+      // Populate profile form when user data is available
+      if (user) {
+        this.profileForm.patchValue({
+          first_name: user.first_name || '',
+          last_name: user.last_name || '',
+          bio: user.bio || '',
+          role: user.role || 'both'
+        });
+      }
     });
 
     // Check if user is logged in
@@ -119,11 +152,77 @@ export class ProfileComponent implements OnInit {
   passwordMatchValidator(g: FormGroup) {
     const newPassword = g.get('newPassword')?.value;
     const confirmPassword = g.get('confirmPassword')?.value;
-    
+
     if (newPassword === confirmPassword) {
       return null;
     }
-    
+
     return { mismatch: true };
+  }
+
+  // Profile editing functions
+  toggleEditProfile(): void {
+    this.isEditingProfile = !this.isEditingProfile;
+    if (!this.isEditingProfile) {
+      // Reset form when canceling
+      this.profileForm.patchValue({
+        first_name: this.user?.first_name || '',
+        last_name: this.user?.last_name || '',
+        bio: this.user?.bio || '',
+        role: this.user?.role || 'both'
+      });
+    }
+  }
+
+  updateProfile(): void {
+    if (this.profileForm.invalid) {
+      return;
+    }
+
+    this.isLoading['profileUpdate'] = true;
+    this.clearMessages();
+
+    const profileData = this.profileForm.value;
+
+    this.authService.updateProfile(profileData).subscribe({
+      next: (response) => {
+        this.successMessage = 'Profile updated successfully';
+        this.isLoading['profileUpdate'] = false;
+        this.isEditingProfile = false;
+        // The user data will be automatically updated via currentUser$ subscription
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Failed to update profile';
+        this.isLoading['profileUpdate'] = false;
+      }
+    });
+  }
+
+  getRoleDisplayName(role: string): string {
+    const roleMap: {[key: string]: string} = {
+      'creator': 'Creator',
+      'learner': 'Learner',
+      'both': 'Creator & Learner'
+    };
+    return roleMap[role] || role;
+  }
+
+  getRoleBadgeClass(role: string): string {
+    const classMap: {[key: string]: string} = {
+      'creator': 'bg-purple-100 text-purple-800',
+      'learner': 'bg-green-100 text-green-800',
+      'both': 'bg-blue-100 text-blue-800'
+    };
+    return classMap[role] || 'bg-gray-100 text-gray-800';
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   }
 }

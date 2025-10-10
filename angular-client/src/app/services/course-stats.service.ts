@@ -13,6 +13,7 @@ export interface CourseDetail {
   topics_count: number;
   content_count: number;
   image_url?: string;
+  is_published?: boolean;
 }
 
 export interface UserCourseStats {

@@ -6,8 +6,9 @@ import { ChapterService } from '../services/chapter.service';
 import { TopicService } from '../services/topic.service';
 import { ContentService } from '../services/content.service';
 import { MathRendererService } from '../services/math-renderer.service';
-import { 
-  faHome, faBook, faLayerGroup, faEye, faMagic, 
+import { AuthService } from '../services/auth/auth.service';
+import {
+  faHome, faBook, faLayerGroup, faEye, faMagic,
   faBookOpen, faChevronRight, faChevronDown, faChevronUp,
   faFileAlt, faSpinner, faInfoCircle, faChevronLeft, faList,
   faEdit, faTrash, faPlus

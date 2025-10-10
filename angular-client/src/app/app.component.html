@@ -19,15 +19,29 @@
         <ul class="flex items-center space-x-6">
           <!-- Show these items only when authenticated -->
           <ng-container *ngIf="isAuthenticated">
-            <li>
+            <!-- Creator-specific menu items -->
+            <li *ngIf="isCreator">
               <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses" (click)="scrollToTop()">
-                <fa-icon [icon]="faGraduationCap" class="text-lg"></fa-icon> My Courses
+                <fa-icon [icon]="faBook" class="text-lg"></fa-icon> My Courses
               </a>
             </li>
 
-            <li>
+            <li *ngIf="isCreator">
               <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/my-courses-dashboard" (click)="scrollToTop()">
-                <fa-icon [icon]="faChartLine" class="text-lg"></fa-icon> Dashboard
+                <fa-icon [icon]="faChartLine" class="text-lg"></fa-icon> Creator Dashboard
+              </a>
+            </li>
+
+            <!-- Learner-specific menu items -->
+            <li *ngIf="isLearner">
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses/browse" (click)="scrollToTop()">
+                <fa-icon [icon]="faSearch" class="text-lg"></fa-icon> Browse Courses
+              </a>
+            </li>
+
+            <li *ngIf="isLearner">
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/learner/dashboard" (click)="scrollToTop()">
+                <fa-icon [icon]="faGraduationCap" class="text-lg"></fa-icon> My Learning
               </a>
             </li>
 
@@ -37,7 +51,7 @@
                 <fa-icon [icon]="faUserShield" class="text-lg"></fa-icon> Admin
               </a>
             </li>
-   
+
             <li>
               <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/profile" (click)="scrollToTop()">
                 <fa-icon [icon]="faUser" class="text-lg"></fa-icon> Profile
@@ -72,15 +86,29 @@
        <ul class="flex flex-col space-y-3 pt-3">
           <!-- Show these items only when authenticated -->
           <ng-container *ngIf="isAuthenticated">
-            <li>
+            <!-- Creator-specific menu items -->
+            <li *ngIf="isCreator">
               <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses" (click)="toggleNavbar(); scrollToTop()">
-                <fa-icon [icon]="faGraduationCap" class="text-lg w-5 text-center"></fa-icon> My Courses
+                <fa-icon [icon]="faBook" class="text-lg w-5 text-center"></fa-icon> My Courses
               </a>
             </li>
 
-            <li>
+            <li *ngIf="isCreator">
               <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/my-courses-dashboard" (click)="toggleNavbar(); scrollToTop()">
-                <fa-icon [icon]="faChartLine" class="text-lg w-5 text-center"></fa-icon> Dashboard
+                <fa-icon [icon]="faChartLine" class="text-lg w-5 text-center"></fa-icon> Creator Dashboard
+              </a>
+            </li>
+
+            <!-- Learner-specific menu items -->
+            <li *ngIf="isLearner">
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses/browse" (click)="toggleNavbar(); scrollToTop()">
+                <fa-icon [icon]="faSearch" class="text-lg w-5 text-center"></fa-icon> Browse Courses
+              </a>
+            </li>
+
+            <li *ngIf="isLearner">
+              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/learner/dashboard" (click)="toggleNavbar(); scrollToTop()">
+                <fa-icon [icon]="faGraduationCap" class="text-lg w-5 text-center"></fa-icon> My Learning
               </a>
             </li>
 
@@ -122,6 +150,9 @@
 </nav>
 
 <router-outlet></router-outlet>
+
+<!-- Toast Notifications -->
+<app-toast-container></app-toast-container>
 
 <app-footer></app-footer>
 

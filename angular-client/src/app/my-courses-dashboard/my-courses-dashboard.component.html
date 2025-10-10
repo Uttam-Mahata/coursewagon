@@ -123,6 +123,9 @@
                 Progress
               </th>
               <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -177,12 +180,42 @@
                 </div>
               </td>
               <td class="px-6 py-4 text-center">
-                <button
-                  (click)="viewCourse(course.course_id)"
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center transition duration-200">
-                  <fa-icon [icon]="faEye" class="mr-2"></fa-icon>
-                  View
-                </button>
+                <span *ngIf="course.is_published"
+                      class="inline-flex items-center px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                  <fa-icon [icon]="faGlobe" class="mr-1"></fa-icon>
+                  Published
+                </span>
+                <span *ngIf="!course.is_published"
+                      class="inline-flex items-center px-3 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">
+                  <fa-icon [icon]="faLock" class="mr-1"></fa-icon>
+                  Draft
+                </span>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <div class="flex flex-col sm:flex-row gap-2 justify-center">
+                  <button
+                    (click)="viewCourse(course.course_id)"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
+                    <fa-icon [icon]="faEye" class="mr-2"></fa-icon>
+                    View
+                  </button>
+                  <button *ngIf="!course.is_published"
+                    (click)="publishCourse(course.course_id)"
+                    [disabled]="isPublishing(course.course_id)"
+                    class="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
+                    <fa-icon *ngIf="isPublishing(course.course_id)" [icon]="faSpinner" animation="spin" class="mr-2"></fa-icon>
+                    <fa-icon *ngIf="!isPublishing(course.course_id)" [icon]="faGlobe" class="mr-2"></fa-icon>
+                    Publish
+                  </button>
+                  <button *ngIf="course.is_published"
+                    (click)="unpublishCourse(course.course_id)"
+                    [disabled]="isPublishing(course.course_id)"
+                    class="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
+                    <fa-icon *ngIf="isPublishing(course.course_id)" [icon]="faSpinner" animation="spin" class="mr-2"></fa-icon>
+                    <fa-icon *ngIf="!isPublishing(course.course_id)" [icon]="faLock" class="mr-2"></fa-icon>
+                    Unpublish
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>

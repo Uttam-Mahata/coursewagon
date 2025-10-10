@@ -21,6 +21,13 @@ import { HowItWorksComponent } from './how-it-works/how-it-works.component';
 import { HelpCenterComponent } from './help-center/help-center.component';
 import { EmailVerificationComponent } from './email-verification/email-verification.component';
 import { MyCoursesDashboardComponent } from './my-courses-dashboard/my-courses-dashboard.component';
+import { LearnerDashboardComponent } from './learner-dashboard/learner-dashboard.component';
+import { CourseCatalogComponent } from './course-catalog/course-catalog.component';
+import { CoursePreviewComponent } from './course-preview/course-preview.component';
+import { LearningViewComponent } from './learning-view/learning-view.component';
+import { learnerGuard } from './guards/learner.guard';
+import { creatorGuard } from './guards/creator.guard';
+import { enrollmentGuard } from './guards/enrollment.guard';
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -29,9 +36,19 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'verify-email', component: EmailVerificationComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
-  { path: 'create-course', component: CourseComponent, canActivate: [AuthGuard] },
-  { path: 'courses', component: CoursesComponent, canActivate: [AuthGuard] },
-  { path: 'my-courses-dashboard', component: MyCoursesDashboardComponent, canActivate: [AuthGuard] },
+
+  // Creator Routes (protected by creatorGuard)
+  { path: 'create-course', component: CourseComponent, canActivate: [creatorGuard] },
+  { path: 'courses', component: CoursesComponent, canActivate: [creatorGuard] },
+  { path: 'my-courses-dashboard', component: MyCoursesDashboardComponent, canActivate: [creatorGuard] },
+
+  // Learner Routes (protected by learnerGuard)
+  { path: 'learner/dashboard', component: LearnerDashboardComponent, canActivate: [learnerGuard] },
+  { path: 'courses/browse', component: CourseCatalogComponent },
+  { path: 'courses/preview/:id', component: CoursePreviewComponent },
+  { path: 'learn/:course_id', component: LearningViewComponent, canActivate: [enrollmentGuard] },
+
+  // Admin Routes
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
 
   // Legal pages - accessible without authentication
@@ -41,11 +58,11 @@ export const routes: Routes = [
   { path: 'how-it-works', component: HowItWorksComponent },
   { path: 'help-center', component: HelpCenterComponent },
   
-  // New subjects component route
-  { 
-    path: 'courses/:course_id/subjects', 
-    component: SubjectsComponent, 
-    canActivate: [AuthGuard] 
+  // Creator Course Management Routes
+  {
+    path: 'courses/:course_id/subjects',
+    component: SubjectsComponent,
+    canActivate: [creatorGuard]
   },
 
   {
@@ -53,38 +70,38 @@ export const routes: Routes = [
     component: WriteReviewComponent,
     canActivate: [AuthGuard]
   },
-  
+
   // Legacy route - keep for compatibility
-  { 
-    path: 'courses/:course_id/subjects-chapters', 
-    component: SubjectsChaptersComponent, 
-    canActivate: [AuthGuard] 
+  {
+    path: 'courses/:course_id/subjects-chapters',
+    component: SubjectsChaptersComponent,
+    canActivate: [creatorGuard]
   },
-  
-  // Course content routes
-  { 
-    path: 'courses/:course_id/subjects/:subject_id/content', 
+
+  // Course content routes (for creators)
+  {
+    path: 'courses/:course_id/subjects/:subject_id/content',
     component: CourseContentComponent,
-    canActivate: [AuthGuard]
+    canActivate: [creatorGuard]
   },
-  { 
-    path: 'courses/:course_id/subjects/:subject_id/content/:topic_id', 
+  {
+    path: 'courses/:course_id/subjects/:subject_id/content/:topic_id',
     component: CourseContentComponent,
-    canActivate: [AuthGuard]
+    canActivate: [creatorGuard]
   },
-  
+
   // Legacy routes - using resolver to handle redirects
-  { 
-    path: 'courses/:course_id/subjects/:subject_id/chapters/:chapter_id/topics', 
+  {
+    path: 'courses/:course_id/subjects/:subject_id/chapters/:chapter_id/topics',
     resolve: { redirect: RouteRedirectResolver },
     component: SubjectsChaptersComponent,
-    canActivate: [AuthGuard] 
+    canActivate: [creatorGuard]
   },
   {
     path: 'courses/:course_id/subjects/:subject_id/chapters/:chapter_id/topics/:topic_id/content',
     resolve: { redirect: RouteRedirectResolver },
     component: TopicsContentComponent,
-    canActivate: [AuthGuard]
+    canActivate: [creatorGuard]
   },
   
   { path: '', redirectTo: '/home', pathMatch: 'full' },

@@ -125,7 +125,8 @@ class GoogleAuth(BaseModel):
 class ProfileUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    # Add other profile fields as needed
+    bio: Optional[str] = None
+    role: Optional[str] = None
 
 class CheckEmail(BaseModel):
     email: EmailStr
@@ -243,8 +244,21 @@ async def login(login_data: UserLogin, response: Response, db: Session = Depends
             'message': 'Login successful'
         }
     except ValueError as e:
-        logger.warning(f"Login failed for {login_data.email}: {str(e)}")
-        raise HTTPException(status_code=401, detail={'error': str(e)})
+        error_msg = str(e)
+        logger.warning(f"Login failed for {login_data.email}: {error_msg}")
+
+        # Special handling for unverified email
+        if error_msg == "EMAIL_NOT_VERIFIED":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    'error': 'EMAIL_NOT_VERIFIED',
+                    'message': 'Please verify your email address before logging in. Check your inbox for the verification link.',
+                    'email': login_data.email
+                }
+            )
+
+        raise HTTPException(status_code=401, detail={'error': error_msg})
     except Exception as e:
         logger.error(f"Login error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail={'error': 'An unexpected error occurred. Please try again later.'})
@@ -311,10 +325,13 @@ async def update_profile(
     try:
         auth_service = AuthService(db)
         user = auth_service.update_user_profile(
-            current_user_id, 
+            current_user_id,
             **profile_data.dict(exclude_unset=True)
         )
-        return user.to_dict()
+        return {
+            'message': 'Profile updated successfully',
+            'user': user.to_dict()
+        }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

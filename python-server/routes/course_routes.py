@@ -74,6 +74,17 @@ async def get_my_courses_statistics(
         logger.error(f"Error getting user course statistics: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@course_router.get('/categories')
+async def get_available_categories(db: Session = Depends(get_db)):
+    """Get list of all available course categories from published courses"""
+    try:
+        course_service = CourseService(db)
+        categories = course_service.get_available_categories()
+        return {"categories": categories}
+    except Exception as e:
+        logger.error(f"Error getting available categories: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @course_router.get('')
 async def get_courses(db: Session = Depends(get_db)):
     try:

@@ -1,9 +1,23 @@
-<div class="flex h-screen bg-gray-50">
+<div class="flex h-screen bg-gray-50 overflow-hidden">
+  <!-- Mobile Sidebar Overlay -->
+  <div *ngIf="isSidebarOpen"
+       (click)="toggleSidebar()"
+       class="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"></div>
+
   <!-- Sidebar -->
-  <div *ngIf="showSidebar" class="w-80 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0">
+  <div class="w-80 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0 transition-all duration-300"
+       [ngClass]="{'translate-x-0': isSidebarOpen, '-translate-x-full md:translate-x-0': !isSidebarOpen, 'fixed md:relative': true, 'h-full z-40': true, 'pt-16 md:pt-0': true}">
     <!-- Course Header -->
     <div class="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-      <h2 class="text-xl font-bold mb-2">{{ course?.name }}</h2>
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-xl font-bold">{{ course?.name }}</h2>
+        <!-- Close sidebar button (visible only on mobile) -->
+        <button
+          class="md:hidden text-white hover:text-blue-200"
+          (click)="toggleSidebar()">
+          <fa-icon [icon]="faChevronLeft" class="text-lg"></fa-icon>
+        </button>
+      </div>
       <div class="flex items-center justify-between text-sm opacity-90">
         <span>Progress: {{ progressPercentage }}%</span>
         <span>{{ completedTopics.size }}/{{ allTopics.length }}</span>
@@ -62,35 +76,68 @@
   <!-- Main Content Area -->
   <div class="flex-1 flex flex-col overflow-hidden">
     <!-- Top Navigation Bar -->
-    <div class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-      <!-- Left side -->
-      <div class="flex items-center space-x-4">
-        <button
-          (click)="toggleSidebar()"
-          class="text-gray-600 hover:text-gray-800 transition duration-200">
-          <fa-icon [icon]="faList" size="lg"></fa-icon>
-        </button>
+    <div class="bg-white border-b border-gray-200 sticky top-0 z-30 px-2 md:px-6 py-3 md:py-4">
+      <!-- Mobile Topic Toggle and Navigation -->
+      <div class="md:hidden">
+        <div class="flex items-center justify-between mb-2">
+          <button
+            (click)="toggleSidebar()"
+            class="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm">
+            <fa-icon [icon]="faList" class="mr-2"></fa-icon>
+            <span class="truncate max-w-[150px]">{{ currentSubject?.name || 'Course Outline' }}</span>
+          </button>
+
+          <!-- Topic Navigation on Mobile -->
+          <div class="flex space-x-2">
+            <button
+              [disabled]="!hasPreviousTopic"
+              [ngClass]="{'opacity-50': !hasPreviousTopic}"
+              (click)="previousTopic()"
+              class="bg-white border border-gray-300 text-gray-700 p-2 rounded-md">
+              <fa-icon [icon]="faChevronLeft" class="text-xs"></fa-icon>
+            </button>
+            <button
+              [disabled]="!hasNextTopic"
+              [ngClass]="{'opacity-50': !hasNextTopic}"
+              (click)="nextTopic()"
+              class="bg-white border border-gray-300 text-gray-700 p-2 rounded-md">
+              <fa-icon [icon]="faChevronRight" class="text-xs"></fa-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Back to Dashboard link (Mobile) -->
         <button
           (click)="goBackToDashboard()"
-          class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-          <fa-icon [icon]="faArrowLeft" class="mr-2"></fa-icon>
-          <span class="hidden sm:inline">Back to Dashboard</span>
+          class="text-blue-600 hover:text-blue-800 flex items-center text-sm transition duration-200">
+          <fa-icon [icon]="faArrowLeft" class="mr-1"></fa-icon>
+          Back to Dashboard
         </button>
       </div>
 
-      <!-- Center - Topic Title -->
-      <div *ngIf="currentTopic" class="flex-1 text-center px-4">
-        <h1 class="text-lg font-semibold text-gray-800 truncate">
-          {{ currentTopic.name }}
-        </h1>
-        <p class="text-xs text-gray-500">{{ currentSubject?.name }}</p>
-      </div>
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center justify-between">
+        <!-- Left side -->
+        <div class="flex items-center space-x-4">
+          <button
+            (click)="toggleSidebar()"
+            class="text-gray-600 hover:text-gray-800 transition duration-200">
+            <fa-icon [icon]="faList" size="lg"></fa-icon>
+          </button>
+          <button
+            (click)="goBackToDashboard()"
+            class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
+            <fa-icon [icon]="faArrowLeft" class="mr-2"></fa-icon>
+            <span class="hidden sm:inline">Back to Dashboard</span>
+          </button>
+        </div>
 
-      <!-- Right side - Time spent -->
-      <div class="flex items-center space-x-4 text-sm text-gray-600">
-        <div class="hidden md:flex items-center">
-          <fa-icon [icon]="faClock" class="mr-2"></fa-icon>
-          <span>{{ timeSpentSeconds }}s</span>
+        <!-- Center - Topic Title -->
+        <div *ngIf="currentTopic" class="flex-1 text-center px-4">
+          <h1 class="text-lg font-semibold text-gray-800 truncate">
+            {{ currentTopic.name }}
+          </h1>
+          <p class="text-xs text-gray-500">{{ currentSubject?.name }}</p>
         </div>
       </div>
     </div>
@@ -113,10 +160,16 @@
       </div>
 
       <!-- Content Display -->
-      <div *ngIf="!loading && !loadingContent && !error && content" class="max-w-4xl mx-auto px-6 py-8">
+      <div *ngIf="!loading && !loadingContent && !error && content" class="w-full px-2 md:px-6 py-4 md:py-8">
+        <!-- Content Header (Mobile) -->
+        <header class="mb-4 md:mb-6 md:hidden">
+          <h1 class="text-xl font-bold text-gray-800 mb-2">{{ currentTopic?.name || 'Select a Topic' }}</h1>
+          <p *ngIf="currentTopic" class="text-gray-600 text-sm">{{ currentSubject?.name }}</p>
+        </header>
+
         <!-- Markdown Content -->
-        <div class="bg-white rounded-lg shadow-sm p-8 prose prose-lg max-w-none">
-          <markdown [data]="content"></markdown>
+        <div class="bg-white rounded-lg shadow-sm p-3 md:p-8 prose prose-sm md:prose-lg max-w-none">
+          <div markdown [data]="content" mermaid katex class="markdown-content"></div>
         </div>
 
         <!-- Mark Complete Button -->
@@ -144,8 +197,8 @@
       </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="bg-white border-t border-gray-200 px-6 py-4">
+    <!-- Bottom Navigation (Desktop) -->
+    <div class="hidden md:block bg-white border-t border-gray-200 px-6 py-4">
       <div class="flex items-center justify-between">
         <button
           (click)="previousTopic()"

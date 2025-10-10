@@ -286,6 +286,26 @@ class CourseRepository:
             logger.error(f"Error getting popular courses: {e}")
             raise
 
+    def get_available_categories(self):
+        """Get list of all unique categories from published courses"""
+        try:
+            categories = self.db.query(Course.category).filter(
+                Course.is_published == True,
+                Course.category.isnot(None),
+                Course.category != ''
+            ).distinct().order_by(Course.category).all()
+
+            # Extract category values from tuples and filter out None/empty
+            return [cat[0] for cat in categories if cat[0]]
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error getting available categories: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error getting available categories: {e}")
+            raise
+
     def increment_enrollment_count(self, course_id):
         """Increment the enrollment count for a course"""
         try:

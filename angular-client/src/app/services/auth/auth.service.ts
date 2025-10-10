@@ -132,6 +132,18 @@ export class AuthService {
     }, { withCredentials: true });
   }
 
+  updateProfile(profileData: any): Observable<any> {
+    return this.http.put(`${this.authUrl}/profile`, profileData, { withCredentials: true }).pipe(
+      tap((response: any) => {
+        // Update stored user data with new profile information
+        const currentUser = this.getCurrentUser();
+        if (currentUser && response.user) {
+          this.storeUser(response.user);
+        }
+      })
+    );
+  }
+
   // Google Authentication Methods
   async signInWithGoogle(): Promise<any> {
     try {

@@ -5,9 +5,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MarkdownModule } from 'ngx-markdown';
 import {
   faHome, faBook, faChevronLeft, faChevronRight, faCheckCircle,
-  faCircle, faSpinner, faArrowLeft, faList, faBookOpen, faClock
+  faCircle, faSpinner, faArrowLeft, faList, faBookOpen
 } from '@fortawesome/free-solid-svg-icons';
-import { Subscription, interval } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { LearningService } from '../services/learning.service';
 import { EnrollmentService } from '../services/enrollment.service';
 import { CourseService } from '../services/course.service';
@@ -35,7 +35,6 @@ export class LearningViewComponent implements OnInit, OnDestroy {
   faArrowLeft = faArrowLeft;
   faList = faList;
   faBookOpen = faBookOpen;
-  faClock = faClock;
 
   // Route parameters
   courseId!: number;
@@ -57,11 +56,6 @@ export class LearningViewComponent implements OnInit, OnDestroy {
   progressMap = new Map<number, any>(); // topic_id -> progress
   completedTopics = new Set<number>();
 
-  // Time tracking
-  topicStartTime: Date | null = null;
-  timeSpentSeconds = 0;
-  timeTrackingInterval: any;
-
   // State
   loading = false;
   loadingContent = false;
@@ -69,6 +63,7 @@ export class LearningViewComponent implements OnInit, OnDestroy {
 
   // Sidebar
   showSidebar = true;
+  isSidebarOpen = true;
 
   private routeSubscription?: Subscription;
 
@@ -96,6 +91,10 @@ export class LearningViewComponent implements OnInit, OnDestroy {
         this.loadCourseData();
       }
     });
+
+    // Adjust sidebar for screen size
+    this.adjustSidebarForScreenSize();
+    window.addEventListener('resize', this.adjustSidebarForScreenSize.bind(this));
   }
 
   ngOnDestroy(): void {
@@ -104,15 +103,13 @@ export class LearningViewComponent implements OnInit, OnDestroy {
       this.trackProgress();
     }
 
-    // Clear time tracking
-    if (this.timeTrackingInterval) {
-      clearInterval(this.timeTrackingInterval);
-    }
-
     // Unsubscribe
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
     }
+
+    // Remove resize listener
+    window.removeEventListener('resize', this.adjustSidebarForScreenSize.bind(this));
   }
 
   loadCourseData(): void {
@@ -324,9 +321,6 @@ export class LearningViewComponent implements OnInit, OnDestroy {
       // Load content
       this.loadContent();
 
-      // Start time tracking
-      this.startTimeTracking();
-
       // Update URL without triggering route subscription
       this.router.navigate([], {
         relativeTo: this.route,
@@ -377,26 +371,6 @@ export class LearningViewComponent implements OnInit, OnDestroy {
     return formatted;
   }
 
-  startTimeTracking(): void {
-    // Clear existing interval
-    if (this.timeTrackingInterval) {
-      clearInterval(this.timeTrackingInterval);
-    }
-
-    this.topicStartTime = new Date();
-    this.timeSpentSeconds = 0;
-
-    // Track time every second
-    this.timeTrackingInterval = setInterval(() => {
-      this.timeSpentSeconds++;
-
-      // Auto-save progress every 30 seconds
-      if (this.timeSpentSeconds % 30 === 0) {
-        this.trackProgress();
-      }
-    }, 1000);
-  }
-
   trackProgress(): void {
     if (!this.enrollment || !this.topicId) return;
 
@@ -406,7 +380,7 @@ export class LearningViewComponent implements OnInit, OnDestroy {
       enrollment_id: this.enrollment.id,
       topic_id: this.topicId,
       completed: isCompleted,
-      time_spent_seconds: this.timeSpentSeconds
+      time_spent_seconds: 0
     }).subscribe({
       next: () => {
         console.log('Progress tracked');
@@ -453,10 +427,28 @@ export class LearningViewComponent implements OnInit, OnDestroy {
 
   selectTopic(topicId: number): void {
     this.loadTopic(topicId);
+
+    // Close sidebar on mobile after topic selection
+    if (window.innerWidth < 768) {
+      this.isSidebarOpen = false;
+
+      // Scroll to top after closing sidebar
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 100);
+    }
   }
 
   toggleSidebar(): void {
-    this.showSidebar = !this.showSidebar;
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  adjustSidebarForScreenSize(): void {
+    if (window.innerWidth < 768) {
+      this.isSidebarOpen = false;
+    } else {
+      this.isSidebarOpen = true;
+    }
   }
 
   goBackToDashboard(): void {

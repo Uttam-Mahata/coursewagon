@@ -58,7 +58,7 @@ class CourseDiscoveryService:
             raise HTTPException(status_code=500, detail=str(e))
 
     def get_course_preview(self, course_id: int):
-        """Get course preview including structure (subjects, chapters, topics) but not detailed content"""
+        """Get course preview including structure (subjects with flattened topics) but not detailed content"""
         try:
             course = self.course_repo.get_course_by_id(course_id)
             if not course:
@@ -67,21 +67,23 @@ class CourseDiscoveryService:
             if not course.is_published:
                 raise HTTPException(status_code=403, detail="Course is not published")
 
-            # Get course structure
+            # Get course structure - flatten topics under subjects for preview
             subjects = self.subject_repo.get_subjects_by_course_id(course_id)
 
             structure = []
             for subject in subjects:
                 subject_dict = subject.to_dict()
+
+                # Get all chapters for this subject
                 chapters = self.chapter_repo.get_chapters_by_subject_id(subject.id)
 
-                subject_dict['chapters'] = []
+                # Flatten all topics from all chapters into a single list
+                all_topics = []
                 for chapter in chapters:
-                    chapter_dict = chapter.to_dict()
                     topics = self.topic_repo.get_topics_by_chapter_id(chapter.id)
-                    chapter_dict['topics'] = [topic.to_dict() for topic in topics]
-                    subject_dict['chapters'].append(chapter_dict)
+                    all_topics.extend([topic.to_dict() for topic in topics])
 
+                subject_dict['topics'] = all_topics
                 structure.append(subject_dict)
 
             return {

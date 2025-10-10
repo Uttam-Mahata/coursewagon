@@ -14,6 +14,11 @@ export interface CourseDetail {
   content_count: number;
   image_url?: string;
   is_published?: boolean;
+  published_at?: string;
+  category?: string;
+  difficulty_level?: string;
+  estimated_duration_hours?: number;
+  enrollment_count?: number;
 }
 
 export interface UserCourseStats {

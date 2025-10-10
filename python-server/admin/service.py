@@ -1,40 +1,76 @@
 from admin.repository import AdminRepository
-from admin.models import AdminStats
+from admin.models import AdminStats, UserCourseStats
 from repositories.user_repository import UserRepository
+from sqlalchemy.orm import Session
 import logging
 
 logger = logging.getLogger(__name__)
 
 class AdminService:
     """Service class for admin functionality"""
-    
-    def __init__(self):
-        self.admin_repo = AdminRepository()
-        self.user_repo = UserRepository()
-    
+
+    def __init__(self, db: Session):
+        self.db = db
+        self.admin_repo = AdminRepository(db)
+        self.user_repo = UserRepository(db)
+
     def get_dashboard_stats(self):
         """Get consolidated statistics for admin dashboard"""
         try:
             # Collect all stats from different sources
             user_stats = self.admin_repo.get_user_stats()
             course_stats = self.admin_repo.get_course_stats()
+            content_stats = self.admin_repo.get_content_stats()
             testimonial_stats = self.admin_repo.get_testimonial_stats()
-            
+            course_breakdown = self.admin_repo.get_course_breakdown()
+
             # Combine into one object
             admin_stats = AdminStats(
                 total_users=user_stats['total_users'],
                 active_users=user_stats['active_users'],
                 total_courses=course_stats['total_courses'],
+                total_subjects=content_stats['total_subjects'],
+                total_chapters=content_stats['total_chapters'],
+                total_topics=content_stats['total_topics'],
+                total_content=content_stats['total_content'],
                 total_testimonials=testimonial_stats['total_testimonials'],
                 pending_testimonials=testimonial_stats['pending_testimonials'],
                 recent_users=user_stats['recent_users'],
-                recent_courses=course_stats['recent_courses']
+                recent_courses=course_stats['recent_courses'],
+                course_breakdown=course_breakdown
             )
-            
+
             return admin_stats.to_dict()
         except Exception as e:
             logger.error(f"Error getting dashboard stats: {str(e)}")
             raise Exception(f"Error retrieving admin dashboard data: {str(e)}")
+
+    def get_user_course_stats(self, user_id: int):
+        """Get course statistics for a specific user (course creator dashboard)"""
+        try:
+            # Get user's course breakdown
+            courses_breakdown = self.admin_repo.get_user_course_breakdown(user_id)
+
+            # Calculate totals
+            total_courses = len(courses_breakdown)
+            total_subjects = sum(c['subjects_count'] for c in courses_breakdown)
+            total_chapters = sum(c['chapters_count'] for c in courses_breakdown)
+            total_topics = sum(c['topics_count'] for c in courses_breakdown)
+            total_content = sum(c['content_count'] for c in courses_breakdown)
+
+            user_stats = UserCourseStats(
+                total_courses=total_courses,
+                total_subjects=total_subjects,
+                total_chapters=total_chapters,
+                total_topics=total_topics,
+                total_content=total_content,
+                courses_with_details=courses_breakdown
+            )
+
+            return user_stats.to_dict()
+        except Exception as e:
+            logger.error(f"Error getting user course stats: {str(e)}")
+            raise Exception(f"Error retrieving user course stats: {str(e)}")
     
     def get_all_users(self):
         """Get all users in the system"""

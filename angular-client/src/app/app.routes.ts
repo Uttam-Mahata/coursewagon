@@ -20,6 +20,7 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
 import { HowItWorksComponent } from './how-it-works/how-it-works.component';
 import { HelpCenterComponent } from './help-center/help-center.component';
 import { EmailVerificationComponent } from './email-verification/email-verification.component';
+import { MyCoursesDashboardComponent } from './my-courses-dashboard/my-courses-dashboard.component';
 
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -30,6 +31,7 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'create-course', component: CourseComponent, canActivate: [AuthGuard] },
   { path: 'courses', component: CoursesComponent, canActivate: [AuthGuard] },
+  { path: 'my-courses-dashboard', component: MyCoursesDashboardComponent, canActivate: [AuthGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
 
   // Legal pages - accessible without authentication

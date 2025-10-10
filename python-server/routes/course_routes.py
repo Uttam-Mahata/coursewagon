@@ -59,6 +59,21 @@ async def get_my_courses(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@course_router.get('/my-courses/statistics')
+async def get_my_courses_statistics(
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """Get detailed statistics for the current user's courses"""
+    try:
+        from admin.service import AdminService
+        admin_service = AdminService(db)
+        stats = admin_service.get_user_course_stats(current_user_id)
+        return stats
+    except Exception as e:
+        logger.error(f"Error getting user course statistics: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @course_router.get('')
 async def get_courses(db: Session = Depends(get_db)):
     try:

@@ -1,5 +1,6 @@
 # repositories/learning_progress_repository.py
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from models.learning_progress import LearningProgress
 from datetime import datetime
 import logging
@@ -104,7 +105,7 @@ class LearningProgressRepository:
     def get_total_time_spent(self, enrollment_id: int) -> int:
         """Get total time spent (in seconds) for an enrollment"""
         result = self.db.query(
-            self.db.func.sum(LearningProgress.time_spent_seconds)
+            func.sum(LearningProgress.time_spent_seconds)
         ).filter(
             LearningProgress.enrollment_id == enrollment_id
         ).scalar()

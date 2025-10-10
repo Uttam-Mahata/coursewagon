@@ -1,5 +1,5 @@
 # extensions.py
-from sqlalchemy import create_engine, Column, Integer, String, Text, Boolean, DateTime, ForeignKey, func
+from sqlalchemy import create_engine, Column, Integer, String, Text, Boolean, DateTime, ForeignKey, Float, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 import os
@@ -72,6 +72,7 @@ class DatabaseWrapper:
         self.Text = Text
         self.Boolean = Boolean
         self.DateTime = DateTime
+        self.Float = Float
         self.ForeignKey = ForeignKey
         self.relationship = relationship
         self.func = func

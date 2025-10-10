@@ -1,16 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CourseService } from '../services/course.service';
 import { SubjectService } from '../services/subject.service';
 import { faHome, faBook, faLayerGroup, faEye, faMagic, faInfoCircle, faChevronRight, faEdit, faTrash, faPlus, faImage, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../services/auth/auth.service';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-subjects',
   templateUrl: './subjects.component.html',
   styleUrls: ['./subjects.component.css'],
-  standalone: false
+  standalone: true,
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FontAwesomeModule]
 })
 export class SubjectsComponent implements OnInit {
   createSubjectForm: FormGroup;

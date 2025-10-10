@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { 
   faMagic, 
   faBrain, 
@@ -17,7 +20,8 @@ import { AuthService } from '../services/auth/auth.service';
     selector: 'app-home',
     templateUrl: './home.component.html',
     styleUrl: './home.component.css',
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, RouterModule, FontAwesomeModule]
 })
 export class HomeComponent implements OnInit { 
   // FontAwesome icons

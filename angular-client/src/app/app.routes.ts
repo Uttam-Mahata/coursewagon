@@ -1,5 +1,4 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { CourseComponent } from './course/course.component';
 import { CoursesComponent } from './courses/courses.component';
 import { HomeComponent } from './home/home.component';
@@ -22,7 +21,7 @@ import { HowItWorksComponent } from './how-it-works/how-it-works.component';
 import { HelpCenterComponent } from './help-center/help-center.component';
 import { EmailVerificationComponent } from './email-verification/email-verification.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'auth', component: AuthComponent, canActivate: [NonAuthGuard] },
   { path: 'forgot-password', component: ForgotPasswordComponent },
@@ -89,14 +88,3 @@ const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: '**', redirectTo: '/home' } // Handle unknown routes
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes, { 
-    useHash: false,
-    scrollPositionRestoration: 'enabled', // Add this to restore scroll position
-    anchorScrolling: 'enabled',
-    scrollOffset: [0, 0]
-  })],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }

@@ -1,17 +1,20 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CourseService } from '../services/course.service';
 import { SubjectService } from '../services/subject.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
 import { faHome, faBook, faPlus, faExclamationTriangle, faExclamationCircle, faMagic, faEye, faEdit, faTrash, faImage, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'app-courses',
     templateUrl: './courses.component.html',
     styleUrls: ['./courses.component.css'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, RouterModule, ReactiveFormsModule, FontAwesomeModule]
 })
 export class CoursesComponent implements OnInit, OnDestroy {
   editCourseForm: FormGroup;

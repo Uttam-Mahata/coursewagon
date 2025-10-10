@@ -78,6 +78,7 @@ python-dateutil
 python-dotenv
 python-jose
 python-multipart
+redis
 requests
 rsa
 scikit-learn

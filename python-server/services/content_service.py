@@ -6,8 +6,10 @@ from repositories.chapter_repo import ChapterRepository
 from repositories.subject_repo import SubjectRepository
 from repositories.course_repo import CourseRepository
 from utils.gemini_helper import GeminiHelper, mermaid_content, extract_markdown
+from utils.unified_storage_helper import storage_helper
 from sqlalchemy.orm import Session
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -103,8 +105,11 @@ class ContentService:
     def get_content_by_topic_id(self, topic_id):
       content = self.content_repo.get_content_by_topic_id(topic_id)
       if content:
-        return mermaid_content(content.content)
-       
+        # Return object with both content and video_url
+        return {
+          "content": mermaid_content(content.content),
+          "video_url": content.video_url
+        }
       else:
         return None
 
@@ -149,14 +154,112 @@ class ContentService:
             
     def delete_content(self, topic_id):
         logger.info(f"Deleting content for topic_id: {topic_id}")
-        
+
         try:
             self.content_repo.delete_content_by_topic_id(topic_id)
-            
+
             # Update topic to reflect it no longer has content
             self.topic_repo.set_has_content(topic_id, False)
-            
+
             return {"message": "Content deleted successfully"}
         except Exception as e:
             logger.error(f"Error deleting content: {str(e)}")
             raise Exception(f"Error deleting content: {str(e)}")
+
+    # Video upload methods
+    def upload_video(self, topic_id, video_file_bytes, filename):
+        """
+        Upload a video file to GCS and save the URL in the database
+
+        Args:
+            topic_id: ID of the topic
+            video_file_bytes: Video file content as bytes
+            filename: Original filename
+
+        Returns:
+            Public URL of the uploaded video
+        """
+        logger.info(f"Uploading video for topic_id: {topic_id}, filename: {filename}")
+
+        try:
+            # Validate file size (100MB max)
+            max_size = 100 * 1024 * 1024  # 100MB in bytes
+            if len(video_file_bytes) > max_size:
+                raise Exception(f"Video file size exceeds maximum allowed size of 100MB")
+
+            # Validate file extension
+            allowed_extensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi']
+            file_extension = filename[filename.rfind('.'):].lower() if '.' in filename else ''
+            if file_extension not in allowed_extensions:
+                raise Exception(f"Invalid video format. Allowed formats: {', '.join(allowed_extensions)}")
+
+            # Generate storage path
+            timestamp = int(time.time())
+            storage_path = f"videos/content/topic_{topic_id}_{timestamp}{file_extension}"
+
+            # Determine content type
+            content_type_map = {
+                '.mp4': 'video/mp4',
+                '.webm': 'video/webm',
+                '.ogg': 'video/ogg',
+                '.mov': 'video/quicktime',
+                '.avi': 'video/x-msvideo'
+            }
+            content_type = content_type_map.get(file_extension, 'video/mp4')
+
+            # Upload to GCS using unified storage helper
+            video_url = storage_helper.upload_file(
+                file_bytes=video_file_bytes,
+                path=storage_path,
+                content_type=content_type
+            )
+
+            # Save video URL to database
+            content = self.content_repo.update_video_url(topic_id, video_url)
+            if not content:
+                # If content doesn't exist, create it with empty text content
+                content = self.content_repo.create_content(topic_id, "")
+                content = self.content_repo.update_video_url(topic_id, video_url)
+
+            logger.info(f"Video uploaded successfully: {video_url}")
+            return {"video_url": video_url, "message": "Video uploaded successfully"}
+
+        except Exception as e:
+            logger.error(f"Error uploading video: {str(e)}")
+            raise Exception(f"Error uploading video: {str(e)}")
+
+    def delete_video(self, topic_id):
+        """
+        Delete the video associated with a topic
+
+        Args:
+            topic_id: ID of the topic
+
+        Returns:
+            Success message
+        """
+        logger.info(f"Deleting video for topic_id: {topic_id}")
+
+        try:
+            # Get current content to retrieve video URL
+            content = self.content_repo.get_content_by_topic_id(topic_id)
+            if not content or not content.video_url:
+                raise Exception("No video found for this topic")
+
+            # Delete from storage
+            video_url = content.video_url
+            try:
+                storage_helper.delete_image(video_url)  # This works for any file type, not just images
+                logger.info(f"Video deleted from storage: {video_url}")
+            except Exception as storage_error:
+                logger.warning(f"Could not delete video from storage: {str(storage_error)}")
+                # Continue anyway to remove URL from database
+
+            # Remove video URL from database
+            self.content_repo.remove_video_url(topic_id)
+
+            return {"message": "Video deleted successfully"}
+
+        except Exception as e:
+            logger.error(f"Error deleting video: {str(e)}")
+            raise Exception(f"Error deleting video: {str(e)}")

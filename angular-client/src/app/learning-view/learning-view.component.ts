@@ -47,6 +47,7 @@ export class LearningViewComponent implements OnInit, OnDestroy {
   currentTopic: any = null;
   currentSubject: any = null;
   content: string = '';
+  videoUrl: string | null = null;
 
   // All topics (flattened for navigation)
   allTopics: any[] = [];
@@ -344,15 +345,26 @@ export class LearningViewComponent implements OnInit, OnDestroy {
       chapterId,
       this.currentTopic.id
     ).subscribe({
-      next: (contentData) => {
-        // contentData is the content string itself, not an object with .content property
-        this.content = this.prepareMarkdownContent(contentData || '');
-        console.log(`[LearningView] Content loaded successfully for topic ${this.currentTopic.id}, length: ${this.content?.length || 0}`);
+      next: (response) => {
+        // Handle both string response (old format) and object response (new format with video_url)
+        if (typeof response === 'string') {
+          this.content = this.prepareMarkdownContent(response || '');
+          this.videoUrl = null;
+        } else if (response && typeof response === 'object') {
+          this.content = this.prepareMarkdownContent(response.content || '');
+          this.videoUrl = response.video_url || null;
+        } else {
+          this.content = '';
+          this.videoUrl = null;
+        }
+
+        console.log(`[LearningView] Content loaded successfully for topic ${this.currentTopic.id}, length: ${this.content?.length || 0}, has video: ${!!this.videoUrl}`);
         this.loadingContent = false;
       },
       error: (err) => {
         console.error('[LearningView] Error loading content:', err);
         this.content = '';
+        this.videoUrl = null;
         this.loadingContent = false;
       }
     });

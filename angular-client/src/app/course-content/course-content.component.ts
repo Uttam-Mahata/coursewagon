@@ -11,7 +11,7 @@ import {
   faHome, faBook, faLayerGroup, faEye, faMagic,
   faBookOpen, faChevronRight, faChevronDown, faChevronUp,
   faFileAlt, faSpinner, faInfoCircle, faChevronLeft, faList,
-  faEdit, faTrash, faPlus
+  faEdit, faTrash, faPlus, faVideo, faUpload, faTrashAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -46,6 +46,7 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   selectedTopic: any = null;
   content: string | null = null;
   processedContent: string | null = null;
+  videoUrl: string | null = null;
   isGeneratingChapters: boolean = false;
   isGeneratingTopics: boolean = false;
   generatingChapterId: number | null = null;
@@ -70,6 +71,10 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   isAddingChapter: boolean = false;
   isAddingTopic: boolean = false;
   isAddingContent: boolean = false;
+  selectedVideoFile: File | null = null;
+  isUploadingVideo: boolean = false;
+  isDeletingVideo: boolean = false;
+  uploadProgress: number = 0;
 
   faHome = faHome;
   faBook = faBook;
@@ -88,6 +93,9 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   faEdit = faEdit;
   faTrash = faTrash;
   faPlus = faPlus;
+  faVideo = faVideo;
+  faUpload = faUpload;
+  faTrashAlt = faTrashAlt;
 
   private subscriptions = new Subscription();
   private needsMathJaxUpdate = false;
@@ -323,20 +331,30 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     this.isLoadingContent = true;
     this.content = null;
     this.processedContent = null;
-    
+    this.videoUrl = null;
+
     this.subscriptions.add(
       this.contentService.getContent(this.courseId, this.subjectId, this.expandedChapterId!, topicId).subscribe({
-        next: (content) => {
-          this.content = content;
-          
-          if (content) {
-            this.processedContent = this.mathRendererService.processContent(content);
+        next: (response) => {
+          // Handle both string response (old format) and object response (new format with video_url)
+          if (typeof response === 'string') {
+            this.content = response;
+            this.videoUrl = null;
+          } else if (response && typeof response === 'object') {
+            this.content = response.content || response;
+            this.videoUrl = response.video_url || null;
+          } else {
+            this.content = response;
+          }
+
+          if (this.content) {
+            this.processedContent = this.mathRendererService.processContent(this.content);
             this.needsMathJaxUpdate = true;
           }
-          
+
           this.isLoadingContent = false;
-          
-          if (content && this.selectedTopic) {
+
+          if (this.content && this.selectedTopic) {
             this.selectedTopic.has_content = true;
           }
         },
@@ -960,6 +978,99 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
         console.error('Error creating content:', err);
         this.errorMessage = 'Failed to create content. Please try again.';
         this.isAddingContent = false;
+      }
+    });
+  }
+
+  // Video upload methods
+  onVideoFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+
+      // Validate file type
+      const allowedTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'];
+      if (!allowedTypes.includes(file.type)) {
+        this.errorMessage = 'Invalid video format. Please upload MP4, WebM, OGG, MOV, or AVI files.';
+        return;
+      }
+
+      // Validate file size (100MB max)
+      const maxSize = 100 * 1024 * 1024; // 100MB
+      if (file.size > maxSize) {
+        this.errorMessage = 'Video file is too large. Maximum size is 100MB.';
+        return;
+      }
+
+      this.selectedVideoFile = file;
+      this.errorMessage = '';
+    }
+  }
+
+  uploadVideo() {
+    if (!this.selectedVideoFile || !this.selectedTopicId || !this.expandedChapterId) {
+      this.errorMessage = 'Please select a video file first';
+      return;
+    }
+
+    this.isUploadingVideo = true;
+    this.errorMessage = '';
+    this.uploadProgress = 0;
+
+    this.contentService.uploadVideo(
+      this.courseId,
+      this.subjectId,
+      this.expandedChapterId,
+      this.selectedTopicId,
+      this.selectedVideoFile
+    ).subscribe({
+      next: (response) => {
+        this.videoUrl = response.video_url;
+        this.selectedVideoFile = null;
+        this.isUploadingVideo = false;
+        this.uploadProgress = 100;
+
+        // Reset file input
+        const fileInput = document.getElementById('videoFileInput') as HTMLInputElement;
+        if (fileInput) {
+          fileInput.value = '';
+        }
+      },
+      error: (err) => {
+        console.error('Error uploading video:', err);
+        this.errorMessage = 'Failed to upload video. Please try again.';
+        this.isUploadingVideo = false;
+        this.uploadProgress = 0;
+      }
+    });
+  }
+
+  deleteVideo() {
+    if (!this.selectedTopicId || !this.expandedChapterId) {
+      return;
+    }
+
+    if (!confirm('Are you sure you want to delete this video?')) {
+      return;
+    }
+
+    this.isDeletingVideo = true;
+    this.errorMessage = '';
+
+    this.contentService.deleteVideo(
+      this.courseId,
+      this.subjectId,
+      this.expandedChapterId,
+      this.selectedTopicId
+    ).subscribe({
+      next: () => {
+        this.videoUrl = null;
+        this.isDeletingVideo = false;
+      },
+      error: (err) => {
+        console.error('Error deleting video:', err);
+        this.errorMessage = 'Failed to delete video. Please try again.';
+        this.isDeletingVideo = false;
       }
     });
   }

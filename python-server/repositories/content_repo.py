@@ -32,9 +32,28 @@ class ContentRepository:
             self.db.commit()
             return content
         return None
-        
+
     def create_content(self, topic_id, content_text):
         content = Content(topic_id=topic_id, content=content_text)
         self.db.add(content)
         self.db.commit()
         return content
+
+    # Video URL operations
+    def update_video_url(self, topic_id, video_url):
+        """Update or set the video URL for content"""
+        content = self.get_content_by_topic_id(topic_id)
+        if content:
+            content.video_url = video_url
+            self.db.commit()
+            return content
+        return None
+
+    def remove_video_url(self, topic_id):
+        """Remove the video URL from content"""
+        content = self.get_content_by_topic_id(topic_id)
+        if content:
+            content.video_url = None
+            self.db.commit()
+            return content
+        return None

@@ -203,7 +203,71 @@ class CourseService:
                 logger.error(f"Error generating course image: {str(img_error)}")
             
             return {"message": "Course created successfully from audio", "course_id": created_course.id}
-            
+
         except Exception as e:
             logger.error(f"Error creating course from audio: {str(e)}")
             raise Exception(f"Error creating course from audio: {e}")
+
+    # Publishing methods
+    def publish_course(self, course_id, user_id, category=None, difficulty_level=None, estimated_duration_hours=None):
+        """Publish a course for learners"""
+        logger.info(f"Publishing course id: {course_id} for user: {user_id}")
+
+        try:
+            # Verify ownership
+            course = self.course_repo.get_course_by_id(course_id)
+            if not course:
+                raise Exception("Course not found")
+
+            if course.user_id != user_id:
+                raise Exception("Not authorized to publish this course")
+
+            # Publish the course
+            updated_course = self.course_repo.publish_course(
+                course_id,
+                category=category,
+                difficulty_level=difficulty_level,
+                estimated_duration_hours=estimated_duration_hours
+            )
+
+            if updated_course:
+                return {
+                    "success": True,
+                    "message": "Course published successfully",
+                    "course": updated_course.to_dict()
+                }
+            else:
+                raise Exception("Failed to publish course")
+
+        except Exception as e:
+            logger.error(f"Error publishing course: {str(e)}")
+            raise Exception(f"Error publishing course: {str(e)}")
+
+    def unpublish_course(self, course_id, user_id):
+        """Unpublish a course"""
+        logger.info(f"Unpublishing course id: {course_id} for user: {user_id}")
+
+        try:
+            # Verify ownership
+            course = self.course_repo.get_course_by_id(course_id)
+            if not course:
+                raise Exception("Course not found")
+
+            if course.user_id != user_id:
+                raise Exception("Not authorized to unpublish this course")
+
+            # Unpublish the course
+            updated_course = self.course_repo.unpublish_course(course_id)
+
+            if updated_course:
+                return {
+                    "success": True,
+                    "message": "Course unpublished successfully",
+                    "course": updated_course.to_dict()
+                }
+            else:
+                raise Exception("Failed to unpublish course")
+
+        except Exception as e:
+            logger.error(f"Error unpublishing course: {str(e)}")
+            raise Exception(f"Error unpublishing course: {str(e)}")

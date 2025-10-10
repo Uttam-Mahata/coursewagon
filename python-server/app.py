@@ -31,9 +31,11 @@ async def lifespan(app: FastAPI):
     try:
         from migrations.add_welcome_email_sent_column import add_welcome_email_sent_column
         from migrations.add_email_verification import run_migration as run_email_verification_migration
+        from migrations.add_learner_functionality import run_all_migrations
 
         add_welcome_email_sent_column()
         run_email_verification_migration()
+        run_all_migrations()  # New learner functionality migrations
         logger.info("Database migrations completed successfully")
     except Exception as e:
         logger.error(f"Database migration failed: {str(e)}")
@@ -69,6 +71,8 @@ from routes.content_routes import content_router
 from routes.auth_routes import auth_router
 from routes.testimonial_routes import testimonial_router
 from routes.image_routes import image_router
+from routes.enrollment_routes import enrollment_router
+from routes.learning_routes import learning_router
 from admin.routes import admin_router
 from routes.utility_routes import utility_router
 from routes.test_auth_routes import test_auth_router
@@ -167,6 +171,8 @@ app.include_router(content_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(testimonial_router, prefix="/api")
 app.include_router(image_router, prefix="/api")
+app.include_router(enrollment_router, prefix="/api")
+app.include_router(learning_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(utility_router, prefix="/api")
 app.include_router(test_auth_router, prefix="/api")

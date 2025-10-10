@@ -161,3 +161,163 @@ class CourseRepository:
             self.db.rollback()
             logger.error(f"Error getting course image URL: {e}")
             raise
+
+    # Publishing and discovery methods
+    def publish_course(self, course_id, category=None, difficulty_level=None, estimated_duration_hours=None):
+        """Publish a course for learners"""
+        try:
+            from datetime import datetime
+            course = self.get_course_by_id(course_id)
+            if course:
+                course.is_published = True
+                course.published_at = datetime.utcnow()
+                if category:
+                    course.category = category
+                if difficulty_level:
+                    course.difficulty_level = difficulty_level
+                if estimated_duration_hours:
+                    course.estimated_duration_hours = estimated_duration_hours
+                self.db.commit()
+                return course
+            return None
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error publishing course: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error publishing course: {e}")
+            raise
+
+    def unpublish_course(self, course_id):
+        """Unpublish a course"""
+        try:
+            course = self.get_course_by_id(course_id)
+            if course:
+                course.is_published = False
+                self.db.commit()
+                return course
+            return None
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error unpublishing course: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error unpublishing course: {e}")
+            raise
+
+    def get_published_courses(self, limit=None, offset=None):
+        """Get all published courses"""
+        try:
+            query = self.db.query(Course).filter(Course.is_published == True).order_by(Course.published_at.desc())
+
+            if offset:
+                query = query.offset(offset)
+            if limit:
+                query = query.limit(limit)
+
+            return query.all()
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error getting published courses: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error getting published courses: {e}")
+            raise
+
+    def get_courses_by_category(self, category, limit=None):
+        """Get published courses by category"""
+        try:
+            query = self.db.query(Course).filter(
+                Course.is_published == True,
+                Course.category == category
+            ).order_by(Course.published_at.desc())
+
+            if limit:
+                query = query.limit(limit)
+
+            return query.all()
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error getting courses by category: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error getting courses by category: {e}")
+            raise
+
+    def search_courses(self, search_term, limit=None):
+        """Search published courses by name or description"""
+        try:
+            query = self.db.query(Course).filter(
+                Course.is_published == True,
+                (Course.name.ilike(f'%{search_term}%') | Course.description.ilike(f'%{search_term}%'))
+            ).order_by(Course.published_at.desc())
+
+            if limit:
+                query = query.limit(limit)
+
+            return query.all()
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error searching courses: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error searching courses: {e}")
+            raise
+
+    def get_popular_courses(self, limit=10):
+        """Get most popular courses by enrollment count"""
+        try:
+            return self.db.query(Course).filter(
+                Course.is_published == True
+            ).order_by(
+                Course.enrollment_count.desc()
+            ).limit(limit).all()
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error getting popular courses: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error getting popular courses: {e}")
+            raise
+
+    def increment_enrollment_count(self, course_id):
+        """Increment the enrollment count for a course"""
+        try:
+            course = self.get_course_by_id(course_id)
+            if course:
+                course.enrollment_count += 1
+                self.db.commit()
+                return course
+            return None
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error incrementing enrollment count: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error incrementing enrollment count: {e}")
+            raise
+
+    def decrement_enrollment_count(self, course_id):
+        """Decrement the enrollment count for a course"""
+        try:
+            course = self.get_course_by_id(course_id)
+            if course and course.enrollment_count > 0:
+                course.enrollment_count -= 1
+                self.db.commit()
+                return course
+            return None
+        except SQLAlchemyError as e:
+            self.db.rollback()
+            logger.error(f"Database error decrementing enrollment count: {e}")
+            raise
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Error decrementing enrollment count: {e}")
+            raise

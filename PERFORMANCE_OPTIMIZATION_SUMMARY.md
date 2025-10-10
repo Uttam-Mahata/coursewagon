@@ -120,8 +120,8 @@ This document summarizes the caching and performance optimizations implemented i
 
 ### Database Layer
 1. **Connection Pooling**: Already optimized (pool_size=20, max_overflow=30)
-2. **New Indexes**: 15+ indexes added for frequently queried columns
-   - Foreign key columns (user_id, course_id, subject_id, etc.)
+2. **New Indexes**: 17 indexes added for frequently queried columns
+   - Foreign key columns (user_id, course_id, subject_id, chapter_id, enrollment_id, topic_id, content_id, etc.)
    - Search columns (email, category, status)
    - Sort columns (published_at)
 

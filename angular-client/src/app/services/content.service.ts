@@ -37,4 +37,18 @@ export class ContentService {
   deleteContent(courseId: number, subjectId: number, chapterId: number, topicId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${courseId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/content`);
   }
+
+  // Video operations
+  uploadVideo(courseId: number, subjectId: number, chapterId: number, topicId: number, videoFile: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('video', videoFile);
+
+    console.log(`[ContentService] Uploading video for course: ${courseId}, subject: ${subjectId}, chapter: ${chapterId}, topic: ${topicId}`);
+    return this.http.post(`${this.apiUrl}/${courseId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/video`, formData);
+  }
+
+  deleteVideo(courseId: number, subjectId: number, chapterId: number, topicId: number): Observable<any> {
+    console.log(`[ContentService] Deleting video for course: ${courseId}, subject: ${subjectId}, chapter: ${chapterId}, topic: ${topicId}`);
+    return this.http.delete(`${this.apiUrl}/${courseId}/subjects/${subjectId}/chapters/${chapterId}/topics/${topicId}/video`);
+  }
 }

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_user_id
 from services.content_service import ContentService
@@ -7,6 +7,9 @@ from repositories.user_repository import UserRepository
 from services.auth_service import AuthService
 from extensions import get_db
 from sqlalchemy.orm import Session
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create FastAPI router instead of Flask Blueprint
 content_router = APIRouter(prefix="/courses", tags=["content"])
@@ -141,8 +144,68 @@ async def delete_content(
         course = course_service.get_course_by_id(course_id)
         if not course or course.get('user_id') != current_user_id:
             raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
-            
+
         result = content_service.delete_content(topic_id)
         return result
     except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Video upload endpoints
+@content_router.post(
+    '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/video'
+)
+async def upload_video(
+    course_id: int,
+    subject_id: int,
+    chapter_id: int,
+    topic_id: int,
+    video: UploadFile = File(...),
+    current_user_id: int = Depends(get_current_user_id),
+    content_service: ContentService = Depends(get_content_service),
+    course_service: CourseService = Depends(get_course_service)
+):
+    try:
+        # Verify course ownership
+        course = course_service.get_course_by_id(course_id)
+        if not course or course.get('user_id') != current_user_id:
+            raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
+
+        # Read video file
+        video_bytes = await video.read()
+
+        # Upload video
+        result = content_service.upload_video(topic_id, video_bytes, video.filename)
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error uploading video: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@content_router.delete(
+    '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/video'
+)
+async def delete_video(
+    course_id: int,
+    subject_id: int,
+    chapter_id: int,
+    topic_id: int,
+    current_user_id: int = Depends(get_current_user_id),
+    content_service: ContentService = Depends(get_content_service),
+    course_service: CourseService = Depends(get_course_service)
+):
+    try:
+        # Verify course ownership
+        course = course_service.get_course_by_id(course_id)
+        if not course or course.get('user_id') != current_user_id:
+            raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
+
+        result = content_service.delete_video(topic_id)
+        return result
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting video: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))

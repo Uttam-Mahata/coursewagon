@@ -8,10 +8,12 @@ class Content(Base):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     topic_id = db.Column(db.Integer, db.ForeignKey('topics.id', ondelete='CASCADE'), nullable=False)  # Changed from subtopic_id to topic_id
     content = db.Column(db.Text, nullable=False)
-    
+    video_url = db.Column(db.Text, nullable=True)
+
     def to_dict(self):
       return{
         'id': self.id,
         'topic_id': self.topic_id,  # Updated key
-        'content': self.content
+        'content': self.content,
+        'video_url': self.video_url
       }

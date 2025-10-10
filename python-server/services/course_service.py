@@ -271,3 +271,12 @@ class CourseService:
         except Exception as e:
             logger.error(f"Error unpublishing course: {str(e)}")
             raise Exception(f"Error unpublishing course: {str(e)}")
+
+    def get_available_categories(self):
+        """Get list of all unique categories from published courses"""
+        try:
+            categories = self.course_repo.get_available_categories()
+            return categories
+        except Exception as e:
+            logger.error(f"Error getting available categories: {str(e)}")
+            raise Exception(f"Error getting available categories: {str(e)}")

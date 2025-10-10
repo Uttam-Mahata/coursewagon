@@ -167,37 +167,41 @@
 <div *ngIf="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
   <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" (click)="closeEditModal()"></div>
   <div class="bg-white bg-opacity-95 rounded-2xl p-6 w-full max-w-md shadow-xl relative z-10 transform transition-all animate-zoomIn">
-    <h2 class="text-xl font-bold mb-5 text-gray-800 border-b pb-2" [formGroup]="editCourseForm">Edit Course</h2>
-    <div class="mb-4">
-      <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-      <input 
-        type="text" 
-        id="courseName" 
-        formControlName="name"
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-        placeholder="Enter course name">
-    </div>
-    <div class="mb-6">
-      <label for="courseDescription" class="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
-      <textarea 
-        id="courseDescription" 
-        formControlName="description"
-        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-        placeholder="Enter course description"
-        rows="3"></textarea>
-    </div>
-    <div class="flex justify-end space-x-3">
-      <button 
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-        (click)="closeEditModal()">
-        Cancel
-      </button>
-      <button 
-        class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg"
-        (click)="updateCourse()">
-        Save Changes
-      </button>
-    </div>
+    <h2 class="text-xl font-bold mb-5 text-gray-800 border-b pb-2">Edit Course</h2>
+    <form [formGroup]="editCourseForm">
+      <div class="mb-4">
+        <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+        <input
+          type="text"
+          id="courseName"
+          formControlName="name"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          placeholder="Enter course name">
+      </div>
+      <div class="mb-6">
+        <label for="courseDescription" class="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
+        <textarea
+          id="courseDescription"
+          formControlName="description"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+          placeholder="Enter course description"
+          rows="3"></textarea>
+      </div>
+      <div class="flex justify-end space-x-3">
+        <button
+          type="button"
+          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+          (click)="closeEditModal()">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg"
+          (click)="updateCourse()">
+          Save Changes
+        </button>
+      </div>
+    </form>
   </div>
 </div>
 

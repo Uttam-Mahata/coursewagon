@@ -79,12 +79,16 @@ class AuthService:
         user = self.user_repository.get_user_by_email(email)
         if not user:
             raise ValueError("No account found with this email address. Please sign up first.")
-        
+
         if not user.check_password(password):
             raise ValueError("Incorrect password. Please try again or use 'Forgot password' to reset it.")
-        
+
         if not user.is_active:
             raise ValueError("Your account has been deactivated. Please contact support for assistance.")
+
+        # Check if email is verified
+        if not user.email_verified:
+            raise ValueError("EMAIL_NOT_VERIFIED")
 
         self.user_repository.update_last_login(user)
         

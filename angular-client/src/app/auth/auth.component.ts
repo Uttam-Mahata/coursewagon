@@ -98,10 +98,10 @@ export class AuthComponent implements OnInit {
       this.errorMessage = 'Please enter a valid email and password';
       return;
     }
-    
+
     const { email, password, rememberMe } = this.loginForm.value;
     console.log('Attempting login with email:', email, 'Remember me:', rememberMe);
-    
+
     this.authService.login(email, password, rememberMe)
       .subscribe({
         next: (response) => {
@@ -113,6 +113,15 @@ export class AuthComponent implements OnInit {
         },
         error: (error) => {
           console.error('Login error:', error);
+
+          // Check if this is an unverified email error
+          if (error.error?.detail?.error === 'EMAIL_NOT_VERIFIED') {
+            this.registeredEmail = error.error.detail.email || email;
+            this.showVerificationMessage = true;
+            this.clearMessages();
+            return;
+          }
+
           this.errorMessage = this.getErrorMessage(error);
         }
       });
@@ -167,6 +176,13 @@ export class AuthComponent implements OnInit {
     this.showVerificationMessage = false;
     this.registeredEmail = '';
     this.isLoginMode = false;
+  }
+
+  backToLogin(): void {
+    this.showVerificationMessage = false;
+    this.registeredEmail = '';
+    this.isLoginMode = true;
+    this.clearMessages();
   }
 
   // Google Sign-In method

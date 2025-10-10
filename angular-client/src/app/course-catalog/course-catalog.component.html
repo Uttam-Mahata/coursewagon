@@ -10,7 +10,7 @@
 
   <!-- Search and Filter Bar -->
   <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-    <!-- Search Input -->
+    <!-- Search Input and Sort -->
     <div class="flex gap-4 mb-4">
       <div class="flex-1 relative">
         <input
@@ -21,6 +21,12 @@
           class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
         <fa-icon [icon]="faSearch" class="absolute left-4 top-4 text-gray-400"></fa-icon>
       </div>
+      <select
+        [(ngModel)]="selectedSort"
+        (change)="onSortChange()"
+        class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+        <option *ngFor="let option of sortOptions" [value]="option.value">{{ option.label }}</option>
+      </select>
       <button
         (click)="searchCourses()"
         class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition duration-200">

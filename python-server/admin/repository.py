@@ -108,7 +108,13 @@ class AdminRepository:
                     'chapters_count': chapters_count,
                     'topics_count': topics_count,
                     'content_count': content_count,
-                    'image_url': course.image_url
+                    'image_url': course.image_url,
+                    'is_published': course.is_published,
+                    'published_at': course.published_at.isoformat() if course.published_at else None,
+                    'category': course.category,
+                    'difficulty_level': course.difficulty_level,
+                    'estimated_duration_hours': course.estimated_duration_hours,
+                    'enrollment_count': course.enrollment_count
                 })
 
             return breakdown
@@ -156,7 +162,13 @@ class AdminRepository:
                     'chapters_count': chapters_count,
                     'topics_count': topics_count,
                     'content_count': content_count,
-                    'image_url': course.image_url
+                    'image_url': course.image_url,
+                    'is_published': course.is_published,
+                    'published_at': course.published_at.isoformat() if course.published_at else None,
+                    'category': course.category,
+                    'difficulty_level': course.difficulty_level,
+                    'estimated_duration_hours': course.estimated_duration_hours,
+                    'enrollment_count': course.enrollment_count
                 })
 
             return breakdown

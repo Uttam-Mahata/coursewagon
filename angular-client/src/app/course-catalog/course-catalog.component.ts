@@ -21,6 +21,8 @@ interface CourseWithEnrollment {
   enrollment_count: number;
   creator_name?: string;
   is_enrolled?: boolean;
+  created_at?: string;
+  published_at?: string;
 }
 
 @Component({
@@ -50,11 +52,18 @@ export class CourseCatalogComponent implements OnInit {
   searchQuery = '';
   selectedCategory = '';
   selectedDifficulty = '';
+  selectedSort = 'popular';
   showFilters = false;
 
   // Categories and difficulty levels
-  categories = ['Programming', 'Data Science', 'Web Development', 'Mobile Development', 'Design', 'Business', 'Other'];
+  categories = ['Programming', 'Data Science', 'Web Development', 'Mobile Development', 'Design', 'Business', 'Mathematics', 'Science', 'Languages', 'Other'];
   difficultyLevels = ['Beginner', 'Intermediate', 'Advanced'];
+  sortOptions = [
+    { value: 'popular', label: 'Most Popular' },
+    { value: 'newest', label: 'Newest First' },
+    { value: 'duration_asc', label: 'Shortest Duration' },
+    { value: 'duration_desc', label: 'Longest Duration' }
+  ];
 
   // Pagination
   currentPage = 1;
@@ -133,11 +142,36 @@ export class CourseCatalogComponent implements OnInit {
   }
 
   applyFilters(): void {
+    // Filter courses
     this.filteredCourses = this.courses.filter(course => {
       const categoryMatch = !this.selectedCategory || course.category === this.selectedCategory;
       const difficultyMatch = !this.selectedDifficulty || course.difficulty_level === this.selectedDifficulty;
       return categoryMatch && difficultyMatch;
     });
+
+    // Apply sorting
+    this.sortCourses();
+  }
+
+  sortCourses(): void {
+    switch (this.selectedSort) {
+      case 'popular':
+        this.filteredCourses.sort((a, b) => (b.enrollment_count || 0) - (a.enrollment_count || 0));
+        break;
+      case 'newest':
+        this.filteredCourses.sort((a, b) => {
+          const dateA = new Date(a.created_at || 0).getTime();
+          const dateB = new Date(b.created_at || 0).getTime();
+          return dateB - dateA;
+        });
+        break;
+      case 'duration_asc':
+        this.filteredCourses.sort((a, b) => (a.estimated_duration_hours || 0) - (b.estimated_duration_hours || 0));
+        break;
+      case 'duration_desc':
+        this.filteredCourses.sort((a, b) => (b.estimated_duration_hours || 0) - (a.estimated_duration_hours || 0));
+        break;
+    }
   }
 
   onCategoryChange(): void {
@@ -148,6 +182,10 @@ export class CourseCatalogComponent implements OnInit {
     this.applyFilters();
   }
 
+  onSortChange(): void {
+    this.applyFilters();
+  }
+
   toggleFilters(): void {
     this.showFilters = !this.showFilters;
   }
@@ -155,6 +193,7 @@ export class CourseCatalogComponent implements OnInit {
   clearFilters(): void {
     this.selectedCategory = '';
     this.selectedDifficulty = '';
+    this.selectedSort = 'popular';
     this.searchQuery = '';
     this.applyFilters();
   }

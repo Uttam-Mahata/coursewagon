@@ -3,9 +3,14 @@ import { faUser, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons
 import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
 import { TestimonialService } from '../services/testimonial.service';
 import { AuthService } from '../services/auth/auth.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { WriteReviewComponent } from '../write-review/write-review.component';
 @Component({
   selector: 'app-testimonials',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, RouterModule, FontAwesomeModule, WriteReviewComponent],
   templateUrl: './testimonials.component.html',
   styleUrls: ['./testimonials.component.css']
 })

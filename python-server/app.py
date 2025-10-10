@@ -84,14 +84,29 @@ app = FastAPI(
 # CORS configuration
 # Note: When allow_credentials=True, cannot use allow_origins=["*"]
 # Must specify exact origins for cookie-based authentication
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+# SECURITY: Different origins for production vs development to prevent cookie theft
+IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
+
+if IS_PRODUCTION:
+    # Production: ONLY allow production domains (NO localhost!)
+    allowed_origins = [
+        "https://www.coursewagon.live",
+        "https://coursewagon.web.app"
+    ]
+    logger.info("CORS configured for PRODUCTION - localhost access disabled")
+else:
+    # Development: Allow localhost for local testing
+    allowed_origins = [
         "http://localhost:4200",
         "http://127.0.0.1:4200",
         "https://www.coursewagon.live",
         "https://coursewagon.web.app"
-    ],
+    ]
+    logger.info("CORS configured for DEVELOPMENT - localhost access enabled")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
     allow_credentials=True,  # Required for HttpOnly cookies
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=[

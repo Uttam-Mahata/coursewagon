@@ -1,19 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth/auth.service';
-import { Router } from '@angular/router';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { 
   faEnvelope, faCheckCircle, faTimesCircle, 
   faExclamationCircle, faTimes,
   faEye, faEyeSlash, faLock, faSave
 } from '@fortawesome/free-solid-svg-icons';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
     selector: 'app-profile',
     
     templateUrl: './profile.component.html',
     styleUrls: ['./profile.component.scss'],
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, RouterModule]
 })
 export class ProfileComponent implements OnInit {
   // FontAwesome icons

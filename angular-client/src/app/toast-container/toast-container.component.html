@@ -1,0 +1,17 @@
+<div class="fixed top-4 right-4 z-50">
+  <div *ngFor="let toast of toasts" [class]="getToastClasses(toast.type)">
+    <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 mr-3">
+      <fa-icon [icon]="getIcon(toast.type)" [class]="getIconClasses(toast.type)"></fa-icon>
+    </div>
+    <div class="text-sm font-normal flex-1">
+      {{ toast.message }}
+    </div>
+    <button
+      type="button"
+      (click)="removeToast(toast.id)"
+      class="ml-3 -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex h-8 w-8 hover:bg-gray-200 transition-colors duration-200"
+      [attr.aria-label]="'Close'">
+      <fa-icon [icon]="faTimes" class="w-5 h-5"></fa-icon>
+    </button>
+  </div>
+</div>

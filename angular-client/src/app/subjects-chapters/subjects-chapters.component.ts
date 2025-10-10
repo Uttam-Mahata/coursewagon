@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CourseService } from '../services/course.service';
 import { SubjectService } from '../services/subject.service';
 import { ChapterService } from '../services/chapter.service';
@@ -8,10 +8,13 @@ import {
   faHome, faBook, faLayerGroup, faEye, faMagic, 
   faBookOpen, faInfoCircle, faChevronRight 
 } from '@fortawesome/free-solid-svg-icons';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-subjects-chapters',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, RouterModule, FontAwesomeModule],
   templateUrl: './subjects-chapters.component.html',
   styleUrls: ['./subjects-chapters.component.css']
 })

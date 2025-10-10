@@ -1,0 +1,225 @@
+<div class="flex h-screen bg-gray-50 overflow-hidden">
+  <!-- Mobile Sidebar Overlay -->
+  <div *ngIf="isSidebarOpen"
+       (click)="toggleSidebar()"
+       class="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"></div>
+
+  <!-- Sidebar -->
+  <div class="w-80 bg-white border-r border-gray-200 overflow-y-auto flex-shrink-0 transition-all duration-300"
+       [ngClass]="{'translate-x-0': isSidebarOpen, '-translate-x-full md:translate-x-0': !isSidebarOpen, 'fixed md:relative': true, 'h-full z-40': true, 'pt-16 md:pt-0': true}">
+    <!-- Course Header -->
+    <div class="p-6 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-xl font-bold">{{ course?.name }}</h2>
+        <!-- Close sidebar button (visible only on mobile) -->
+        <button
+          class="md:hidden text-white hover:text-blue-200"
+          (click)="toggleSidebar()">
+          <fa-icon [icon]="faChevronLeft" class="text-lg"></fa-icon>
+        </button>
+      </div>
+      <div class="flex items-center justify-between text-sm opacity-90">
+        <span>Progress: {{ progressPercentage }}%</span>
+        <span>{{ completedTopics.size }}/{{ allTopics.length }}</span>
+      </div>
+      <div class="mt-2 w-full bg-blue-400 rounded-full h-2">
+        <div class="bg-white h-2 rounded-full transition-all duration-500"
+             [style.width.%]="progressPercentage"></div>
+      </div>
+    </div>
+
+    <!-- Course Structure List -->
+    <div class="p-4">
+      <div *ngFor="let subject of subjects" class="mb-6">
+        <!-- Subject Header -->
+        <h3 class="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide border-b pb-2">
+          {{ subject.name }}
+        </h3>
+
+        <!-- Chapters in this subject -->
+        <div *ngIf="subject.chapters && subject.chapters.length > 0" class="space-y-3">
+          <div *ngFor="let chapter of subject.chapters" class="ml-2">
+            <!-- Chapter Name -->
+            <h4 class="text-xs font-medium text-gray-600 mb-2">
+              {{ chapter.name }}
+            </h4>
+
+            <!-- Topics in this chapter -->
+            <div *ngIf="chapter.topics && chapter.topics.length > 0" class="space-y-1 ml-3">
+              <div *ngFor="let topic of chapter.topics"
+                   (click)="selectTopic(topic.id)"
+                   [class.bg-blue-50]="topicId === topic.id"
+                   [class.border-l-4]="topicId === topic.id"
+                   [class.border-blue-600]="topicId === topic.id"
+                   class="p-3 rounded cursor-pointer hover:bg-gray-50 transition duration-150 border-l-4 border-transparent">
+                <div class="flex items-start">
+                  <fa-icon *ngIf="isTopicCompleted(topic.id)"
+                           [icon]="faCheckCircle"
+                           class="text-green-600 mr-2 mt-0.5 flex-shrink-0"></fa-icon>
+                  <fa-icon *ngIf="!isTopicCompleted(topic.id)"
+                           [icon]="faCircle"
+                           class="text-gray-300 mr-2 mt-0.5 flex-shrink-0 text-xs"></fa-icon>
+                  <span class="text-sm" [class.font-semibold]="topicId === topic.id"
+                        [class.text-blue-600]="topicId === topic.id"
+                        [class.text-gray-700]="topicId !== topic.id">
+                    {{ topic.name }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Top Navigation Bar -->
+    <div class="bg-white border-b border-gray-200 sticky top-0 z-30 px-2 md:px-6 py-3 md:py-4">
+      <!-- Mobile Topic Toggle and Navigation -->
+      <div class="md:hidden">
+        <div class="flex items-center justify-between mb-2">
+          <button
+            (click)="toggleSidebar()"
+            class="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm">
+            <fa-icon [icon]="faList" class="mr-2"></fa-icon>
+            <span class="truncate max-w-[150px]">{{ currentSubject?.name || 'Course Outline' }}</span>
+          </button>
+
+          <!-- Topic Navigation on Mobile -->
+          <div class="flex space-x-2">
+            <button
+              [disabled]="!hasPreviousTopic"
+              [ngClass]="{'opacity-50': !hasPreviousTopic}"
+              (click)="previousTopic()"
+              class="bg-white border border-gray-300 text-gray-700 p-2 rounded-md">
+              <fa-icon [icon]="faChevronLeft" class="text-xs"></fa-icon>
+            </button>
+            <button
+              [disabled]="!hasNextTopic"
+              [ngClass]="{'opacity-50': !hasNextTopic}"
+              (click)="nextTopic()"
+              class="bg-white border border-gray-300 text-gray-700 p-2 rounded-md">
+              <fa-icon [icon]="faChevronRight" class="text-xs"></fa-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Back to Dashboard link (Mobile) -->
+        <button
+          (click)="goBackToDashboard()"
+          class="text-blue-600 hover:text-blue-800 flex items-center text-sm transition duration-200">
+          <fa-icon [icon]="faArrowLeft" class="mr-1"></fa-icon>
+          Back to Dashboard
+        </button>
+      </div>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center justify-between">
+        <!-- Left side -->
+        <div class="flex items-center space-x-4">
+          <button
+            (click)="toggleSidebar()"
+            class="text-gray-600 hover:text-gray-800 transition duration-200">
+            <fa-icon [icon]="faList" size="lg"></fa-icon>
+          </button>
+          <button
+            (click)="goBackToDashboard()"
+            class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
+            <fa-icon [icon]="faArrowLeft" class="mr-2"></fa-icon>
+            <span class="hidden sm:inline">Back to Dashboard</span>
+          </button>
+        </div>
+
+        <!-- Center - Topic Title -->
+        <div *ngIf="currentTopic" class="flex-1 text-center px-4">
+          <h1 class="text-lg font-semibold text-gray-800 truncate">
+            {{ currentTopic.name }}
+          </h1>
+          <p class="text-xs text-gray-500">{{ currentSubject?.name }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="flex-1 overflow-y-auto bg-gray-50">
+      <!-- Loading State -->
+      <div *ngIf="loading || loadingContent" class="flex justify-center items-center h-full">
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mx-auto"></div>
+          <p class="mt-4 text-gray-600">Loading content...</p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error && !loading" class="flex justify-center items-center h-full">
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md max-w-lg">
+          <p>{{ error }}</p>
+        </div>
+      </div>
+
+      <!-- Content Display -->
+      <div *ngIf="!loading && !loadingContent && !error && content" class="w-full px-2 md:px-6 py-4 md:py-8">
+        <!-- Content Header (Mobile) -->
+        <header class="mb-4 md:mb-6 md:hidden">
+          <h1 class="text-xl font-bold text-gray-800 mb-2">{{ currentTopic?.name || 'Select a Topic' }}</h1>
+          <p *ngIf="currentTopic" class="text-gray-600 text-sm">{{ currentSubject?.name }}</p>
+        </header>
+
+        <!-- Markdown Content -->
+        <div class="bg-white rounded-lg shadow-sm p-3 md:p-8 prose prose-sm md:prose-lg max-w-none">
+          <div markdown [data]="content" mermaid katex class="markdown-content"></div>
+        </div>
+
+        <!-- Mark Complete Button -->
+        <div class="mt-8 flex justify-center">
+          <button *ngIf="!isTopicCompleted(topicId!)"
+                  (click)="markTopicComplete()"
+                  class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg flex items-center transition duration-200 font-semibold">
+            <fa-icon [icon]="faCheckCircle" class="mr-2"></fa-icon>
+            Mark as Complete
+          </button>
+          <div *ngIf="isTopicCompleted(topicId!)"
+               class="bg-green-100 border border-green-300 text-green-800 px-8 py-3 rounded-lg flex items-center font-semibold">
+            <fa-icon [icon]="faCheckCircle" class="mr-2"></fa-icon>
+            Completed
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty Content State -->
+      <div *ngIf="!loading && !loadingContent && !error && !content" class="flex justify-center items-center h-full">
+        <div class="text-center text-gray-500">
+          <fa-icon [icon]="faBookOpen" size="3x" class="mb-4 text-gray-300"></fa-icon>
+          <p class="text-lg">No content available for this topic yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation (Desktop) -->
+    <div class="hidden md:block bg-white border-t border-gray-200 px-6 py-4">
+      <div class="flex items-center justify-between">
+        <button
+          (click)="previousTopic()"
+          [disabled]="!hasPreviousTopic"
+          class="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg flex items-center transition duration-200">
+          <fa-icon [icon]="faChevronLeft" class="mr-2"></fa-icon>
+          Previous
+        </button>
+
+        <div class="text-sm text-gray-600">
+          Topic {{ currentTopicIndex + 1 }} of {{ allTopics.length }}
+        </div>
+
+        <button
+          (click)="nextTopic()"
+          [disabled]="!hasNextTopic"
+          class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg flex items-center transition duration-200">
+          Next
+          <fa-icon [icon]="faChevronRight" class="ml-2"></fa-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

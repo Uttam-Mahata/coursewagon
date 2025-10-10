@@ -15,6 +15,9 @@ class User(Base):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)  # New field for admin role
+    role = db.Column(db.String(50), default='both', nullable=False)  # creator, learner, or both
+    bio = db.Column(db.Text, nullable=True)  # User biography
+    profile_image_url = db.Column(db.String(512), nullable=True)  # Profile image URL
     last_login = db.Column(db.DateTime)
     welcome_email_sent = db.Column(db.Boolean, default=False)  # Track if welcome email has been sent
     email_verified = db.Column(db.Boolean, default=False)  # Track if email has been verified
@@ -45,6 +48,9 @@ class User(Base):
             'created_at': self.created_at.isoformat(),
             'is_active': self.is_active,
             'is_admin': self.is_admin,
+            'role': self.role,
+            'bio': self.bio,
+            'profile_image_url': self.profile_image_url,
             'welcome_email_sent': self.welcome_email_sent,
             'email_verified': self.email_verified
         }

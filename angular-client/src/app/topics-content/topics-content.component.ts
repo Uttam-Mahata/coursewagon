@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { ActivatedRoute, Router, ParamMap, RouterModule } from '@angular/router';
 import { CourseService } from '../services/course.service';
 import { SubjectService } from '../services/subject.service';
 import { ChapterService } from '../services/chapter.service';
@@ -12,10 +12,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { MarkdownModule } from 'ngx-markdown';
 
 @Component({
   selector: 'app-topics-content',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, RouterModule, FontAwesomeModule, MarkdownModule],
   templateUrl: './topics-content.component.html',
   styleUrls: ['./topics-content.component.css']
 })

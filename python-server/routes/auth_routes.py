@@ -125,7 +125,8 @@ class GoogleAuth(BaseModel):
 class ProfileUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    # Add other profile fields as needed
+    bio: Optional[str] = None
+    role: Optional[str] = None
 
 class CheckEmail(BaseModel):
     email: EmailStr
@@ -193,6 +194,7 @@ async def register(
     db: Session = Depends(get_db),
     auth_service: AuthService = Depends(get_auth_service)
 ):
+    """Register new user"""
     try:
         user = auth_service.register_user(
             email=user_data.email,
@@ -202,16 +204,21 @@ async def register(
         )
         
         logger.info(f"User registered successfully: {user.email}")
-        return {'message': 'User created successfully', 'user': user.to_dict()}
+        return {
+            'message': 'Registration successful! Please check your email to verify your account.',
+            'user': user.to_dict()
+        }
         
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.warning(f"Registration failed for {user_data.email}: {str(e)}")
+        raise HTTPException(status_code=400, detail={'error': str(e)})
     except Exception as e:
         logger.error(f"Registration error: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail='Internal server error')
+        raise HTTPException(status_code=500, detail={'error': 'Registration failed. Please try again later.'})
 
 @auth_router.post('/login')
 async def login(login_data: UserLogin, response: Response, db: Session = Depends(get_db)):
+    """Login user with email and password"""
     try:
         logger.debug(f"Login attempt for {login_data.email}, remember_me={login_data.remember_me}")
 
@@ -229,16 +236,32 @@ async def login(login_data: UserLogin, response: Response, db: Session = Depends
             remember_me=login_data.remember_me
         )
 
+        logger.info(f"User logged in: {login_data.email}")
+
         # Return user data only (tokens are in cookies)
         return {
             'user': auth_data['user'],
             'message': 'Login successful'
         }
     except ValueError as e:
-        raise HTTPException(status_code=401, detail=str(e))
+        error_msg = str(e)
+        logger.warning(f"Login failed for {login_data.email}: {error_msg}")
+
+        # Special handling for unverified email
+        if error_msg == "EMAIL_NOT_VERIFIED":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    'error': 'EMAIL_NOT_VERIFIED',
+                    'message': 'Please verify your email address before logging in. Check your inbox for the verification link.',
+                    'email': login_data.email
+                }
+            )
+
+        raise HTTPException(status_code=401, detail={'error': error_msg})
     except Exception as e:
         logger.error(f"Login error: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail='Internal server error')
+        raise HTTPException(status_code=500, detail={'error': 'An unexpected error occurred. Please try again later.'})
 
 @auth_router.post('/refresh')
 async def refresh_token_endpoint(request: Request, response: Response, db: Session = Depends(get_db)):
@@ -302,34 +325,41 @@ async def update_profile(
     try:
         auth_service = AuthService(db)
         user = auth_service.update_user_profile(
-            current_user_id, 
+            current_user_id,
             **profile_data.dict(exclude_unset=True)
         )
-        return user.to_dict()
+        return {
+            'message': 'Profile updated successfully',
+            'user': user.to_dict()
+        }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @auth_router.post('/forgot-password')
 async def forgot_password(forgot_data: ForgotPassword, db: Session = Depends(get_db)):
+    """Request password reset email"""
     try:
         if not forgot_data.email:
-            raise HTTPException(status_code=400, detail='Email is required')
+            raise HTTPException(status_code=400, detail={'error': 'Email address is required.'})
             
         auth_service = AuthService(db)
         result = auth_service.request_password_reset(forgot_data.email, forgot_data.frontend_url)
         
         # Always return success message (even if email doesn't exist) for security
-        return {'message': 'If an account with this email exists, a password reset link has been sent.'}
+        return {'message': 'If an account with this email exists, a password reset link has been sent to your email.'}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error processing forgot password: {str(e)}")
-        raise HTTPException(status_code=500, detail='Internal server error')
+        raise HTTPException(status_code=500, detail={'error': 'Failed to process password reset request. Please try again later.'})
 
 @auth_router.post('/verify-reset-token')
 async def verify_reset_token(token_data: VerifyResetToken, db: Session = Depends(get_db)):
+    """Verify password reset token validity"""
     try:
         if not token_data.token:
-            raise HTTPException(status_code=400, detail='Token is required')
+            raise HTTPException(status_code=400, detail={'error': 'Reset token is required.'})
             
         auth_service = AuthService(db)
         is_valid = auth_service.verify_reset_token(token_data.token)
@@ -339,24 +369,25 @@ async def verify_reset_token(token_data: VerifyResetToken, db: Session = Depends
         raise
     except Exception as e:
         logger.error(f"Error verifying reset token: {str(e)}")
-        raise HTTPException(status_code=500, detail='Internal server error')
+        raise HTTPException(status_code=500, detail={'error': 'Failed to verify reset token. Please try again later.'})
 
 @auth_router.post('/reset-password')
 async def reset_password(reset_data: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """Reset password using reset token"""
     try:
         if not reset_data.token or not reset_data.password:
-            raise HTTPException(status_code=400, detail='Token and password are required')
+            raise HTTPException(status_code=400, detail={'error': 'Reset token and new password are required.'})
             
         # Reset password with token
         auth_service = AuthService(db)
         user = auth_service.reset_password(reset_data.token, reset_data.password)
         
-        return {'message': 'Your password has been reset successfully. You can now log in with your new password.'}
+        return {'message': 'Your password has been reset successfully! You can now log in with your new password.'}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail={'error': str(e)})
     except Exception as e:
         logger.error(f"Error resetting password: {str(e)}")
-        raise HTTPException(status_code=500, detail='Internal server error')
+        raise HTTPException(status_code=500, detail={'error': 'Failed to reset password. Please try again or request a new reset link.'})
 
 @auth_router.post('/change-password')
 async def change_password(
@@ -364,68 +395,69 @@ async def change_password(
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ):
+    """Change password for authenticated user"""
     try:
         if not password_data.current_password or not password_data.new_password:
-            raise HTTPException(status_code=400, detail='Current password and new password are required')
+            raise HTTPException(status_code=400, detail={'error': 'Current password and new password are required.'})
             
         # Get user
         user_repo = UserRepository(db)
         user = user_repo.get_user_by_id(current_user_id)
         if not user:
-            raise HTTPException(status_code=404, detail='User not found')
+            raise HTTPException(status_code=404, detail={'error': 'User account not found.'})
             
         # Verify current password
         if not user.check_password(password_data.current_password):
-            raise HTTPException(status_code=400, detail='Current password is incorrect')
+            raise HTTPException(status_code=400, detail={'error': 'Current password is incorrect. Please try again.'})
             
         # Update password
         auth_service = AuthService(db)
         user = auth_service.update_user_profile(current_user_id, password=password_data.new_password)
         
-        return {'message': 'Password changed successfully'}
+        return {'message': 'Password changed successfully!'}
     except HTTPException:
         raise
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail={'error': str(e)})
     except Exception as e:
         logger.error(f"Error changing password: {str(e)}")
-        raise HTTPException(status_code=500, detail='Internal server error')
+        raise HTTPException(status_code=500, detail={'error': 'Failed to change password. Please try again later.'})
 
 @auth_router.post('/verify-email')
 async def verify_email(verify_data: VerifyEmail, db: Session = Depends(get_db)):
     """Verify user's email address with token"""
     try:
         if not verify_data.token:
-            raise HTTPException(status_code=400, detail='Token is required')
+            raise HTTPException(status_code=400, detail={'error': 'Verification token is required.'})
 
         auth_service = AuthService(db)
         user = auth_service.verify_email(verify_data.token)
 
         return {
-            'message': 'Email verified successfully! You can now log in.',
+            'message': 'Email verified successfully! You can now log in to your account.',
             'user': user.to_dict()
         }
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail={'error': str(e)})
     except Exception as e:
         logger.error(f"Error verifying email: {str(e)}")
-        raise HTTPException(status_code=500, detail='Email verification failed')
+        raise HTTPException(status_code=500, detail={'error': 'Email verification failed. Please try again or request a new verification email.'})
 
 @auth_router.post('/resend-verification')
 async def resend_verification(resend_data: ResendVerification, db: Session = Depends(get_db)):
     """Resend verification email to user"""
     try:
         if not resend_data.email:
-            raise HTTPException(status_code=400, detail='Email is required')
+            raise HTTPException(status_code=400, detail={'error': 'Email address is required.'})
 
         auth_service = AuthService(db)
         result = auth_service.resend_verification_email(resend_data.email)
 
         # Always return success message (even if email doesn't exist) for security
-        return {'message': 'If an account with this email exists and is not verified, a verification email has been sent.'}
+        return {'message': 'If an account with this email exists and is not verified, a verification email has been sent to your inbox.'}
     except Exception as e:
         logger.error(f"Error resending verification: {str(e)}")
-        raise HTTPException(status_code=500, detail='Failed to resend verification email')
+        raise HTTPException(status_code=500, detail={'error': 'Failed to resend verification email. Please try again later.'})
 
 @auth_router.get('/verification-status')
 async def verification_status(
@@ -469,7 +501,7 @@ async def google_auth(
     """Handle Google authentication via Firebase token"""
     try:
         if not google_data.firebase_token or not google_data.user_data:
-            raise HTTPException(status_code=400, detail='Firebase token and user data are required')
+            raise HTTPException(status_code=400, detail={'error': 'Google sign-in failed. Please try again.'})
 
         # Verify the Firebase token and process Google authentication
         result = auth_service.authenticate_google_user(google_data.firebase_token, google_data.user_data)
@@ -492,7 +524,7 @@ async def google_auth(
 
     except ValueError as e:
         logger.error(f"Google auth validation error: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail={'error': str(e)})
     except Exception as e:
         logger.error(f"Google auth error: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail='Google authentication failed')
+        raise HTTPException(status_code=500, detail={'error': 'Google sign-in failed. Please try again later.'})

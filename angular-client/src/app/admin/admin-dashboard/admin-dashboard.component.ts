@@ -1,9 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { faUsers, faGraduationCap, faStar } from '@fortawesome/free-solid-svg-icons';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-admin-dashboard',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, FontAwesomeModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })

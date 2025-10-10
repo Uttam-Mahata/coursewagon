@@ -1,13 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AdminService } from '../services/admin.service';
 import { AuthService } from '../services/auth/auth.service';
 import { faChartLine, faUsers, faStar } from '@fortawesome/free-solid-svg-icons';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { AdminUsersComponent } from './admin-users/admin-users.component';
+import { AdminTestimonialsComponent } from './admin-testimonials/admin-testimonials.component';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-admin',
-  standalone: false,
+  standalone: true,
+  imports: [CommonModule, RouterModule, FontAwesomeModule, AdminDashboardComponent, AdminUsersComponent, AdminTestimonialsComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })

@@ -1,0 +1,94 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole site, values
+# which you are expected to set up once and rarely edit after that.
+
+title: CourseWagon Documentation
+description: Enterprise-grade educational platform powered by AI
+baseurl: "/coursewagon" # the subpath of your site, e.g. /blog
+url: "https://uttam-mahata.github.io" # the base hostname & protocol for your site
+
+# Theme settings
+theme: just-the-docs
+color_scheme: light
+
+# Logo and site settings
+logo: "/assets/images/logo.png"
+favicon_ico: "/assets/images/favicon.ico"
+
+# Enable search
+search_enabled: true
+search:
+  heading_level: 2
+  previews: 3
+  preview_words_before: 5
+  preview_words_after: 10
+  tokenizer_separator: /[\s/]+/
+  rel_url: true
+  button: false
+
+# Heading anchor links
+heading_anchors: true
+
+# Aux links for the upper right navigation
+aux_links:
+  "CourseWagon on GitHub":
+    - "https://github.com/Uttam-Mahata/coursewagon"
+  "Live Application":
+    - "https://www.coursewagon.live"
+
+# Makes Aux links open in a new tab
+aux_links_new_tab: true
+
+# Footer content
+footer_content: "Copyright &copy; 2024 CourseWagon. Distributed by an <a href=\"https://github.com/Uttam-Mahata/coursewagon/blob/main/LICENSE\">MIT license.</a>"
+
+# Footer last edit timestamp
+last_edit_timestamp: true
+last_edit_time_format: "%b %e %Y at %I:%M %p"
+
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub"
+gh_edit_repository: "https://github.com/Uttam-Mahata/coursewagon"
+gh_edit_branch: "main"
+gh_edit_view_mode: "tree"
+
+# Plugins
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Back to top link
+back_to_top: true
+back_to_top_text: "Back to top"
+
+# Collections for organizing docs
+collections:
+  docs:
+    permalink: "/:collection/:path/"
+    output: true
+
+# Default layout
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: 'highlight'
+    block:
+      line_numbers: true
+
+# Exclude from processing
+exclude:
+  - node_modules
+  - vendor
+  - Gemfile
+  - Gemfile.lock
+  - README.md

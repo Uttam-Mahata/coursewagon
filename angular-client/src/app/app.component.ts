@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService } from './services/auth/auth.service';
 import { NavigationService } from './services/navigation.service';
-import { faBars, faTimes, faGraduationCap, faShoppingCart, faBook, faUser, faPowerOff, faSignInAlt, faUserPlus, faUserShield } from '@fortawesome/free-solid-svg-icons'; // Import admin icon
+import { faBars, faTimes, faGraduationCap, faShoppingCart, faBook, faUser, faPowerOff, faSignInAlt, faUserPlus, faUserShield, faChartLine } from '@fortawesome/free-solid-svg-icons'; // Import admin icon
 import { FooterComponent } from './footer/footer.component';
 
 @Component({
@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
   faSignInAlt = faSignInAlt;
   faUserPlus = faUserPlus;
   faUserShield = faUserShield; // Add admin icon
+  faChartLine = faChartLine; // Add dashboard icon
 
   constructor(
     private authService: AuthService,

@@ -1,5 +1,5 @@
-<!-- Dashboard Stats -->
-<div *ngIf="!loading && !error" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<!-- Dashboard Stats - First Row -->
+<div *ngIf="!loading && !error" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
   <!-- Users Card -->
   <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
     <div class="flex items-center">
@@ -17,7 +17,7 @@
         <span class="text-sm font-semibold">{{dashboardStats.active_users || 0}}</span>
       </div>
       <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-        <div class="bg-blue-600 h-2.5 rounded-full" 
+        <div class="bg-blue-600 h-2.5 rounded-full"
           [style.width.%]="dashboardStats.total_users ? (dashboardStats.active_users / dashboardStats.total_users) * 100 : 0">
         </div>
       </div>
@@ -57,18 +57,116 @@
     <div class="mt-4">
       <div class="flex justify-between items-center">
         <span class="text-sm text-gray-500">Pending Approval</span>
-        <span 
+        <span
           [class.text-red-600]="dashboardStats.pending_testimonials > 0"
           class="text-sm font-semibold">
           {{dashboardStats.pending_testimonials || 0}}
         </span>
       </div>
-      <button 
+      <button
         *ngIf="dashboardStats.pending_testimonials > 0"
         class="mt-2 text-sm bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded"
         (click)="reviewTestimonials()">
         Review Testimonials
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Content Statistics - Second Row -->
+<div *ngIf="!loading && !error" class="mb-8">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800">Content Overview</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Subjects Card -->
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md p-6 text-white">
+      <div class="flex justify-between items-start mb-2">
+        <div class="text-sm opacity-90">Subjects</div>
+        <div class="p-2 bg-white bg-opacity-20 rounded-lg">
+          <fa-icon [icon]="faGraduationCap" size="lg"></fa-icon>
+        </div>
+      </div>
+      <div class="text-3xl font-bold">{{dashboardStats.total_subjects || 0}}</div>
+    </div>
+
+    <!-- Chapters Card -->
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-md p-6 text-white">
+      <div class="flex justify-between items-start mb-2">
+        <div class="text-sm opacity-90">Chapters</div>
+        <div class="p-2 bg-white bg-opacity-20 rounded-lg">
+          <fa-icon [icon]="faGraduationCap" size="lg"></fa-icon>
+        </div>
+      </div>
+      <div class="text-3xl font-bold">{{dashboardStats.total_chapters || 0}}</div>
+    </div>
+
+    <!-- Topics Card -->
+    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-md p-6 text-white">
+      <div class="flex justify-between items-start mb-2">
+        <div class="text-sm opacity-90">Topics</div>
+        <div class="p-2 bg-white bg-opacity-20 rounded-lg">
+          <fa-icon [icon]="faGraduationCap" size="lg"></fa-icon>
+        </div>
+      </div>
+      <div class="text-3xl font-bold">{{dashboardStats.total_topics || 0}}</div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-md p-6 text-white">
+      <div class="flex justify-between items-start mb-2">
+        <div class="text-sm opacity-90">Content Items</div>
+        <div class="p-2 bg-white bg-opacity-20 rounded-lg">
+          <fa-icon [icon]="faGraduationCap" size="lg"></fa-icon>
+        </div>
+      </div>
+      <div class="text-3xl font-bold">{{dashboardStats.total_content || 0}}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Course Breakdown Table -->
+<div *ngIf="!loading && !error && dashboardStats.course_breakdown?.length" class="mb-8">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800">Course Breakdown</h2>
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Subjects</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Chapters</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Topics</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let course of dashboardStats.course_breakdown" class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="text-sm font-medium text-gray-900">{{course.course_name}}</div>
+              <div class="text-sm text-gray-500">{{course.created_at | date:'short'}}</div>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded-full">
+                {{course.subjects_count}}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-purple-800 bg-purple-100 rounded-full">
+                {{course.chapters_count}}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-orange-800 bg-orange-100 rounded-full">
+                {{course.topics_count}}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-pink-800 bg-pink-100 rounded-full">
+                {{course.content_count}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

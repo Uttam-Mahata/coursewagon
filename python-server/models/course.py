@@ -14,6 +14,14 @@ class Course(Base):
     has_subjects = db.Column(db.Boolean, default=False)  # Track if subjects were generated
     image_url = db.Column(db.String(512), nullable=True)  # Store the cover image URL
 
+    # Publishing and discovery fields
+    is_published = db.Column(db.Boolean, default=False, nullable=False)  # Whether course is published for learners
+    published_at = db.Column(db.DateTime, nullable=True)  # When the course was published
+    category = db.Column(db.String(100), nullable=True)  # Course category (e.g., Programming, Math, Science)
+    difficulty_level = db.Column(db.String(50), nullable=True)  # beginner, intermediate, advanced
+    estimated_duration_hours = db.Column(db.Integer, nullable=True)  # Estimated time to complete in hours
+    enrollment_count = db.Column(db.Integer, default=0, nullable=False)  # Number of enrolled learners
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -22,5 +30,11 @@ class Course(Base):
             'user_id': self.user_id,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'has_subjects': self.has_subjects,
-            'image_url': self.image_url
+            'image_url': self.image_url,
+            'is_published': self.is_published,
+            'published_at': self.published_at.isoformat() if self.published_at else None,
+            'category': self.category,
+            'difficulty_level': self.difficulty_level,
+            'estimated_duration_hours': self.estimated_duration_hours,
+            'enrollment_count': self.enrollment_count
         }

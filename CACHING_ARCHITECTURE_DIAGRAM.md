@@ -240,30 +240,29 @@ Static config       | 30 min  | Very stable
 ## Database Indexes
 
 ```
-Indexed Columns (15+):
-├── course
+Indexed Columns (17):
+├── courses (table)
 │   ├── user_id (FK)
 │   ├── is_published
 │   ├── category
 │   └── published_at
-├── subject
+├── subjects (table)
 │   └── course_id (FK)
-├── chapter
+├── chapters (table)
 │   └── subject_id (FK)
-├── topic
-│   ├── subject_id (FK)
+├── topics (table)
 │   └── chapter_id (FK)
-├── content
+├── content (table)
 │   └── topic_id (FK)
-├── user
-│   ├── email
-│   └── firebase_uid
-├── enrollment
+├── user (table)
+│   └── email
+├── enrollments (table)
 │   ├── user_id (FK)
 │   ├── course_id (FK)
 │   └── status
-└── learning_progress
-    ├── user_id (FK)
+└── learning_progress (table)
+    ├── enrollment_id (FK)
+    ├── topic_id (FK)
     └── content_id (FK)
 
 Performance Impact:

@@ -30,36 +30,38 @@ def add_database_indexes():
             try:
                 # Indexes for course table
                 indexes_to_create = [
-                    # Course table indexes
-                    ("idx_course_user_id", "course", "user_id"),
-                    ("idx_course_is_published", "course", "is_published"),
-                    ("idx_course_category", "course", "category"),
-                    ("idx_course_published_at", "course", "published_at"),
-                    
-                    # Subject table indexes
-                    ("idx_subject_course_id", "subject", "course_id"),
-                    
-                    # Chapter table indexes (if exists)
-                    ("idx_chapter_subject_id", "chapter", "subject_id"),
-                    
-                    # Topic table indexes
-                    ("idx_topic_subject_id", "topic", "subject_id"),
-                    ("idx_topic_chapter_id", "topic", "chapter_id"),
-                    
+                    # Course table indexes (table name is plural: courses)
+                    ("idx_courses_user_id", "courses", "user_id"),
+                    ("idx_courses_is_published", "courses", "is_published"),
+                    ("idx_courses_category", "courses", "category"),
+                    ("idx_courses_published_at", "courses", "published_at"),
+
+                    # Subject table indexes (table name is plural: subjects)
+                    ("idx_subjects_course_id", "subjects", "course_id"),
+
+                    # Chapter table indexes (table name is plural: chapters)
+                    ("idx_chapters_subject_id", "chapters", "subject_id"),
+
+                    # Topic table indexes (table name is plural: topics)
+                    # Note: topics only have chapter_id, not subject_id
+                    ("idx_topics_chapter_id", "topics", "chapter_id"),
+
                     # Content table indexes
                     ("idx_content_topic_id", "content", "topic_id"),
-                    
+
                     # User table indexes
                     ("idx_user_email", "user", "email"),
-                    ("idx_user_firebase_uid", "user", "firebase_uid"),
-                    
-                    # Enrollment table indexes
-                    ("idx_enrollment_user_id", "enrollment", "user_id"),
-                    ("idx_enrollment_course_id", "enrollment", "course_id"),
-                    ("idx_enrollment_status", "enrollment", "status"),
-                    
+                    # Note: firebase_uid column does not exist in user table
+
+                    # Enrollment table indexes (table name is plural: enrollments)
+                    ("idx_enrollments_user_id", "enrollments", "user_id"),
+                    ("idx_enrollments_course_id", "enrollments", "course_id"),
+                    ("idx_enrollments_status", "enrollments", "status"),
+
                     # Learning progress indexes
-                    ("idx_learning_progress_user_id", "learning_progress", "user_id"),
+                    # Note: learning_progress uses enrollment_id, not user_id
+                    ("idx_learning_progress_enrollment_id", "learning_progress", "enrollment_id"),
+                    ("idx_learning_progress_topic_id", "learning_progress", "topic_id"),
                     ("idx_learning_progress_content_id", "learning_progress", "content_id"),
                 ]
                 

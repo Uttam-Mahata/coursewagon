@@ -6,6 +6,7 @@ from repositories.chapter_repo import ChapterRepository
 from repositories.subject_repo import SubjectRepository
 from repositories.course_repo import CourseRepository
 from utils.gemini_helper import GeminiHelper
+from utils.cache_helper import cache_helper, invalidate_cache
 from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
@@ -71,6 +72,10 @@ class TopicService:
             # Mark that the chapter has topics
             self.chapter_repo.set_has_topics(chapter_id, True)
             
+            # Invalidate caches
+            invalidate_cache(f"topics:chapter:{chapter_id}")
+            invalidate_cache(f"chapter:{chapter_id}")
+            
             logger.info(f"Successfully added {topics_added} topics")
             return {"message": f"Successfully generated {topics_added} topics"}
             
@@ -79,11 +84,32 @@ class TopicService:
             raise Exception(f"Error generating topics: {str(e)}")
 
     def get_topics_by_chapter_id(self, chapter_id):
-        return [topic.to_dict() for topic in self.topic_repo.get_topics_by_chapter_id(chapter_id)]
+        # Cache topics for 5 minutes
+        cache_key = f"topics:chapter:{chapter_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached topics for chapter {chapter_id}")
+            return cached
+        
+        topics = self.topic_repo.get_topics_by_chapter_id(chapter_id)
+        result = [topic.to_dict() for topic in topics]
+        cache_helper.set(cache_key, result, ttl=300)
+        return result
     
     def get_topic_by_id(self, topic_id):
+        # Cache individual topic for 5 minutes
+        cache_key = f"topic:{topic_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached topic {topic_id}")
+            return cached
+        
         topic = self.topic_repo.get_topic_by_id(topic_id)
-        return topic.to_dict() if topic else None
+        if topic:
+            result = topic.to_dict()
+            cache_helper.set(cache_key, result, ttl=300)
+            return result
+        return None
 
     # New CRUD methods
     def create_topic(self, chapter_id, name):
@@ -101,6 +127,9 @@ class TopicService:
             # If this is first topic, mark chapter as having topics
             if not chapter.has_topics:
                 self.chapter_repo.set_has_topics(chapter_id, True)
+            
+            # Invalidate caches
+            invalidate_cache(f"topics:chapter:{chapter_id}")
                 
             return topic.to_dict()
         except Exception as e:
@@ -113,6 +142,9 @@ class TopicService:
         try:
             topic = self.topic_repo.update_topic(topic_id, name)
             if topic:
+                # Invalidate caches
+                invalidate_cache(f"topic:{topic_id}")
+                invalidate_cache(f"topics:chapter:{topic.chapter_id}")
                 return topic.to_dict()
             else:
                 logger.error(f"Topic not found for id: {topic_id}")
@@ -125,8 +157,14 @@ class TopicService:
         logger.info(f"Deleting topic id: {topic_id}")
         
         try:
+            # Get topic before deleting to invalidate chapter cache
+            topic = self.topic_repo.get_topic_by_id(topic_id)
             success = self.topic_repo.delete_topic(topic_id)
             if success:
+                # Invalidate caches
+                invalidate_cache(f"topic:{topic_id}")
+                if topic:
+                    invalidate_cache(f"topics:chapter:{topic.chapter_id}")
                 return {"message": "Topic deleted successfully"}
             else:
                 logger.error(f"Topic not found for id: {topic_id}")

@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { 
   faFacebook, 
   faTwitter, 
@@ -17,7 +20,8 @@ import { NavigationService } from '../services/navigation.service';
     selector: 'app-footer',
     templateUrl: './footer.component.html',
     styleUrl: './footer.component.css',
-    standalone: false
+    standalone: true,
+    imports: [CommonModule, RouterModule, FontAwesomeModule],
 })
 export class FooterComponent {
   // Brand icons

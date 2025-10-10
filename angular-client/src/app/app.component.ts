@@ -1,11 +1,16 @@
 import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService } from './services/auth/auth.service';
 import { NavigationService } from './services/navigation.service';
 import { faBars, faTimes, faGraduationCap, faShoppingCart, faBook, faUser, faPowerOff, faSignInAlt, faUserPlus, faUserShield } from '@fortawesome/free-solid-svg-icons'; // Import admin icon
+import { FooterComponent } from './footer/footer.component';
 
 @Component({
     selector: 'app-root',
-    standalone: false,
+    standalone: true,
+    imports: [CommonModule, RouterModule, FontAwesomeModule, FooterComponent],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
     

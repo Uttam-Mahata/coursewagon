@@ -7,6 +7,7 @@ from repositories.subject_repo import SubjectRepository
 from repositories.course_repo import CourseRepository
 from utils.gemini_helper import GeminiHelper, mermaid_content, extract_markdown
 from utils.unified_storage_helper import storage_helper
+from utils.cache_helper import cache_helper, invalidate_cache
 from sqlalchemy.orm import Session
 import logging
 import time
@@ -100,18 +101,31 @@ class ContentService:
         content = Content(topic_id=topic_id, content=response)
         content.content = extract_markdown(content.content)
         self.content_repo.add_content(content)
+        
+        # Invalidate cache
+        invalidate_cache(f"content:topic:{topic_id}")
+        
         return {"message": "Content generated successfully"}
     
     def get_content_by_topic_id(self, topic_id):
-      content = self.content_repo.get_content_by_topic_id(topic_id)
-      if content:
-        # Return object with both content and video_url
-        return {
-          "content": mermaid_content(content.content),
-          "video_url": content.video_url
-        }
-      else:
-        return None
+        # Cache content for 10 minutes (content is expensive to generate)
+        cache_key = f"content:topic:{topic_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached content for topic {topic_id}")
+            return cached
+        
+        content = self.content_repo.get_content_by_topic_id(topic_id)
+        if content:
+            # Return object with both content and video_url
+            result = {
+                "content": mermaid_content(content.content),
+                "video_url": content.video_url
+            }
+            cache_helper.set(cache_key, result, ttl=600)
+            return result
+        else:
+            return None
 
     # New CRUD methods
     def create_content_manual(self, topic_id, content_text):
@@ -127,6 +141,9 @@ class ContentService:
             
             # Mark the topic as having content
             self.topic_repo.set_has_content(topic_id, True)
+            
+            # Invalidate cache
+            invalidate_cache(f"content:topic:{topic_id}")
             
             return content.content
         except Exception as e:
@@ -144,6 +161,8 @@ class ContentService:
         try:
             content = self.content_repo.update_content(topic_id, content_text)
             if content:
+                # Invalidate cache
+                invalidate_cache(f"content:topic:{topic_id}")
                 return content.content
             else:
                 # If no content exists yet, create it
@@ -160,6 +179,9 @@ class ContentService:
 
             # Update topic to reflect it no longer has content
             self.topic_repo.set_has_content(topic_id, False)
+            
+            # Invalidate cache
+            invalidate_cache(f"content:topic:{topic_id}")
 
             return {"message": "Content deleted successfully"}
         except Exception as e:
@@ -221,6 +243,9 @@ class ContentService:
                 content = self.content_repo.create_content(topic_id, "")
                 content = self.content_repo.update_video_url(topic_id, video_url)
 
+            # Invalidate content cache
+            invalidate_cache(f"content:topic:{topic_id}")
+            
             logger.info(f"Video uploaded successfully: {video_url}")
             return {"video_url": video_url, "message": "Video uploaded successfully"}
 

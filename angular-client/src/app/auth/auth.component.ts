@@ -60,14 +60,13 @@ export class AuthComponent implements OnInit {
       password: ['', Validators.required]
     });
 
-    this.authService.isLoggedIn$.subscribe(
-      (isLoggedIn: boolean) => {
-        if (isLoggedIn) {
-          console.log('User already logged in. Redirecting to courses page.');
-          this.router.navigate(['/courses']);
-        }
-      }
-    );
+    // Check if user is already logged in at initialization only
+    // Don't subscribe to changes to avoid redirecting during active sign-in
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      console.log('User already logged in. Redirecting to courses page.');
+      this.router.navigate(['/courses']);
+    }
 
     this.route.queryParams.subscribe(params => {
       const mode = params['mode'];
@@ -107,13 +106,14 @@ export class AuthComponent implements OnInit {
       .subscribe({
         next: (response) => {
           console.log('Login successful, response:', response);
+          this.successMessage = 'Login successful! Redirecting...';
           setTimeout(() => {
             this.router.navigate(['/courses']);
           }, 100);
         },
         error: (error) => {
           console.error('Login error:', error);
-          this.errorMessage = error.error?.error || 'An unexpected error occurred';
+          this.errorMessage = this.getErrorMessage(error);
         }
       });
   }
@@ -135,7 +135,7 @@ export class AuthComponent implements OnInit {
         },
         error: (error) => {
           console.error('Registration error:', error);
-          this.errorMessage = error.error?.detail || error.error?.error || 'Registration failed. Please try again.';
+          this.errorMessage = this.getErrorMessage(error);
         }
       });
   }
@@ -146,7 +146,7 @@ export class AuthComponent implements OnInit {
     }
 
     this.resendingVerification = true;
-    this.errorMessage = '';
+    this.clearMessages();
 
     this.authService.resendVerificationEmail(this.registeredEmail)
       .subscribe({
@@ -158,7 +158,7 @@ export class AuthComponent implements OnInit {
         error: (error) => {
           this.resendingVerification = false;
           console.error('Error resending verification:', error);
-          this.errorMessage = 'Failed to resend verification email. Please try again.';
+          this.errorMessage = this.getErrorMessage(error);
         }
       });
   }
@@ -187,18 +187,92 @@ export class AuthComponent implements OnInit {
       }, 1000);
     } catch (error: any) {
       console.error('Google sign-in error:', error);
-      
-      // Provide more detailed error messages
-      if (error.error?.detail) {
-        this.errorMessage = error.error.detail;
-      } else if (error.message) {
-        this.errorMessage = error.message;
-      } else {
-        this.errorMessage = 'Google sign-in failed. Please try again.';
-      }
+      this.errorMessage = this.getErrorMessage(error);
     } finally {
       this.isGoogleLoading = false;
     }
+  }
+
+  private getErrorMessage(error: any): string {
+    // Handle different error response structures from backend
+    if (error.error) {
+      // Backend API error responses
+      if (typeof error.error === 'string') {
+        return error.error;
+      }
+      if (error.error.error) {
+        return error.error.error;
+      }
+      if (error.error.detail) {
+        if (typeof error.error.detail === 'string') {
+          return error.error.detail;
+        }
+        if (error.error.detail.error) {
+          return error.error.detail.error;
+        }
+      }
+      if (error.error.message) {
+        return error.error.message;
+      }
+    }
+    
+    // Firebase authentication errors
+    if (error.message) {
+      if (error.message.includes('auth/user-not-found')) {
+        return 'No account found with this email. Please sign up first.';
+      }
+      if (error.message.includes('auth/wrong-password')) {
+        return 'Incorrect password. Please try again or use "Forgot password".';
+      }
+      if (error.message.includes('auth/invalid-email')) {
+        return 'Please enter a valid email address.';
+      }
+      if (error.message.includes('auth/user-disabled')) {
+        return 'Your account has been disabled. Please contact support.';
+      }
+      if (error.message.includes('auth/email-already-in-use')) {
+        return 'An account with this email already exists. Please login instead.';
+      }
+      if (error.message.includes('auth/weak-password')) {
+        return 'Password is too weak. Please use at least 6 characters.';
+      }
+      if (error.message.includes('auth/network-request-failed')) {
+        return 'Network error. Please check your internet connection.';
+      }
+      if (error.message.includes('auth/popup-closed-by-user')) {
+        return 'Sign-in cancelled. Please try again.';
+      }
+      if (error.message.includes('auth/popup-blocked')) {
+        return 'Pop-up was blocked. Please allow pop-ups for this site.';
+      }
+      if (error.message.includes('auth/cancelled-popup-request')) {
+        return 'Sign-in cancelled. Please try again.';
+      }
+      return error.message;
+    }
+    
+    // HTTP status-based messages
+    if (error.status === 0) {
+      return 'Cannot connect to the server. Please check your internet connection.';
+    }
+    if (error.status === 400) {
+      return 'Invalid request. Please check your input and try again.';
+    }
+    if (error.status === 401) {
+      return 'Invalid credentials. Please check your email and password.';
+    }
+    if (error.status === 403) {
+      return 'Access denied. Your account may be inactive.';
+    }
+    if (error.status === 404) {
+      return 'Service not found. Please try again later.';
+    }
+    if (error.status >= 500) {
+      return 'Server error. Please try again later.';
+    }
+    
+    // Default fallback
+    return 'An unexpected error occurred. Please try again.';
   }
 
   clearMessages(): void {

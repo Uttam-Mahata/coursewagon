@@ -38,13 +38,13 @@ class AuthService:
     def register_user(self, email, password, first_name=None, last_name=None):
         # Check if email is already registered
         if self.user_repository.get_user_by_email(email):
-            raise ValueError("Email already exists")
+            raise ValueError("An account with this email already exists. Please login instead.")
 
         # Validate email deliverability
         is_valid, error_message = validate_email(email, check_smtp=False)
         if not is_valid:
             logger.warning(f"Email validation failed for {email}: {error_message}")
-            raise ValueError(f"Invalid email address: {error_message}")
+            raise ValueError(f"Invalid email address. Please check and try again.")
 
         # Create the user with email_verified=False
         user = self.user_repository.create_user(
@@ -77,11 +77,14 @@ class AuthService:
 
     def authenticate_user(self, email, password):
         user = self.user_repository.get_user_by_email(email)
-        if not user or not user.check_password(password):
-            raise ValueError("Invalid credentials")
+        if not user:
+            raise ValueError("No account found with this email address. Please sign up first.")
+        
+        if not user.check_password(password):
+            raise ValueError("Incorrect password. Please try again or use 'Forgot password' to reset it.")
         
         if not user.is_active:
-            raise ValueError("Account is deactivated")
+            raise ValueError("Your account has been deactivated. Please contact support for assistance.")
 
         self.user_repository.update_last_login(user)
         

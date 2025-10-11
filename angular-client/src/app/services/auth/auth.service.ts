@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError, lastValueFrom } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
@@ -14,33 +14,59 @@ export class AuthService {
   private userKey = 'current_user';  // Still store user data for convenience
 
   // Observable sources
-  private currentUserSource = new BehaviorSubject<any>(null);
-  private isLoggedInSource = new BehaviorSubject<boolean>(false);
+  private currentUserSource = new BehaviorSubject<any>(this.getInitialUser());
+  private isLoggedInSource = new BehaviorSubject<boolean>(this.getInitialAuthState());
+  private isCheckingAuthSource = new BehaviorSubject<boolean>(false);
 
   // Observable streams
   currentUser$ = this.currentUserSource.asObservable();
   isLoggedIn$ = this.isLoggedInSource.asObservable();
+  isCheckingAuth$ = this.isCheckingAuthSource.asObservable();
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private firebaseAuthService: FirebaseAuthService
   ) {
+    // Initialize from localStorage immediately (synchronous - no flash!)
+    // Then verify with backend (asynchronous - security check)
     this.checkAuthState();
   }
 
+  /**
+   * Get initial auth state from localStorage (synchronous)
+   * This prevents the flash of unauthenticated content on page load
+   */
+  private getInitialAuthState(): boolean {
+    const userStr = localStorage.getItem(this.userKey);
+    return userStr !== null;
+  }
+
+  /**
+   * Get initial user data from localStorage (synchronous)
+   */
+  private getInitialUser(): any {
+    const userStr = localStorage.getItem(this.userKey);
+    return userStr ? JSON.parse(userStr) : null;
+  }
+
   checkAuthState(): void {
+    // Set checking flag to true
+    this.isCheckingAuthSource.next(true);
+
     // Always verify with backend to check if HttpOnly cookie is still valid
     // Don't trust localStorage alone as cookies might have been deleted
     this.http.get(`${this.authUrl}/profile`, { withCredentials: true }).subscribe({
       next: (userData: any) => {
         // Valid session - store/update user data
         this.storeUser(userData);
+        this.isCheckingAuthSource.next(false);
         console.log('Auth state checked - User is logged in', {user: userData});
       },
       error: () => {
         // No valid session - clear any stale data
         this.clearAuthData();
+        this.isCheckingAuthSource.next(false);
         console.log('Auth state checked - User is not logged in');
       }
     });
@@ -153,16 +179,18 @@ export class AuthService {
       const { user, accessToken } = firebaseResult;
 
       // Send the Firebase ID token to your backend for verification and registration/login
-      const backendResponse = await this.http.post(`${this.authUrl}/google-auth`, {
-        firebase_token: accessToken,
-        user_data: {
-          uid: user.uid,
-          email: user.email,
-          display_name: user.displayName,
-          photo_url: user.photoURL,
-          email_verified: user.emailVerified
-        }
-      }, { withCredentials: true }).toPromise();
+      const backendResponse = await lastValueFrom(
+        this.http.post(`${this.authUrl}/google-auth`, {
+          firebase_token: accessToken,
+          user_data: {
+            uid: user.uid,
+            email: user.email,
+            display_name: user.displayName,
+            photo_url: user.photoURL,
+            email_verified: user.emailVerified
+          }
+        }, { withCredentials: true })
+      );
 
       // Store user data (tokens are in HttpOnly cookies)
       if (backendResponse && (backendResponse as any).user) {

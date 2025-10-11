@@ -2,6 +2,7 @@ from admin.repository import AdminRepository
 from admin.models import AdminStats, UserCourseStats
 from repositories.user_repository import UserRepository
 from sqlalchemy.orm import Session
+from utils.cache_helper import cache_helper, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,7 +16,15 @@ class AdminService:
         self.user_repo = UserRepository(db)
 
     def get_dashboard_stats(self):
-        """Get consolidated statistics for admin dashboard"""
+        """Get consolidated statistics for admin dashboard (cached for 3 minutes)"""
+        cache_key = "admin:dashboard:stats"
+
+        # Try to get from cache first
+        cached_stats = cache_helper.get(cache_key)
+        if cached_stats is not None:
+            logger.debug(f"Returning cached dashboard stats")
+            return cached_stats
+
         try:
             # Collect all stats from different sources
             user_stats = self.admin_repo.get_user_stats()
@@ -40,7 +49,13 @@ class AdminService:
                 course_breakdown=course_breakdown
             )
 
-            return admin_stats.to_dict()
+            result = admin_stats.to_dict()
+
+            # Cache the result for 3 minutes (180 seconds)
+            cache_helper.set(cache_key, result, ttl=180)
+            logger.debug(f"Cached dashboard stats for 3 minutes")
+
+            return result
         except Exception as e:
             logger.error(f"Error getting dashboard stats: {str(e)}")
             raise Exception(f"Error retrieving admin dashboard data: {str(e)}")

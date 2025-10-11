@@ -71,50 +71,54 @@ class AdminRepository:
     def get_course_breakdown(self):
         """Get detailed breakdown of each course with content counts"""
         try:
-            courses = self.db.query(Course).order_by(Course.created_at.desc()).all()
+            # Use a single optimized query with LEFT JOINs and GROUP BY
+            # This replaces the N+1 query problem (1 query per course)
+            from sqlalchemy.orm import aliased
+
+            query = self.db.query(
+                Course.id,
+                Course.name,
+                Course.description,
+                Course.created_at,
+                Course.image_url,
+                Course.is_published,
+                Course.published_at,
+                Course.category,
+                Course.difficulty_level,
+                Course.estimated_duration_hours,
+                Course.enrollment_count,
+                func.count(func.distinct(Subject.id)).label('subjects_count'),
+                func.count(func.distinct(Chapter.id)).label('chapters_count'),
+                func.count(func.distinct(Topic.id)).label('topics_count'),
+                func.count(func.distinct(Content.id)).label('content_count')
+            )\
+            .outerjoin(Subject, Course.id == Subject.course_id)\
+            .outerjoin(Chapter, Subject.id == Chapter.subject_id)\
+            .outerjoin(Topic, Chapter.id == Topic.chapter_id)\
+            .outerjoin(Content, Topic.id == Content.topic_id)\
+            .group_by(Course.id)\
+            .order_by(Course.created_at.desc())
+
+            results = query.all()
+
             breakdown = []
-
-            for course in courses:
-                # Count subjects for this course
-                subjects_count = self.db.query(Subject).filter_by(course_id=course.id).count()
-
-                # Count chapters across all subjects in this course
-                chapters_count = self.db.query(func.count(Chapter.id))\
-                    .join(Subject, Chapter.subject_id == Subject.id)\
-                    .filter(Subject.course_id == course.id)\
-                    .scalar() or 0
-
-                # Count topics across all chapters in this course
-                topics_count = self.db.query(func.count(Topic.id))\
-                    .join(Chapter, Topic.chapter_id == Chapter.id)\
-                    .join(Subject, Chapter.subject_id == Subject.id)\
-                    .filter(Subject.course_id == course.id)\
-                    .scalar() or 0
-
-                # Count content across all topics in this course
-                content_count = self.db.query(func.count(Content.id))\
-                    .join(Topic, Content.topic_id == Topic.id)\
-                    .join(Chapter, Topic.chapter_id == Chapter.id)\
-                    .join(Subject, Chapter.subject_id == Subject.id)\
-                    .filter(Subject.course_id == course.id)\
-                    .scalar() or 0
-
+            for row in results:
                 breakdown.append({
-                    'course_id': course.id,
-                    'course_name': course.name,
-                    'course_description': course.description,
-                    'created_at': course.created_at.isoformat() if course.created_at else None,
-                    'subjects_count': subjects_count,
-                    'chapters_count': chapters_count,
-                    'topics_count': topics_count,
-                    'content_count': content_count,
-                    'image_url': course.image_url,
-                    'is_published': course.is_published,
-                    'published_at': course.published_at.isoformat() if course.published_at else None,
-                    'category': course.category,
-                    'difficulty_level': course.difficulty_level,
-                    'estimated_duration_hours': course.estimated_duration_hours,
-                    'enrollment_count': course.enrollment_count
+                    'course_id': row.id,
+                    'course_name': row.name,
+                    'course_description': row.description,
+                    'created_at': row.created_at.isoformat() if row.created_at else None,
+                    'subjects_count': row.subjects_count,
+                    'chapters_count': row.chapters_count,
+                    'topics_count': row.topics_count,
+                    'content_count': row.content_count,
+                    'image_url': row.image_url,
+                    'is_published': row.is_published,
+                    'published_at': row.published_at.isoformat() if row.published_at else None,
+                    'category': row.category,
+                    'difficulty_level': row.difficulty_level,
+                    'estimated_duration_hours': row.estimated_duration_hours,
+                    'enrollment_count': row.enrollment_count
                 })
 
             return breakdown
@@ -125,50 +129,55 @@ class AdminRepository:
     def get_user_course_breakdown(self, user_id: int):
         """Get detailed breakdown of courses for a specific user"""
         try:
-            courses = self.db.query(Course).filter_by(user_id=user_id).order_by(Course.created_at.desc()).all()
+            # Use a single optimized query with LEFT JOINs and GROUP BY
+            # This replaces the N+1 query problem (1 query per course)
+            from sqlalchemy.orm import aliased
+
+            query = self.db.query(
+                Course.id,
+                Course.name,
+                Course.description,
+                Course.created_at,
+                Course.image_url,
+                Course.is_published,
+                Course.published_at,
+                Course.category,
+                Course.difficulty_level,
+                Course.estimated_duration_hours,
+                Course.enrollment_count,
+                func.count(func.distinct(Subject.id)).label('subjects_count'),
+                func.count(func.distinct(Chapter.id)).label('chapters_count'),
+                func.count(func.distinct(Topic.id)).label('topics_count'),
+                func.count(func.distinct(Content.id)).label('content_count')
+            )\
+            .filter(Course.user_id == user_id)\
+            .outerjoin(Subject, Course.id == Subject.course_id)\
+            .outerjoin(Chapter, Subject.id == Chapter.subject_id)\
+            .outerjoin(Topic, Chapter.id == Topic.chapter_id)\
+            .outerjoin(Content, Topic.id == Content.topic_id)\
+            .group_by(Course.id)\
+            .order_by(Course.created_at.desc())
+
+            results = query.all()
+
             breakdown = []
-
-            for course in courses:
-                # Count subjects for this course
-                subjects_count = self.db.query(Subject).filter_by(course_id=course.id).count()
-
-                # Count chapters across all subjects in this course
-                chapters_count = self.db.query(func.count(Chapter.id))\
-                    .join(Subject, Chapter.subject_id == Subject.id)\
-                    .filter(Subject.course_id == course.id)\
-                    .scalar() or 0
-
-                # Count topics across all chapters in this course
-                topics_count = self.db.query(func.count(Topic.id))\
-                    .join(Chapter, Topic.chapter_id == Chapter.id)\
-                    .join(Subject, Chapter.subject_id == Subject.id)\
-                    .filter(Subject.course_id == course.id)\
-                    .scalar() or 0
-
-                # Count content across all topics in this course
-                content_count = self.db.query(func.count(Content.id))\
-                    .join(Topic, Content.topic_id == Topic.id)\
-                    .join(Chapter, Topic.chapter_id == Chapter.id)\
-                    .join(Subject, Chapter.subject_id == Subject.id)\
-                    .filter(Subject.course_id == course.id)\
-                    .scalar() or 0
-
+            for row in results:
                 breakdown.append({
-                    'course_id': course.id,
-                    'course_name': course.name,
-                    'course_description': course.description,
-                    'created_at': course.created_at.isoformat() if course.created_at else None,
-                    'subjects_count': subjects_count,
-                    'chapters_count': chapters_count,
-                    'topics_count': topics_count,
-                    'content_count': content_count,
-                    'image_url': course.image_url,
-                    'is_published': course.is_published,
-                    'published_at': course.published_at.isoformat() if course.published_at else None,
-                    'category': course.category,
-                    'difficulty_level': course.difficulty_level,
-                    'estimated_duration_hours': course.estimated_duration_hours,
-                    'enrollment_count': course.enrollment_count
+                    'course_id': row.id,
+                    'course_name': row.name,
+                    'course_description': row.description,
+                    'created_at': row.created_at.isoformat() if row.created_at else None,
+                    'subjects_count': row.subjects_count,
+                    'chapters_count': row.chapters_count,
+                    'topics_count': row.topics_count,
+                    'content_count': row.content_count,
+                    'image_url': row.image_url,
+                    'is_published': row.is_published,
+                    'published_at': row.published_at.isoformat() if row.published_at else None,
+                    'category': row.category,
+                    'difficulty_level': row.difficulty_level,
+                    'estimated_duration_hours': row.estimated_duration_hours,
+                    'enrollment_count': row.enrollment_count
                 })
 
             return breakdown

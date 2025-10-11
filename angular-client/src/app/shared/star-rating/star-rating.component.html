@@ -7,8 +7,7 @@
       [class.cursor-pointer]="interactive"
       [class.hover:scale-110]="interactive"
       [ngClass]="{
-        'text-yellow-400': star.type === 'full',
-        'text-yellow-400': star.type === 'half',
+        'text-yellow-400': star.type === 'full' || star.type === 'half',
         'text-gray-300': star.type === 'empty',
         'hover:text-yellow-500': interactive
       }"

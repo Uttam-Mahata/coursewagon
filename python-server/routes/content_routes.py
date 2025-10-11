@@ -48,10 +48,13 @@ async def generate_content(
         course = course_service.get_course_by_id(course_id)
         if not course or course.get('user_id') != current_user_id:
             raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
-            
+
         result = content_service.generate_content(course_id, subject_id, chapter_id, topic_id)
         return result
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"Error generating content for topic {topic_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @content_router.get(
@@ -70,7 +73,12 @@ async def get_content(
             return content
         else:
             raise HTTPException(status_code=404, detail="Content Not Found")
+    except HTTPException:
+        # Re-raise HTTP exceptions without modifying status code
+        raise
     except Exception as e:
+        # Only convert non-HTTP exceptions to 500
+        logger.error(f"Error getting content for topic {topic_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @content_router.post(
@@ -91,13 +99,16 @@ async def create_content_manual(
         course = course_service.get_course_by_id(course_id)
         if not course or course.get('user_id') != current_user_id:
             raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
-            
+
         if not content_data.content:
             raise HTTPException(status_code=400, detail="Content is required")
-            
+
         result = content_service.create_content_manual(topic_id, content_data.content)
         return result
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"Error creating content for topic {topic_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @content_router.put(
@@ -118,13 +129,16 @@ async def update_content(
         course = course_service.get_course_by_id(course_id)
         if not course or course.get('user_id') != current_user_id:
             raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
-            
+
         if not content_data.content:
             raise HTTPException(status_code=400, detail="Content is required")
-            
+
         result = content_service.update_content(topic_id, content_data.content)
         return result
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"Error updating content for topic {topic_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @content_router.delete(
@@ -147,7 +161,10 @@ async def delete_content(
 
         result = content_service.delete_content(topic_id)
         return result
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"Error deleting content for topic {topic_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Video upload endpoints

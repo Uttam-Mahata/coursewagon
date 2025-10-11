@@ -430,10 +430,10 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     if (!this.selectedTopicId || !this.expandedChapterId) {
       return;
     }
-    
+
     this.isGeneratingContent = true;
     this.errorMessage = '';
-    
+
     this.subscriptions.add(
       this.contentService.generateContent(
         this.courseId,
@@ -445,21 +445,30 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
           if (this.selectedTopic) {
             this.selectedTopic.has_content = true;
           }
-          
+
           this.contentService.getContent(
-            this.courseId, 
-            this.subjectId, 
-            this.expandedChapterId!, 
+            this.courseId,
+            this.subjectId,
+            this.expandedChapterId!,
             this.selectedTopicId!
           ).subscribe({
-            next: (content) => {
-              this.content = content;
-              
-              if (content) {
-                this.processedContent = this.mathRendererService.processContent(content);
+            next: (response) => {
+              // Handle both string response (old format) and object response (new format with video_url)
+              if (typeof response === 'string') {
+                this.content = response;
+                this.videoUrl = null;
+              } else if (response && typeof response === 'object') {
+                this.content = response.content || response;
+                this.videoUrl = response.video_url || null;
+              } else {
+                this.content = response;
+              }
+
+              if (this.content) {
+                this.processedContent = this.mathRendererService.processContent(this.content);
                 this.needsMathJaxUpdate = true;
               }
-              
+
               this.isGeneratingContent = false;
             },
             error: (err) => {

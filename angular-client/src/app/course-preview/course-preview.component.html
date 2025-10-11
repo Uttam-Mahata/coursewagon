@@ -51,9 +51,23 @@
             </div>
 
             <!-- Course Title -->
-            <h1 class="text-3xl font-bold text-gray-800 mb-4">
+            <h1 class="text-3xl font-bold text-gray-800 mb-3">
               {{ coursePreview.course.name }}
             </h1>
+
+            <!-- Rating Display -->
+            <div *ngIf="reviewStats && reviewStats.review_count > 0" class="flex items-center gap-2 mb-4">
+              <app-star-rating
+                [rating]="reviewStats.average_rating"
+                [interactive]="false"
+                [size]="'md'"
+                [showCount]="true"
+                [reviewCount]="reviewStats.review_count"
+              ></app-star-rating>
+            </div>
+            <div *ngIf="!loadingReviewStats && (!reviewStats || reviewStats.review_count === 0)" class="text-sm text-gray-500 mb-4">
+              No ratings yet
+            </div>
 
             <!-- Course Description -->
             <p class="text-gray-600 mb-6">
@@ -125,6 +139,94 @@
                  class="text-center py-8 text-gray-500">
               Course structure not available
             </div>
+          </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mt-6">
+          <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-semibold text-gray-800">Reviews & Ratings</h2>
+              <!-- Write Review Button -->
+              <button *ngIf="isAuthenticated && isEnrolled && !userReview && !showReviewForm"
+                (click)="openReviewForm()"
+                class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-2 transition duration-200">
+                <fa-icon [icon]="faPen"></fa-icon>
+                Write Review
+              </button>
+              <!-- Edit Review Button -->
+              <button *ngIf="isAuthenticated && userReview && !showReviewForm"
+                (click)="openReviewForm()"
+                class="bg-gray-600 hover:bg-gray-700 text-white text-sm px-4 py-2 rounded-lg flex items-center gap-2 transition duration-200">
+                <fa-icon [icon]="faPen"></fa-icon>
+                Edit Review
+              </button>
+            </div>
+          </div>
+
+          <div class="p-6">
+            <!-- Loading State -->
+            <div *ngIf="loadingReviewStats" class="text-center py-8">
+              <fa-icon [icon]="faSpinner" animation="spin" class="text-2xl text-blue-500"></fa-icon>
+              <p class="text-gray-600 mt-2">Loading reviews...</p>
+            </div>
+
+            <!-- Review Stats Summary -->
+            <div *ngIf="!loadingReviewStats && reviewStats && reviewStats.review_count > 0" class="mb-6 pb-6 border-b border-gray-200">
+              <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <!-- Average Rating -->
+                <div class="flex flex-col items-center">
+                  <div class="text-5xl font-bold text-gray-800 mb-2">{{ reviewStats.average_rating.toFixed(1) }}</div>
+                  <app-star-rating
+                    [rating]="reviewStats.average_rating"
+                    [interactive]="false"
+                    [size]="'lg'"
+                  ></app-star-rating>
+                  <p class="text-sm text-gray-600 mt-2">{{ reviewStats.review_count }} {{ reviewStats.review_count === 1 ? 'review' : 'reviews' }}</p>
+                </div>
+
+                <!-- Rating Distribution -->
+                <div class="flex-1 w-full">
+                  <div *ngFor="let star of [5, 4, 3, 2, 1]" class="flex items-center gap-2 mb-2">
+                    <span class="text-sm font-medium text-gray-700 w-8">{{ star }} <fa-icon [icon]="faStar" class="text-yellow-400 text-xs"></fa-icon></span>
+                    <div class="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                      <div class="bg-yellow-400 h-full rounded-full transition-all duration-300"
+                           [style.width.%]="reviewStats.review_count > 0 ? ((reviewStats.rating_distribution[star] || 0) / reviewStats.review_count * 100) : 0">
+                      </div>
+                    </div>
+                    <span class="text-sm text-gray-600 w-8 text-right">{{ reviewStats.rating_distribution[star] || 0 }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Review Form (Conditional) -->
+            <div *ngIf="showReviewForm" class="mb-6">
+              <app-course-review
+                [courseId]="courseId"
+                [existingReview]="userReview || undefined"
+                (reviewSubmitted)="onReviewSubmitted($event)"
+                (reviewDeleted)="onReviewDeleted()"
+                (cancelled)="onReviewFormCancelled()"
+              ></app-course-review>
+            </div>
+
+            <!-- Call to Action for Non-enrolled Users -->
+            <div *ngIf="!isAuthenticated || !isEnrolled" class="text-center py-8 bg-gray-50 rounded-lg mb-6">
+              <fa-icon [icon]="faStar" class="text-4xl text-gray-400 mb-3"></fa-icon>
+              <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                {{ !isAuthenticated ? 'Login to Leave a Review' : 'Enroll to Leave a Review' }}
+              </h3>
+              <p class="text-sm text-gray-600">
+                {{ !isAuthenticated ? 'Please login and enroll in this course to share your feedback.' : 'You need to enroll in this course to leave a review.' }}
+              </p>
+            </div>
+
+            <!-- Reviews List -->
+            <app-course-reviews-list
+              [courseId]="courseId"
+              [limit]="10"
+            ></app-course-reviews-list>
           </div>
         </div>
       </div>

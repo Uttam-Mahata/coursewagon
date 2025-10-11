@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -15,6 +15,8 @@ import { SubjectService } from '../services/subject.service';
 import { ChapterService } from '../services/chapter.service';
 import { TopicService } from '../services/topic.service';
 import { ContentService } from '../services/content.service';
+import { MathRendererService } from '../services/math-renderer.service';
+import { ChartRendererService } from '../services/chart-renderer.service';
 
 @Component({
   selector: 'app-learning-view',
@@ -23,7 +25,7 @@ import { ContentService } from '../services/content.service';
   templateUrl: './learning-view.component.html',
   styleUrl: './learning-view.component.css'
 })
-export class LearningViewComponent implements OnInit, OnDestroy {
+export class LearningViewComponent implements OnInit, OnDestroy, AfterViewChecked {
   // Icons
   faHome = faHome;
   faBook = faBook;
@@ -47,6 +49,7 @@ export class LearningViewComponent implements OnInit, OnDestroy {
   currentTopic: any = null;
   currentSubject: any = null;
   content: string = '';
+  processedContent: string | null = null;
   videoUrl: string | null = null;
 
   // All topics (flattened for navigation)
@@ -66,6 +69,9 @@ export class LearningViewComponent implements OnInit, OnDestroy {
   showSidebar = true;
   isSidebarOpen = true;
 
+  // Math and Chart rendering
+  private needsMathJaxUpdate = false;
+
   private routeSubscription?: Subscription;
 
   constructor(
@@ -77,7 +83,9 @@ export class LearningViewComponent implements OnInit, OnDestroy {
     private subjectService: SubjectService,
     private chapterService: ChapterService,
     private topicService: TopicService,
-    private contentService: ContentService
+    private contentService: ContentService,
+    public mathRendererService: MathRendererService,
+    private chartRendererService: ChartRendererService
   ) {}
 
   ngOnInit(): void {
@@ -109,8 +117,24 @@ export class LearningViewComponent implements OnInit, OnDestroy {
       this.routeSubscription.unsubscribe();
     }
 
+    // Cleanup charts
+    this.chartRendererService.destroyAllCharts();
+
     // Remove resize listener
     window.removeEventListener('resize', this.adjustSidebarForScreenSize.bind(this));
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.needsMathJaxUpdate) {
+      this.mathRendererService.renderMathJax();
+      this.chartRendererService.renderCharts();
+      this.needsMathJaxUpdate = false;
+
+      // Additional render attempt for complex equations
+      setTimeout(() => {
+        this.mathRendererService.renderMathJax();
+      }, 500);
+    }
   }
 
   loadCourseData(): void {
@@ -348,14 +372,22 @@ export class LearningViewComponent implements OnInit, OnDestroy {
       next: (response) => {
         // Handle both string response (old format) and object response (new format with video_url)
         if (typeof response === 'string') {
-          this.content = this.prepareMarkdownContent(response || '');
+          this.content = response || '';
           this.videoUrl = null;
         } else if (response && typeof response === 'object') {
-          this.content = this.prepareMarkdownContent(response.content || '');
+          this.content = response.content || '';
           this.videoUrl = response.video_url || null;
         } else {
           this.content = '';
           this.videoUrl = null;
+        }
+
+        // Process content for math and charts
+        if (this.content) {
+          this.processedContent = this.mathRendererService.processContent(this.content);
+          this.needsMathJaxUpdate = true;
+        } else {
+          this.processedContent = null;
         }
 
         console.log(`[LearningView] Content loaded successfully for topic ${this.currentTopic.id}, length: ${this.content?.length || 0}, has video: ${!!this.videoUrl}`);
@@ -364,6 +396,7 @@ export class LearningViewComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('[LearningView] Error loading content:', err);
         this.content = '';
+        this.processedContent = null;
         this.videoUrl = null;
         this.loadingContent = false;
       }

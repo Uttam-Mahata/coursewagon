@@ -30,6 +30,9 @@ export class CourseReviewsListComponent implements OnInit {
   totalPages = 1;
   totalCount = 0;
 
+  // Expose Math to template
+  Math = Math;
+
   constructor(private reviewService: ReviewService) {}
 
   ngOnInit(): void {

@@ -353,8 +353,6 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
 
           if (this.content) {
             this.processedContent = this.mathRendererService.processContent(this.content);
-            // Process chart blocks in content
-            this.processedContent = this.chartRendererService.processContent(this.processedContent);
             this.needsMathJaxUpdate = true;
           }
 

@@ -69,28 +69,28 @@ export class ToastContainerComponent implements OnInit, OnDestroy {
     const baseClasses = 'flex items-center w-full max-w-md p-4 mb-4 rounded-lg shadow-lg transition-all duration-300 ease-in-out';
     switch (type) {
       case 'success':
-        return `${baseClasses} bg-green-50 text-green-800 border-l-4 border-green-500`;
+        return `${baseClasses} bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 border-l-4 border-green-500 dark:border-green-400`;
       case 'error':
-        return `${baseClasses} bg-red-50 text-red-800 border-l-4 border-red-500`;
+        return `${baseClasses} bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 border-l-4 border-red-500 dark:border-red-400`;
       case 'warning':
-        return `${baseClasses} bg-yellow-50 text-yellow-800 border-l-4 border-yellow-500`;
+        return `${baseClasses} bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 border-l-4 border-yellow-500 dark:border-yellow-400`;
       case 'info':
       default:
-        return `${baseClasses} bg-blue-50 text-blue-800 border-l-4 border-blue-500`;
+        return `${baseClasses} bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 border-l-4 border-blue-500 dark:border-blue-400`;
     }
   }
 
   getIconClasses(type: string): string {
     switch (type) {
       case 'success':
-        return 'text-green-500';
+        return 'text-green-500 dark:text-green-400';
       case 'error':
-        return 'text-red-500';
+        return 'text-red-500 dark:text-red-400';
       case 'warning':
-        return 'text-yellow-500';
+        return 'text-yellow-500 dark:text-yellow-400';
       case 'info':
       default:
-        return 'text-blue-500';
+        return 'text-blue-500 dark:text-blue-400';
     }
   }
 }

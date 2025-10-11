@@ -6,6 +6,7 @@ import { ChapterService } from '../services/chapter.service';
 import { TopicService } from '../services/topic.service';
 import { ContentService } from '../services/content.service';
 import { MathRendererService } from '../services/math-renderer.service';
+import { ChartRendererService } from '../services/chart-renderer.service';
 import { AuthService } from '../services/auth/auth.service';
 import {
   faHome, faBook, faLayerGroup, faEye, faMagic,
@@ -109,6 +110,7 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     private topicService: TopicService,
     private contentService: ContentService,
     public mathRendererService: MathRendererService,
+    private chartRendererService: ChartRendererService,
     private route: ActivatedRoute,
     private router: Router,
     private formBuilder: FormBuilder
@@ -168,12 +170,14 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
+    this.chartRendererService.destroyAllCharts(); // Cleanup charts
     window.removeEventListener('resize', this.adjustSidebarForScreenSize.bind(this));
   }
   
   ngAfterViewChecked() {
     if (this.needsMathJaxUpdate) {
       this.mathRendererService.renderMathJax();
+      this.chartRendererService.renderCharts(); // Render charts after content is displayed
       this.needsMathJaxUpdate = false;
       
       setTimeout(() => {
@@ -349,6 +353,8 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
 
           if (this.content) {
             this.processedContent = this.mathRendererService.processContent(this.content);
+            // Process chart blocks in content
+            this.processedContent = this.chartRendererService.processContent(this.processedContent);
             this.needsMathJaxUpdate = true;
           }
 

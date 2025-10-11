@@ -4,16 +4,27 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faBook, faBookOpen, faListUl, faClock, faSignal,
-  faUsers, faArrowLeft, faPlay, faSpinner, faCheckCircle
+  faUsers, faArrowLeft, faPlay, faSpinner, faCheckCircle, faStar, faPen
 } from '@fortawesome/free-solid-svg-icons';
 import { LearningService, CoursePreview } from '../services/learning.service';
 import { EnrollmentService, EnrollmentCheck } from '../services/enrollment.service';
 import { AuthService } from '../services/auth/auth.service';
+import { ReviewService, ReviewStats, CourseReview } from '../services/review.service';
+import { StarRatingComponent } from '../shared/star-rating/star-rating.component';
+import { CourseReviewComponent } from '../course-review/course-review.component';
+import { CourseReviewsListComponent } from '../course-reviews-list/course-reviews-list.component';
 
 @Component({
   selector: 'app-course-preview',
   standalone: true,
-  imports: [CommonModule, RouterModule, FontAwesomeModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FontAwesomeModule,
+    StarRatingComponent,
+    CourseReviewComponent,
+    CourseReviewsListComponent
+  ],
   templateUrl: './course-preview.component.html',
   styleUrl: './course-preview.component.css'
 })
@@ -29,6 +40,8 @@ export class CoursePreviewComponent implements OnInit {
   faPlay = faPlay;
   faSpinner = faSpinner;
   faCheckCircle = faCheckCircle;
+  faStar = faStar;
+  faPen = faPen;
 
   courseId!: number;
   coursePreview: CoursePreview | null = null;
@@ -41,12 +54,20 @@ export class CoursePreviewComponent implements OnInit {
   isAuthenticated = false;
   isLearner = false;
 
+  // Review-related state
+  reviewStats: ReviewStats | null = null;
+  userReview: CourseReview | null = null;
+  showReviewForm = false;
+  loadingReviewStats = false;
+  loadingUserReview = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private learningService: LearningService,
     private enrollmentService: EnrollmentService,
-    private authService: AuthService
+    private authService: AuthService,
+    private reviewService: ReviewService
   ) {}
 
   ngOnInit(): void {
@@ -61,8 +82,10 @@ export class CoursePreviewComponent implements OnInit {
       if (id) {
         this.courseId = parseInt(id);
         this.loadCoursePreview();
+        this.loadReviewStats();
         if (this.isAuthenticated) {
           this.checkEnrollmentStatus();
+          this.loadUserReview();
         }
       }
     });
@@ -160,5 +183,67 @@ export class CoursePreviewComponent implements OnInit {
 
   get isEnrolled(): boolean {
     return this.enrollmentCheck?.enrolled || false;
+  }
+
+  // Review methods
+  loadReviewStats(): void {
+    this.loadingReviewStats = true;
+    this.reviewService.getReviewStats(this.courseId).subscribe({
+      next: (stats) => {
+        this.reviewStats = stats;
+        this.loadingReviewStats = false;
+      },
+      error: (err) => {
+        console.error('Error loading review stats:', err);
+        this.loadingReviewStats = false;
+      }
+    });
+  }
+
+  loadUserReview(): void {
+    this.loadingUserReview = true;
+    this.reviewService.getMyReview(this.courseId).subscribe({
+      next: (review) => {
+        this.userReview = review;
+        this.loadingUserReview = false;
+      },
+      error: (err) => {
+        // 404 is expected if user hasn't reviewed yet
+        if (err.status !== 404) {
+          console.error('Error loading user review:', err);
+        }
+        this.loadingUserReview = false;
+      }
+    });
+  }
+
+  openReviewForm(): void {
+    if (!this.isAuthenticated) {
+      this.router.navigate(['/auth'], { queryParams: { returnUrl: `/courses/preview/${this.courseId}` } });
+      return;
+    }
+    this.showReviewForm = true;
+  }
+
+  onReviewSubmitted(review: CourseReview): void {
+    this.userReview = review;
+    this.showReviewForm = false;
+    // Reload stats to reflect new review
+    this.loadReviewStats();
+    // Reload course preview to get updated ratings
+    this.loadCoursePreview();
+  }
+
+  onReviewDeleted(): void {
+    this.userReview = null;
+    this.showReviewForm = false;
+    // Reload stats
+    this.loadReviewStats();
+    // Reload course preview
+    this.loadCoursePreview();
+  }
+
+  onReviewFormCancelled(): void {
+    this.showReviewForm = false;
   }
 }

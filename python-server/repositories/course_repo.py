@@ -1,6 +1,6 @@
 # repositories/course_repo.py
 from models.course import Course
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import SQLAlchemyError
 import logging
 

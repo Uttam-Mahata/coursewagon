@@ -33,11 +33,13 @@ async def lifespan(app: FastAPI):
         from migrations.add_email_verification import run_migration as run_email_verification_migration
         from migrations.add_learner_functionality import run_all_migrations
         from migrations.add_video_url_to_content import add_video_url_to_content
+        from migrations.add_database_indexes import add_database_indexes
 
         add_welcome_email_sent_column()
         run_email_verification_migration()
         run_all_migrations()  # New learner functionality migrations
         add_video_url_to_content()  # Add video_url to content table
+        add_database_indexes()  # Add performance indexes
         logger.info("Database migrations completed successfully")
     except Exception as e:
         logger.error(f"Database migration failed: {str(e)}")

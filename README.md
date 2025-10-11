@@ -1,6 +1,22 @@
 # CourseWagon
 
+[![Documentation](https://img.shields.io/badge/docs-online-blue?style=for-the-badge)](https://uttam-mahata.github.io/coursewagon/)
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/demo-live-success?style=for-the-badge)](https://www.coursewagon.live)
+
 CourseWagon is an enterprise-grade educational platform that leverages generative AI to facilitate dynamic course content generation and comprehensive learning management. The platform integrates modern web technologies with advanced AI capabilities to deliver a scalable, secure, and user-centric educational experience.
+
+## 📚 Documentation
+
+**Complete documentation is available at: [https://uttam-mahata.github.io/coursewagon/](https://uttam-mahata.github.io/coursewagon/)**
+
+- [Getting Started Guide](https://uttam-mahata.github.io/coursewagon/getting-started)
+- [System Architecture](https://uttam-mahata.github.io/coursewagon/architecture)
+- [API Reference](https://uttam-mahata.github.io/coursewagon/api-reference)
+- [User Guide](https://uttam-mahata.github.io/coursewagon/user-guide)
+- [Developer Guide](https://uttam-mahata.github.io/coursewagon/developer-guide)
+- [Deployment Guide](https://uttam-mahata.github.io/coursewagon/deployment)
+- [FAQ & Troubleshooting](https://uttam-mahata.github.io/coursewagon/faq)
 
 ##  Features
 

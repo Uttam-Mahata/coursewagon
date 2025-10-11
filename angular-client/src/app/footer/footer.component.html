@@ -1,13 +1,13 @@
-<footer class="bg-gray-900 text-gray-300 pt-12 pb-8">
+<footer class="bg-gray-900 dark:bg-slate-950 text-gray-300 dark:text-gray-400 pt-16 pb-10 border-t border-gray-800 dark:border-slate-800">
   <div class="container mx-auto px-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
       <!-- About Course Wagon Section -->
       <div class="lg:col-span-2">
-        <div class="flex items-center mb-4">
-          <img src="/coursewagon.png" alt="Course Wagon Logo" class="h-8 w-auto mr-3">
-          <h3 class="text-xl font-bold text-white">Course Wagon</h3>
+        <div class="flex items-center mb-6">
+          <img src="/coursewagon.png" alt="Course Wagon Logo" class="h-10 w-auto mr-3">
+          <h3 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Course Wagon</h3>
         </div>
-        <p class="text-gray-400 leading-relaxed mb-4">
+        <p class="text-gray-400 dark:text-gray-500 leading-relaxed mb-4 text-base">
           Course Wagon automates course creation with Generative AI, delivering dynamic, interactive learning experiences. Whether you're a student or a professional, our platform caters to your personalized learning journey.
         </p>
         <!-- <div class="flex space-x-4 mt-6">
@@ -32,16 +32,16 @@
 
       <!-- Explore Section -->
       <div>
-        <h5 class="text-white font-semibold text-lg mb-4">Explore</h5>
+        <h5 class="text-white dark:text-gray-200 font-semibold text-lg mb-5">Explore</h5>
         <ul class="space-y-3">
           <li>
-            <a routerLink="/courses" (click)="scrollToTop()" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500"></fa-icon> Courses
+            <a routerLink="/courses" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> Courses
             </a>
           </li>
           <li>
-            <a routerLink="/how-it-works" (click)="scrollToTop()" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500"></fa-icon> How It Works
+            <a routerLink="/how-it-works" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> How It Works
             </a>
           </li>
           <!-- <li>
@@ -59,26 +59,26 @@
 
       <!-- Resources Section -->
       <div>
-        <h5 class="text-white font-semibold text-lg mb-4">Resources</h5>
+        <h5 class="text-white dark:text-gray-200 font-semibold text-lg mb-5">Resources</h5>
         <ul class="space-y-3">
           <!-- <li>
-            <a routerLink="/create-course" (click)="scrollToTop()" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500"></fa-icon> AI Course Generator
+            <a routerLink="/create-course" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> AI Course Generator
             </a>
           </li> -->
           <!-- <li>
-            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500"></fa-icon> Developer Resources
+            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> Developer Resources
             </a>
           </li>
            <li>
-            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500"></fa-icon> Community Forum
+            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> Community Forum
             </a>
           </li> -->
           <li>
-            <a routerLink="/help-center" (click)="scrollToTop()" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500"></fa-icon> Help Center
+            <a routerLink="/help-center" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> Help Center
             </a>
           </li>
         </ul>
@@ -86,12 +86,12 @@
 
       <!-- Contact Section -->
       <div>
-        <h5 class="text-white font-semibold text-lg mb-4">Contact</h5>
+        <h5 class="text-white dark:text-gray-200 font-semibold text-lg mb-5">Contact</h5>
         <ul class="space-y-3">
-      
+
           <li class="flex items-center">
-            <fa-icon [icon]="faEnvelope" class="text-indigo-500 mr-3"></fa-icon>
-            <span class="text-gray-400">coursewagon&#64;gmail.com</span>
+            <fa-icon [icon]="faEnvelope" class="text-indigo-500 dark:text-indigo-400 mr-3"></fa-icon>
+            <span class="text-gray-400 dark:text-gray-500">coursewagon&#64;gmail.com</span>
           </li>
           <!-- <li class="flex items-center">
             <fa-icon [icon]="faPhone" class="text-indigo-500 mr-3"></fa-icon>
@@ -104,13 +104,13 @@
     </div>
 
     <!-- Bottom Footer -->
-    <div class="border-t border-gray-800 mt-10 pt-6">
+    <div class="border-t border-gray-800 dark:border-slate-800 mt-12 pt-8">
       <div class="flex flex-col md:flex-row justify-between items-center">
-        <p class="text-sm text-gray-400">© 2025 Course Wagon. All rights reserved.</p>
+        <p class="text-sm text-gray-400 dark:text-gray-500">© 2025 Course Wagon. All rights reserved.</p>
         <div class="flex space-x-6 mt-4 md:mt-0">
-          <a routerLink="/privacy-policy" (click)="scrollToTop()" class="text-sm text-gray-400 hover:text-indigo-400 transition-colors duration-300">Privacy Policy</a>
-          <a routerLink="/terms" (click)="scrollToTop()" class="text-sm text-gray-400 hover:text-indigo-400 transition-colors duration-300">Terms of Service</a>
-          <!-- <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-sm text-gray-400 hover:text-indigo-400 transition-colors duration-300">Cookie Policy</a> -->
+          <a routerLink="/privacy-policy" (click)="scrollToTop()" class="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300">Privacy Policy</a>
+          <a routerLink="/terms" (click)="scrollToTop()" class="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300">Terms of Service</a>
+          <!-- <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300">Cookie Policy</a> -->
         </div>
       </div>
     </div>

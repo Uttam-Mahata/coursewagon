@@ -15,6 +15,11 @@
   animation: gradientBG 15s ease infinite;
 }
 
+/* Dark mode gradient */
+:host-context(.dark) .animated-gradient {
+  background: linear-gradient(-45deg, #1e1b4b, #4c1d95, #1e3a8a, #312e81);
+}
+
 @keyframes gradient {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -41,6 +46,16 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
+/* Dark mode glass card */
+:host-context(.dark) .glass-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+:host-context(.dark) .glass-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
 .feature-icon {
   transition: all 0.3s ease;
 }
@@ -59,6 +74,12 @@
 
 .testimonial-card:hover {
   transform: translateY(-5px) scale(1.02);
+}
+
+/* Dark mode testimonial card */
+:host-context(.dark) .testimonial-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.3);
 }
 
 .cta-button {

@@ -1,50 +1,61 @@
-<div class="landing-page">
-  <header class="animated-gradient text-white py-16 md:py-24 relative overflow-hidden">
-    <div class="absolute inset-0 bg-black opacity-20 z-0"></div>
+<div class="landing-page bg-white dark:bg-slate-900 transition-colors duration-300">
+  <header class="animated-gradient text-white py-20 md:py-32 relative overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-20 dark:opacity-40 z-0"></div>
+    <div class="absolute inset-0 z-0" style="background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.15) 0%, transparent 50%);"></div>
     <div class="container mx-auto px-6 relative z-10">
       <div class="text-center mb-12">
-        <div class="flex justify-center mb-4">
-          <div class="bg-white p-3 rounded-full shadow-lg inline-block">
-            <img src="/coursewagon.png" alt="Course Wagon Logo" class="h-16 w-auto">
+        <div class="flex justify-center mb-6 animate-[float_3s_ease-in-out_infinite]">
+          <div class="bg-white dark:bg-slate-800 p-4 rounded-full shadow-2xl inline-block ring-4 ring-white/20">
+            <img src="/coursewagon.png" alt="Course Wagon Logo" class="h-20 w-auto">
           </div>
         </div>
-        <span class="text-2xl font-bold block mt-3">Course Wagon</span>
-        <h1 class="text-4xl md:text-6xl font-extrabold mt-4 mb-5 tracking-tight">
+        <span class="text-2xl md:text-3xl font-bold block mt-3 mb-2 tracking-wide">Course Wagon</span>
+        <h1 class="text-5xl md:text-7xl font-extrabold mt-6 mb-6 tracking-tight leading-tight bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
           The Ultimate Course Authoring Tool
         </h1>
-        <p class="text-lg md:text-xl mb-10 opacity-80 max-w-2xl mx-auto">
+        <p class="text-xl md:text-2xl mb-12 opacity-90 max-w-3xl mx-auto leading-relaxed font-light">
           Effortlessly create, customize, and publish engaging courses with AI-powered tools. Empower educators, trainers, and creators to bring their learning experiences to life.
         </p>
-        <a routerLink="/create-course" (click)="scrollToTop()" class="bg-white text-indigo-600 hover:bg-indigo-50 font-bold py-4 px-10 rounded-full shadow-xl transition duration-300 inline-flex items-center transform hover:scale-105 hover:shadow-2xl">
-          <fa-icon [icon]="faMagic" class="mr-2"></fa-icon>
-          Start Authoring
+        <a routerLink="/create-course" (click)="scrollToTop()" class="bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 font-bold py-5 px-12 rounded-full shadow-2xl transition-all duration-300 inline-flex items-center transform hover:scale-105 hover:shadow-3xl gap-3 group">
+          <fa-icon [icon]="faMagic" class="text-xl group-hover:rotate-12 transition-transform"></fa-icon>
+          <span class="text-lg">Start Authoring</span>
         </a>
       </div>
     </div>
   </header>
 
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+
   <!-- Why Choose Section -->
-  <section class="py-16 md:py-20 bg-gradient-to-b from-indigo-50 via-white to-white">
+  <section class="py-20 md:py-28 bg-gradient-to-b from-indigo-50 via-white to-white dark:from-slate-800 dark:via-slate-900 dark:to-slate-900">
     <div class="container mx-auto px-4">
-      <h2 class="text-center text-3xl font-bold mb-10">Why Author with Course Wagon?</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-        <div class="bg-white bg-opacity-90 rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-          <div class="p-6 text-center">
-            <div class="mb-4 text-blue-600">
-              <fa-icon [icon]="faBrain" class="text-4xl"></fa-icon>
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">Why Author with Course Wagon?</h2>
+        <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Powerful features designed to make course creation effortless</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div class="bg-white dark:bg-slate-800 bg-opacity-95 dark:bg-opacity-90 rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-gray-100 dark:border-slate-700 group">
+          <div class="p-8 text-center">
+            <div class="mb-6 text-blue-600 dark:text-blue-400 inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/30 group-hover:scale-110 transition-transform">
+              <fa-icon [icon]="faBrain" class="text-5xl"></fa-icon>
             </div>
-            <h5 class="text-xl font-semibold mb-2 text-gray-800">AI-Assisted Authoring</h5>
-            <p class="text-gray-600">Generate course outlines, modules, and content suggestions instantly with Generative AI.</p>
+            <h5 class="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">AI-Assisted Authoring</h5>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed">Generate course outlines, modules, and content suggestions instantly with Generative AI.</p>
           </div>
         </div>
-        <div class="bg-white bg-opacity-90 rounded-xl shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-          <div class="p-6 text-center">
-            <div class="mb-4 text-blue-600">
-              <fa-icon [icon]="faChartLine" class="text-4xl"></fa-icon>
+        <div class="bg-white dark:bg-slate-800 bg-opacity-95 dark:bg-opacity-90 rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 border border-gray-100 dark:border-slate-700 group">
+          <div class="p-8 text-center">
+            <div class="mb-6 text-blue-600 dark:text-blue-400 inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/30 group-hover:scale-110 transition-transform">
+              <fa-icon [icon]="faChartLine" class="text-5xl"></fa-icon>
             </div>
-            <h5 class="text-xl font-semibold mb-2 text-gray-800">Publish & Track</h5>
-            <p class="text-gray-600">Publish your courses and monitor learner engagement with built-in analytics and progress tracking.</p>
-            <span class="inline-block mt-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">Coming Soon</span>
+            <h5 class="text-2xl font-semibold mb-3 text-gray-800 dark:text-white">Publish & Track</h5>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed mb-3">Publish your courses and monitor learner engagement with built-in analytics and progress tracking.</p>
+            <span class="inline-block mt-2 px-4 py-1.5 bg-gradient-to-r from-green-400 to-emerald-500 text-white dark:from-green-500 dark:to-emerald-600 rounded-full text-sm font-semibold shadow-md">Coming Soon</span>
           </div>
         </div>
       </div>
@@ -52,44 +63,44 @@
   </section>
 
   <!-- How it Works Section -->
-  <section class="py-16 md:py-20 bg-white relative">
+  <section class="py-20 md:py-28 bg-white dark:bg-slate-900 relative">
     <div class="container mx-auto px-6">
-      <h2 class="text-3xl md:text-4xl font-bold text-center mb-16 text-gray-800">
+      <h2 class="text-4xl md:text-5xl font-bold text-center mb-6 text-gray-900 dark:text-white">
         How to Author a Course
-        <span class="block text-lg font-normal text-indigo-600 mt-2">Create and publish in just a few steps</span>
       </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <p class="text-center text-lg text-indigo-600 dark:text-indigo-400 mb-20 font-medium">Create and publish in just a few steps</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
         <!-- Step 1 -->
         <div class="flex">
-          <div class="bg-white p-6 rounded-xl shadow-md w-full transition-all duration-300 hover:shadow-xl relative glass-card">
-            <div class="absolute -top-4 -left-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">1</div>
-            <div class="text-blue-500 mb-4 text-center">
-              <fa-icon [icon]="faBookOpen" class="text-4xl"></fa-icon>
+          <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl w-full transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 relative glass-card border border-gray-100 dark:border-slate-700 group">
+            <div class="absolute -top-5 -left-5 bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 text-white rounded-full w-14 h-14 flex items-center justify-center font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">1</div>
+            <div class="text-blue-500 dark:text-blue-400 mb-6 text-center">
+              <fa-icon [icon]="faBookOpen" class="text-5xl"></fa-icon>
             </div>
-            <h5 class="text-xl font-semibold mb-3 text-center">Define Your Course</h5>
-            <p class="text-gray-600">Describe your course idea and let AI help you generate a compelling course title and summary.</p>
+            <h5 class="text-2xl font-semibold mb-4 text-center text-gray-800 dark:text-white">Define Your Course</h5>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-center">Describe your course idea and let AI help you generate a compelling course title and summary.</p>
           </div>
         </div>
         <!-- Step 2-->
         <div class="flex">
-          <div class="bg-white p-6 rounded-xl shadow-md w-full transition-all duration-300 hover:shadow-xl relative glass-card">
-            <div class="absolute -top-4 -left-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">2</div>
-            <div class="text-blue-500 mb-4 text-center">
-              <fa-icon [icon]="faLayerGroup" class="text-4xl"></fa-icon>
+          <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl w-full transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 relative glass-card border border-gray-100 dark:border-slate-700 group">
+            <div class="absolute -top-5 -left-5 bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 text-white rounded-full w-14 h-14 flex items-center justify-center font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">2</div>
+            <div class="text-blue-500 dark:text-blue-400 mb-6 text-center">
+              <fa-icon [icon]="faLayerGroup" class="text-5xl"></fa-icon>
             </div>
-            <h5 class="text-xl font-semibold mb-3 text-center">Structure & Customize</h5>
-            <p class="text-gray-600">Organize your course with modules, lessons, and quizzes. Customize content with rich media and interactive elements.</p>
+            <h5 class="text-2xl font-semibold mb-4 text-center text-gray-800 dark:text-white">Structure & Customize</h5>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-center">Organize your course with modules, lessons, and quizzes. Customize content with rich media and interactive elements.</p>
           </div>
         </div>
         <!-- Step 3 -->
         <div class="flex">
-          <div class="bg-white p-6 rounded-xl shadow-md w-full transition-all duration-300 hover:shadow-xl relative glass-card">
-            <div class="absolute -top-4 -left-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">3</div>
-            <div class="text-blue-500 mb-4 text-center">
-              <fa-icon [icon]="faSitemap" class="text-4xl"></fa-icon>
+          <div class="bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl w-full transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 relative glass-card border border-gray-100 dark:border-slate-700 group">
+            <div class="absolute -top-5 -left-5 bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-400 dark:to-purple-500 text-white rounded-full w-14 h-14 flex items-center justify-center font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">3</div>
+            <div class="text-blue-500 dark:text-blue-400 mb-6 text-center">
+              <fa-icon [icon]="faSitemap" class="text-5xl"></fa-icon>
             </div>
-            <h5 class="text-xl font-semibold mb-3 text-center">Publish & Share</h5>
-            <p class="text-gray-600">Publish your course and share it with learners. Track engagement and update content anytime.</p>
+            <h5 class="text-2xl font-semibold mb-4 text-center text-gray-800 dark:text-white">Publish & Share</h5>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-center">Publish your course and share it with learners. Track engagement and update content anytime.</p>
           </div>
         </div>
       </div>
@@ -99,14 +110,15 @@
   <!-- Testimonials Section -->
 
   <!-- Call to Action Section -->
-  <section class="py-16 md:py-24 animated-gradient text-white relative overflow-hidden">
-    <div class="absolute inset-0 bg-black opacity-30 z-0"></div>
+  <section class="py-24 md:py-32 animated-gradient text-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-30 dark:opacity-50 z-0"></div>
+    <div class="absolute inset-0 z-0" style="background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.2) 0%, transparent 60%), radial-gradient(circle at 70% 70%, rgba(124, 58, 237, 0.2) 0%, transparent 60%);"></div>
     <div class="container mx-auto px-6 text-center relative z-10">
-      <h2 class="text-3xl md:text-4xl font-bold mb-8 tracking-tight">Ready to Create Your Next Course?</h2>
-      <p class="text-lg md:text-xl mb-10 opacity-80 max-w-xl mx-auto">Join educators and creators using Course Wagon to build impactful learning experiences.</p>
-      <a routerLink="/auth" (click)="scrollToTop()" class="cta-button bg-white text-indigo-600 hover:bg-indigo-50 font-bold py-4 px-10 rounded-full shadow-xl transition duration-300 inline-flex items-center transform hover:scale-105 hover:shadow-2xl">
-        <fa-icon [icon]="faUserPlus" class="mr-2"></fa-icon>
-        Start Authoring Today!
+      <h2 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">Ready to Create Your Next Course?</h2>
+      <p class="text-xl md:text-2xl mb-12 opacity-90 max-w-2xl mx-auto leading-relaxed font-light">Join educators and creators using Course Wagon to build impactful learning experiences.</p>
+      <a routerLink="/auth" (click)="scrollToTop()" class="cta-button bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-700 font-bold py-5 px-12 rounded-full shadow-2xl transition-all duration-300 inline-flex items-center transform hover:scale-110 hover:shadow-3xl gap-3 group">
+        <fa-icon [icon]="faUserPlus" class="text-xl group-hover:translate-x-1 transition-transform"></fa-icon>
+        <span class="text-lg">Start Authoring Today!</span>
       </a>
     </div>
   </section>

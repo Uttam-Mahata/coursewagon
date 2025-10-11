@@ -1,64 +1,67 @@
-<nav class="bg-gray-100 sticky top-0 z-50 shadow-md">
+<nav class="bg-white dark:bg-slate-900 sticky top-0 z-50 shadow-lg dark:shadow-slate-900/30 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 border-b border-gray-200 dark:border-slate-800">
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex justify-between items-center h-16">
       <!-- Logo and Brand -->
-      <a class="flex items-center gap-3" routerLink="/home" (click)="scrollToTop()">
-        <img src="/coursewagon.png" alt="Course Wagon Logo" class="h-10 w-auto">
-        <span class="font-bold text-xl text-blue-600 font-poppins">Course Wagon</span>
+      <a class="flex items-center gap-3 group" routerLink="/home" (click)="scrollToTop()">
+        <img src="/coursewagon.png" alt="Course Wagon Logo" class="h-10 w-auto transition-transform group-hover:scale-105">
+        <span class="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent font-poppins">Course Wagon</span>
       </a>
 
-      <!-- Mobile Menu Button -->
-      <div class="lg:hidden">
-        <button (click)="toggleNavbar()" class="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600" title="Toggle Navbar">
+      <!-- Mobile Menu Button & Theme Toggle -->
+      <div class="lg:hidden flex items-center gap-2">
+        <button (click)="toggleTheme()" class="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none transition-all hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg" title="Toggle Theme">
+          <fa-icon [icon]="themeService.isDarkMode() ? faSun : faMoon" size="lg"></fa-icon>
+        </button>
+        <button (click)="toggleNavbar()" class="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none transition-all hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg" title="Toggle Navbar">
           <fa-icon [icon]="isNavbarOpen ? faTimes : faBars" size="lg"></fa-icon>
         </button>
       </div>
 
       <!-- Desktop Menu -->
-      <div class="hidden lg:flex lg:items-center lg:space-x-6">
-        <ul class="flex items-center space-x-6">
+      <div class="hidden lg:flex lg:items-center lg:space-x-2">
+        <ul class="flex items-center space-x-2">
           <!-- Show these items only when authenticated -->
           <ng-container *ngIf="isAuthenticated">
             <!-- Creator-specific menu items -->
             <li *ngIf="isCreator">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/courses" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
                 <fa-icon [icon]="faBook" class="text-lg"></fa-icon> My Courses
               </a>
             </li>
 
             <li *ngIf="isCreator">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/my-courses-dashboard" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/my-courses-dashboard" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
                 <fa-icon [icon]="faChartLine" class="text-lg"></fa-icon> Creator Dashboard
               </a>
             </li>
 
             <!-- Learner-specific menu items -->
             <li *ngIf="isLearner">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses/browse" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/courses/browse" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
                 <fa-icon [icon]="faSearch" class="text-lg"></fa-icon> Browse Courses
               </a>
             </li>
 
             <li *ngIf="isLearner">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/learner/dashboard" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/learner/dashboard" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
                 <fa-icon [icon]="faGraduationCap" class="text-lg"></fa-icon> My Learning
               </a>
             </li>
 
             <!-- Admin Link - Only show for admin users -->
             <li *ngIf="isAdmin">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/admin" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/admin" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
                 <fa-icon [icon]="faUserShield" class="text-lg"></fa-icon> Admin
               </a>
             </li>
 
             <li>
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/profile" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/profile" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
                 <fa-icon [icon]="faUser" class="text-lg"></fa-icon> Profile
               </a>
             </li>
             <li>
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins cursor-pointer" (click)="onLogout(); scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer" (click)="onLogout(); scrollToTop()">
                 <fa-icon [icon]="faPowerOff" class="text-lg"></fa-icon> Logout
               </a>
             </li>
@@ -67,65 +70,72 @@
           <!-- Show login/signup when not authenticated -->
           <ng-container *ngIf="!isAuthenticated">
             <li>
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins px-4 py-2 rounded-lg hover:bg-gray-200" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="scrollToTop()">
                 <fa-icon [icon]="faSignInAlt" class="text-lg"></fa-icon> Login
               </a>
             </li>
             <li>
-              <a class="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 transition-colors font-poppins px-4 py-2 rounded-lg" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 transition-all font-poppins px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="scrollToTop()">
                 <fa-icon [icon]="faUserPlus" class="text-lg"></fa-icon> Sign Up
               </a>
             </li>
           </ng-container>
+
+          <!-- Theme Toggle Button -->
+          <li class="ml-2">
+            <button (click)="toggleTheme()" class="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none transition-all hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg" title="Toggle Theme">
+              <fa-icon [icon]="themeService.isDarkMode() ? faSun : faMoon" size="lg"></fa-icon>
+            </button>
+          </li>
         </ul>
       </div>
     </div>
 
     <!-- Mobile Menu (Collapsible) -->
-    <div [ngClass]="{'block': isNavbarOpen, 'hidden': !isNavbarOpen}" class="lg:hidden pb-4">
-       <ul class="flex flex-col space-y-3 pt-3">
+    <div [ngClass]="{'block': isNavbarOpen, 'hidden': !isNavbarOpen}" class="lg:hidden pb-4 border-t border-gray-200 dark:border-slate-800 mt-2">
+       <ul class="flex flex-col space-y-1 pt-3">
           <!-- Show these items only when authenticated -->
           <ng-container *ngIf="isAuthenticated">
             <!-- Creator-specific menu items -->
             <li *ngIf="isCreator">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses" (click)="toggleNavbar(); scrollToTop()">
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/courses" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faBook" class="text-lg w-5 text-center"></fa-icon> My Courses
               </a>
             </li>
 
             <li *ngIf="isCreator">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/my-courses-dashboard" (click)="toggleNavbar(); scrollToTop()">
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/my-courses-dashboard" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faChartLine" class="text-lg w-5 text-center"></fa-icon> Creator Dashboard
               </a>
             </li>
 
             <!-- Learner-specific menu items -->
             <li *ngIf="isLearner">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/courses/browse" (click)="toggleNavbar(); scrollToTop()">
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/courses/browse" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faSearch" class="text-lg w-5 text-center"></fa-icon> Browse Courses
               </a>
             </li>
 
             <li *ngIf="isLearner">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/learner/dashboard" (click)="toggleNavbar(); scrollToTop()">
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/learner/dashboard" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faGraduationCap" class="text-lg w-5 text-center"></fa-icon> My Learning
               </a>
             </li>
 
             <!-- Admin Link - Only show for admin users -->
             <li *ngIf="isAdmin">
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/admin" (click)="toggleNavbar(); scrollToTop()">
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/admin" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faUserShield" class="text-lg w-5 text-center"></fa-icon> Admin
               </a>
             </li>
 
             <li>
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" routerLink="/profile" (click)="toggleNavbar(); scrollToTop()">
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/profile" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faUser" class="text-lg w-5 text-center"></fa-icon> Profile
               </a>
             </li>
             <li>
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins cursor-pointer" (click)="onLogout(); toggleNavbar(); scrollToTop()">
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer" (click)="onLogout(); toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faPowerOff" class="text-lg w-5 text-center"></fa-icon> Logout
               </a>
             </li>
@@ -134,12 +144,12 @@
           <!-- Mobile menu login/signup -->
           <ng-container *ngIf="!isAuthenticated">
             <li>
-              <a class="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-poppins" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="toggleNavbar(); scrollToTop()">
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faSignInAlt" class="text-lg w-5 text-center"></fa-icon> Login
               </a>
             </li>
             <li>
-              <a class="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 transition-colors font-poppins px-4 py-2 rounded-lg" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="toggleNavbar(); scrollToTop()">
+              <a class="flex items-center gap-3 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 transition-all font-poppins px-4 py-2 rounded-lg shadow-md" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faUserPlus" class="text-lg w-5 text-center"></fa-icon> Sign Up
               </a>
             </li>

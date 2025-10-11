@@ -4,10 +4,11 @@ import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AuthService } from './services/auth/auth.service';
 import { NavigationService } from './services/navigation.service';
+import { ThemeService } from './services/theme.service';
 import {
   faBars, faTimes, faGraduationCap, faShoppingCart, faBook, faUser,
   faPowerOff, faSignInAlt, faUserPlus, faUserShield, faChartLine,
-  faBookOpen, faSearch
+  faBookOpen, faSearch, faMoon, faSun
 } from '@fortawesome/free-solid-svg-icons';
 import { FooterComponent } from './footer/footer.component';
 import { ToastContainerComponent } from './toast-container/toast-container.component';
@@ -42,10 +43,13 @@ export class AppComponent implements OnInit {
   faUserPlus = faUserPlus;
   faUserShield = faUserShield;
   faChartLine = faChartLine;
+  faMoon = faMoon;
+  faSun = faSun;
 
   constructor(
     private authService: AuthService,
-    private navigationService: NavigationService // Inject NavigationService
+    private navigationService: NavigationService,
+    public themeService: ThemeService // Inject ThemeService
   ) {}
 
   ngOnInit(): void {
@@ -81,5 +85,10 @@ export class AppComponent implements OnInit {
   // Add method to manually scroll to top when needed
   scrollToTop(): void {
     this.navigationService.scrollToTop();
+  }
+
+  // Toggle theme between light and dark mode
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 }

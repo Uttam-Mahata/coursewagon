@@ -6,11 +6,12 @@ import { CacheService } from '../services/cache.service';
 
 /**
  * HTTP Caching Interceptor
- * 
+ *
  * Caches GET requests to reduce backend calls and improve performance.
  * - Only caches successful GET requests (status 200)
  * - TTL of 3 minutes for cached responses
  * - Automatically bypasses cache for requests with skipCache header
+ * - Auto-invalidates related caches on mutations (POST/PUT/DELETE)
  */
 @Injectable()
 export class CacheInterceptor implements HttpInterceptor {
@@ -19,9 +20,16 @@ export class CacheInterceptor implements HttpInterceptor {
   constructor(private cacheService: CacheService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Only cache GET requests
+    // Handle mutations (POST/PUT/DELETE) - invalidate related caches
     if (req.method !== 'GET') {
-      return next.handle(req);
+      return next.handle(req).pipe(
+        tap(event => {
+          if (event instanceof HttpResponse && (event.status === 200 || event.status === 201)) {
+            // Extract resource path and invalidate related caches
+            this.invalidateRelatedCaches(req.url);
+          }
+        })
+      );
     }
 
     // Check if request should skip cache
@@ -49,5 +57,55 @@ export class CacheInterceptor implements HttpInterceptor {
         }
       })
     );
+  }
+
+  /**
+   * Invalidate related caches based on mutation URL
+   * @param url The URL of the mutation request
+   */
+  private invalidateRelatedCaches(url: string): void {
+    // Extract resource path patterns to invalidate
+    const patterns: string[] = [];
+
+    // Course-related endpoints
+    if (url.includes('/courses')) {
+      patterns.push('/courses');
+      patterns.push('/my-courses');
+    }
+
+    // Learning/catalog endpoints
+    if (url.includes('/learning')) {
+      patterns.push('/learning');
+    }
+
+    // Subject endpoints
+    if (url.includes('/subjects')) {
+      patterns.push('/subjects');
+    }
+
+    // Topic endpoints
+    if (url.includes('/topics')) {
+      patterns.push('/topics');
+    }
+
+    // Content endpoints
+    if (url.includes('/content')) {
+      patterns.push('/content');
+    }
+
+    // Chapter endpoints
+    if (url.includes('/chapters')) {
+      patterns.push('/chapters');
+    }
+
+    // Statistics endpoints
+    if (url.includes('/statistics')) {
+      patterns.push('/statistics');
+    }
+
+    // Invalidate all matching caches
+    patterns.forEach(pattern => {
+      this.cacheService.invalidateHttp(pattern);
+    });
   }
 }

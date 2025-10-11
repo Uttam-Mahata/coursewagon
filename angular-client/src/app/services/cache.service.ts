@@ -88,6 +88,27 @@ export class CacheService {
   }
 
   /**
+   * Invalidate HTTP cache keys matching URL pattern
+   * @param urlPattern URL pattern to match (e.g., '/courses', '/learning')
+   * @returns Number of cache entries invalidated
+   */
+  invalidateHttp(urlPattern: string): number {
+    const keys = Array.from(this.memoryCache.keys());
+    let invalidatedCount = 0;
+
+    keys.forEach(key => {
+      // HTTP cache keys are in format: http:{url}
+      if (key.startsWith('http:') && key.includes(urlPattern)) {
+        this.memoryCache.delete(key);
+        invalidatedCount++;
+      }
+    });
+
+    console.log(`[Cache] Invalidated ${invalidatedCount} HTTP cache entries matching: ${urlPattern}`);
+    return invalidatedCount;
+  }
+
+  /**
    * Clear all memory cache
    */
   clear(): void {

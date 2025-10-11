@@ -5,7 +5,7 @@ from repositories.topic_repo import TopicRepository
 from repositories.chapter_repo import ChapterRepository
 from repositories.subject_repo import SubjectRepository
 from repositories.course_repo import CourseRepository
-from utils.gemini_helper import GeminiHelper, mermaid_content, extract_markdown
+from utils.gemini_helper import GeminiHelper, mermaid_content, chart_content, extract_markdown
 from utils.unified_storage_helper import storage_helper
 from utils.cache_helper import cache_helper, invalidate_cache
 from sqlalchemy.orm import Session
@@ -54,6 +54,8 @@ class ContentService:
     Delve deeply into the core concepts related to the topic, defining key terms, principles, and theories. Include any historical context or real-world relevance to ground the material.
     Examples: Include relevant examples to illustrate the concepts. The examples should be diverse, including:
     Numerical examples that explain complex ideas step-by-step using equations, tables, or graphs.
+    
+    ## DIAGRAMS WITH MERMAID JS:
     Draw diagrams (only if you are 100% confident that your code for the diagram will work; otherwise, you do not need to draw them) as per the content using Mermaid JS, as it is integrated in ngx-markdown, if possible or if it is relevant to the content.
     Take diagram syntax help from Mermaid JS and Ngx markdown. 
     These are possible in Markdown: Flowchart, Sequence Diagram, Class Diagram, State Diagram, Entity Relationship Diagram, 
@@ -79,6 +81,59 @@ class ContentService:
     Carefully draw the diagrams. Take help from Mermaid JS documentation, and ensure there are no syntax errors in the Mermaid code.
     For other diagrams like flowchart, sequence diagram, class diagram, state diagram, entity relationship diagram, 
     user journey, gantt, pie chart, quadrant chart, requirement diagram, gitgraph (git) diagram, c4 diagram, mindmaps, timeline, zenuml, sankey, xy chart, block diagram, packet, architecture, use Mermaid JS.
+    
+    ## INTERACTIVE CHARTS WITH CHART.JS:
+    For data visualizations like statistical graphs, comparison charts, performance metrics, or any numerical data representation, use Chart.js format.
+    You MUST generate interactive charts using the following JSON format wrapped in code blocks:
+    
+    ```chart-json
+    {{
+      "type": "bar",
+      "data": {{
+        "labels": ["January", "February", "March", "April"],
+        "datasets": [{{
+          "label": "Sales Data",
+          "data": [12, 19, 3, 5],
+          "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(255, 206, 86, 0.2)", "rgba(75, 192, 192, 0.2)"],
+          "borderColor": ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)", "rgba(75, 192, 192, 1)"],
+          "borderWidth": 1
+        }}]
+      }},
+      "options": {{
+        "responsive": true,
+        "maintainAspectRatio": true,
+        "plugins": {{
+          "title": {{
+            "display": true,
+            "text": "Chart Title"
+          }},
+          "legend": {{
+            "display": true,
+            "position": "top"
+          }}
+        }},
+        "scales": {{
+          "y": {{
+            "beginAtZero": true
+          }}
+        }}
+      }}
+    }}
+    ```
+    
+    Supported Chart Types:
+    - "bar" - for bar charts (vertical bars)
+    - "line" - for line charts (trends over time)
+    - "pie" - for pie charts (proportions)
+    - "doughnut" - for doughnut charts
+    - "radar" - for radar/spider charts
+    - "polarArea" - for polar area charts
+    - "bubble" - for bubble charts
+    - "scatter" - for scatter plots
+    
+    Use Chart.js for: Performance comparisons, statistical data, time series, algorithm complexity comparisons, benchmark results, survey data, distribution graphs, trend analysis, etc.
+    Use Mermaid JS for: Process flows, system architecture, relationships, state machines, timelines, etc.
+    
     Always write mathematical formulas in LaTeX $$ $$ or $ $ format.
 
     For multiline equation always use this format : $$your equation$$.
@@ -117,9 +172,13 @@ class ContentService:
         
         content = self.content_repo.get_content_by_topic_id(topic_id)
         if content:
+            # Process both mermaid and chart content
+            processed_content = mermaid_content(content.content)
+            processed_content = chart_content(processed_content)
+            
             # Return object with both content and video_url
             result = {
-                "content": mermaid_content(content.content),
+                "content": processed_content,
                 "video_url": content.video_url
             }
             cache_helper.set(cache_key, result, ttl=600)

@@ -4,15 +4,19 @@ import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faBook, faBookOpen, faGraduationCap, faChartLine,
-  faSpinner, faPlay, faSearch, faTrophy, faClock
+  faSpinner, faPlay, faSearch, faTrophy, faClock, faStar, faPen
 } from '@fortawesome/free-solid-svg-icons';
 import { EnrollmentService, Enrollment } from '../services/enrollment.service';
 import { LearningService } from '../services/learning.service';
+import { ReviewService, CanReviewResponse, CourseReview } from '../services/review.service';
 
 interface EnrollmentWithProgress extends Enrollment {
   progressPercentage?: number;
   totalTimeSpent?: number;
   lastAccessedTopic?: string;
+  canReview?: boolean;
+  hasReviewed?: boolean;
+  userReview?: CourseReview;
 }
 
 @Component({
@@ -33,6 +37,8 @@ export class LearnerDashboardComponent implements OnInit {
   faSearch = faSearch;
   faTrophy = faTrophy;
   faClock = faClock;
+  faStar = faStar;
+  faPen = faPen;
 
   enrollments: EnrollmentWithProgress[] = [];
   activeEnrollments: EnrollmentWithProgress[] = [];
@@ -49,6 +55,7 @@ export class LearnerDashboardComponent implements OnInit {
   constructor(
     private enrollmentService: EnrollmentService,
     private learningService: LearningService,
+    private reviewService: ReviewService,
     private router: Router
   ) {}
 
@@ -95,6 +102,10 @@ export class LearnerDashboardComponent implements OnInit {
 
           // Update enrollment's progress_percentage for display
           enrollment.progress_percentage = progress.progress_percentage;
+
+          // Check review eligibility and load user review
+          this.checkReviewEligibility(enrollment);
+          this.loadUserReview(enrollment);
         },
         error: (err) => {
           console.error(`Error loading progress for enrollment ${enrollment.id}:`, err);
@@ -105,6 +116,38 @@ export class LearnerDashboardComponent implements OnInit {
         }
       });
     });
+  }
+
+  checkReviewEligibility(enrollment: EnrollmentWithProgress): void {
+    this.reviewService.canReview(enrollment.course_id).subscribe({
+      next: (response: CanReviewResponse) => {
+        enrollment.canReview = response.can_review;
+      },
+      error: (err) => {
+        console.error(`Error checking review eligibility for course ${enrollment.course_id}:`, err);
+        enrollment.canReview = false;
+      }
+    });
+  }
+
+  loadUserReview(enrollment: EnrollmentWithProgress): void {
+    this.reviewService.getMyReview(enrollment.course_id).subscribe({
+      next: (review: CourseReview) => {
+        enrollment.hasReviewed = true;
+        enrollment.userReview = review;
+      },
+      error: (err) => {
+        // 404 is expected if user hasn't reviewed yet
+        if (err.status !== 404) {
+          console.error(`Error loading user review for course ${enrollment.course_id}:`, err);
+        }
+        enrollment.hasReviewed = false;
+      }
+    });
+  }
+
+  writeReview(courseId: number): void {
+    this.router.navigate(['/courses/preview', courseId]);
   }
 
   browseCourses(): void {

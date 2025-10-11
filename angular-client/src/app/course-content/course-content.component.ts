@@ -6,6 +6,7 @@ import { ChapterService } from '../services/chapter.service';
 import { TopicService } from '../services/topic.service';
 import { ContentService } from '../services/content.service';
 import { MathRendererService } from '../services/math-renderer.service';
+import { ChartRendererService } from '../services/chart-renderer.service';
 import { AuthService } from '../services/auth/auth.service';
 import {
   faHome, faBook, faLayerGroup, faEye, faMagic,
@@ -109,6 +110,7 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     private topicService: TopicService,
     private contentService: ContentService,
     public mathRendererService: MathRendererService,
+    private chartRendererService: ChartRendererService,
     private route: ActivatedRoute,
     private router: Router,
     private formBuilder: FormBuilder
@@ -168,12 +170,14 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
   
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
+    this.chartRendererService.destroyAllCharts(); // Cleanup charts
     window.removeEventListener('resize', this.adjustSidebarForScreenSize.bind(this));
   }
   
   ngAfterViewChecked() {
     if (this.needsMathJaxUpdate) {
       this.mathRendererService.renderMathJax();
+      this.chartRendererService.renderCharts(); // Render charts after content is displayed
       this.needsMathJaxUpdate = false;
       
       setTimeout(() => {
@@ -430,10 +434,10 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
     if (!this.selectedTopicId || !this.expandedChapterId) {
       return;
     }
-    
+
     this.isGeneratingContent = true;
     this.errorMessage = '';
-    
+
     this.subscriptions.add(
       this.contentService.generateContent(
         this.courseId,
@@ -445,21 +449,30 @@ export class CourseContentComponent implements OnInit, OnDestroy, AfterViewCheck
           if (this.selectedTopic) {
             this.selectedTopic.has_content = true;
           }
-          
+
           this.contentService.getContent(
-            this.courseId, 
-            this.subjectId, 
-            this.expandedChapterId!, 
+            this.courseId,
+            this.subjectId,
+            this.expandedChapterId!,
             this.selectedTopicId!
           ).subscribe({
-            next: (content) => {
-              this.content = content;
-              
-              if (content) {
-                this.processedContent = this.mathRendererService.processContent(content);
+            next: (response) => {
+              // Handle both string response (old format) and object response (new format with video_url)
+              if (typeof response === 'string') {
+                this.content = response;
+                this.videoUrl = null;
+              } else if (response && typeof response === 'object') {
+                this.content = response.content || response;
+                this.videoUrl = response.video_url || null;
+              } else {
+                this.content = response;
+              }
+
+              if (this.content) {
+                this.processedContent = this.mathRendererService.processContent(this.content);
                 this.needsMathJaxUpdate = true;
               }
-              
+
               this.isGeneratingContent = false;
             },
             error: (err) => {

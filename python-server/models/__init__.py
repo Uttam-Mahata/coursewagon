@@ -10,6 +10,7 @@ from models.password_reset import PasswordReset
 from models.email_verification import EmailVerification
 from models.enrollment import Enrollment
 from models.learning_progress import LearningProgress
+from models.course_review import CourseReview
 
 __all__ = [
     'User',
@@ -22,5 +23,6 @@ __all__ = [
     'PasswordReset',
     'EmailVerification',
     'Enrollment',
-    'LearningProgress'
+    'LearningProgress',
+    'CourseReview'
 ]

@@ -140,6 +140,17 @@
             {{ course.name }}
           </h3>
 
+          <!-- Rating Display -->
+          <div *ngIf="course.average_rating && course.review_count && course.review_count > 0" class="mb-3">
+            <app-star-rating
+              [rating]="course.average_rating"
+              [interactive]="false"
+              [size]="'sm'"
+              [showCount]="true"
+              [reviewCount]="course.review_count"
+            ></app-star-rating>
+          </div>
+
           <!-- Course Description -->
           <p class="text-sm text-gray-600 mb-4 line-clamp-3">
             {{ course.description }}

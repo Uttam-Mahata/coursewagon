@@ -34,12 +34,14 @@ async def lifespan(app: FastAPI):
         from migrations.add_learner_functionality import run_all_migrations
         from migrations.add_video_url_to_content import add_video_url_to_content
         from migrations.add_database_indexes import add_database_indexes
+        from migrations.add_course_reviews import run_migration as run_course_reviews_migration
 
         add_welcome_email_sent_column()
         run_email_verification_migration()
         run_all_migrations()  # New learner functionality migrations
         add_video_url_to_content()  # Add video_url to content table
         add_database_indexes()  # Add performance indexes
+        run_course_reviews_migration()  # Add course reviews and ratings
         logger.info("Database migrations completed successfully")
     except Exception as e:
         logger.error(f"Database migration failed: {str(e)}")
@@ -77,6 +79,7 @@ from routes.testimonial_routes import testimonial_router
 from routes.image_routes import image_router
 from routes.enrollment_routes import enrollment_router
 from routes.learning_routes import learning_router
+from routes.review_routes import review_router
 from admin.routes import admin_router
 from routes.utility_routes import utility_router
 from routes.test_auth_routes import test_auth_router
@@ -123,7 +126,8 @@ app.add_middleware(
         "X-Requested-With",
         "Accept",
         "Origin",
-        "Cookie"
+        "Cookie",
+        "X-Skip-Cache"  # Allow cache control header for frontend cache bypassing
     ],
     expose_headers=["Set-Cookie"]
 )
@@ -177,6 +181,7 @@ app.include_router(testimonial_router, prefix="/api")
 app.include_router(image_router, prefix="/api")
 app.include_router(enrollment_router, prefix="/api")
 app.include_router(learning_router, prefix="/api")
+app.include_router(review_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(utility_router, prefix="/api")
 app.include_router(test_auth_router, prefix="/api")

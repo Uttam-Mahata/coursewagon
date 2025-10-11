@@ -183,7 +183,22 @@
 
         <!-- Markdown Content -->
         <div class="bg-white rounded-lg shadow-sm p-3 md:p-8 prose prose-sm md:prose-lg max-w-none">
-          <div markdown [data]="content" mermaid katex class="markdown-content"></div>
+          <!-- Use KaTeX for regular markdown and inline/simple equations -->
+          <div *ngIf="!processedContent" markdown [data]="content" mermaid katex class="markdown-content"></div>
+
+          <!-- Use the processed content for mixed KaTeX/MathJax approach -->
+          <div *ngIf="processedContent" class="markdown-content">
+            <!-- First render with KaTeX for standard markdown and inline equations -->
+            <div markdown [data]="processedContent" mermaid katex class="markdown-content"></div>
+
+            <!-- The mathjax-block divs will be processed by MathJax for multiline equations -->
+            <!-- Add a trigger for MathJax in case it wasn't automatically rendered -->
+            <button *ngIf="content && content.includes('\\begin{cases}')"
+                    (click)="mathRendererService.renderMathJax()"
+                    class="text-xs text-blue-600 hover:text-blue-800 mt-2 underline">
+              Equations not rendering correctly? Click here to refresh.
+            </button>
+          </div>
         </div>
 
         <!-- Mark Complete Button -->

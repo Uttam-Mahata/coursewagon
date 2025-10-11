@@ -9,6 +9,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { LearningService } from '../services/learning.service';
 import { EnrollmentService } from '../services/enrollment.service';
+import { StarRatingComponent } from '../shared/star-rating/star-rating.component';
 
 interface CourseWithEnrollment {
   id: number;
@@ -23,12 +24,14 @@ interface CourseWithEnrollment {
   is_enrolled?: boolean;
   created_at?: string;
   published_at?: string;
+  average_rating?: number;
+  review_count?: number;
 }
 
 @Component({
   selector: 'app-course-catalog',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, FontAwesomeModule],
+  imports: [CommonModule, RouterModule, FormsModule, FontAwesomeModule, StarRatingComponent],
   templateUrl: './course-catalog.component.html',
   styleUrl: './course-catalog.component.css'
 })
@@ -60,6 +63,7 @@ export class CourseCatalogComponent implements OnInit {
   difficultyLevels = ['Beginner', 'Intermediate', 'Advanced'];
   sortOptions = [
     { value: 'popular', label: 'Most Popular' },
+    { value: 'rating', label: 'Highest Rated' },
     { value: 'newest', label: 'Newest First' },
     { value: 'duration_asc', label: 'Shortest Duration' },
     { value: 'duration_desc', label: 'Longest Duration' }
@@ -157,6 +161,9 @@ export class CourseCatalogComponent implements OnInit {
     switch (this.selectedSort) {
       case 'popular':
         this.filteredCourses.sort((a, b) => (b.enrollment_count || 0) - (a.enrollment_count || 0));
+        break;
+      case 'rating':
+        this.filteredCourses.sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0));
         break;
       case 'newest':
         this.filteredCourses.sort((a, b) => {

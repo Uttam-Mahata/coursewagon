@@ -81,3 +81,8 @@ class Config:
     AZURE_CONTAINER_REGISTRY = os.environ.get('AZURE_CONTAINER_REGISTRY', 'coursewagoracr')
     AZURE_CONTAINER_APP_ENV = os.environ.get('AZURE_CONTAINER_APP_ENV', 'coursewagon-env')
     AZURE_CONTAINER_APP_NAME = os.environ.get('AZURE_CONTAINER_APP_NAME', 'coursewagon-backend')
+
+    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+    REDIS_PORT = int(os.getenv('REDIS_PORT', '6379'))
+    REDIS_DB = int(os.getenv('REDIS_DB', '0'))
+    REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', None)

@@ -61,7 +61,9 @@ export class CourseService {
       return;
     }
 
-    this.http.get<any[]>(`${this.apiUrl}/my-courses`).subscribe({
+    // Skip HTTP cache to ensure fresh data after mutations
+    const headers = new HttpHeaders({ 'X-Skip-Cache': 'true' });
+    this.http.get<any[]>(`${this.apiUrl}/my-courses`, { headers }).subscribe({
       next: (courses) => {
         this.myCoursesSubject.next(courses);
       },

@@ -126,7 +126,8 @@ app.add_middleware(
         "X-Requested-With",
         "Accept",
         "Origin",
-        "Cookie"
+        "Cookie",
+        "X-Skip-Cache"  # Allow cache control header for frontend cache bypassing
     ],
     expose_headers=["Set-Cookie"]
 )

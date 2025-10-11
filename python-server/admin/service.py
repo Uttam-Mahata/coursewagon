@@ -2,6 +2,7 @@ from admin.repository import AdminRepository
 from admin.models import AdminStats, UserCourseStats
 from repositories.user_repository import UserRepository
 from sqlalchemy.orm import Session
+from utils.cache_helper import cache_helper, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,7 +16,15 @@ class AdminService:
         self.user_repo = UserRepository(db)
 
     def get_dashboard_stats(self):
-        """Get consolidated statistics for admin dashboard"""
+        """Get consolidated statistics for admin dashboard (cached for 3 minutes)"""
+        cache_key = "admin:dashboard:stats"
+
+        # Try to get from cache first
+        cached_stats = cache_helper.get(cache_key)
+        if cached_stats is not None:
+            logger.debug(f"Returning cached dashboard stats")
+            return cached_stats
+
         try:
             # Collect all stats from different sources
             user_stats = self.admin_repo.get_user_stats()
@@ -40,7 +49,13 @@ class AdminService:
                 course_breakdown=course_breakdown
             )
 
-            return admin_stats.to_dict()
+            result = admin_stats.to_dict()
+
+            # Cache the result for 3 minutes (180 seconds)
+            cache_helper.set(cache_key, result, ttl=180)
+            logger.debug(f"Cached dashboard stats for 3 minutes")
+
+            return result
         except Exception as e:
             logger.error(f"Error getting dashboard stats: {str(e)}")
             raise Exception(f"Error retrieving admin dashboard data: {str(e)}")
@@ -73,18 +88,46 @@ class AdminService:
             raise Exception(f"Error retrieving user course stats: {str(e)}")
     
     def get_all_users(self):
-        """Get all users in the system"""
+        """Get all users in the system (cached for 3 minutes)"""
+        cache_key = "admin:users:all"
+
+        # Try to get from cache first
+        cached_users = cache_helper.get(cache_key)
+        if cached_users is not None:
+            logger.debug(f"Returning cached users list")
+            return cached_users
+
         try:
             users = self.user_repo.get_all_users()
-            return [user.to_dict() for user in users]
+            result = [user.to_dict() for user in users]
+
+            # Cache the result for 3 minutes (180 seconds)
+            cache_helper.set(cache_key, result, ttl=180)
+            logger.debug(f"Cached users list for 3 minutes")
+
+            return result
         except Exception as e:
             logger.error(f"Error getting all users: {str(e)}")
             raise Exception(f"Error retrieving user list: {str(e)}")
     
     def get_pending_testimonials(self):
-        """Get all pending testimonials"""
+        """Get all pending testimonials (cached for 3 minutes)"""
+        cache_key = "admin:testimonials:pending"
+
+        # Try to get from cache first
+        cached_testimonials = cache_helper.get(cache_key)
+        if cached_testimonials is not None:
+            logger.debug(f"Returning cached pending testimonials")
+            return cached_testimonials
+
         try:
-            return self.admin_repo.get_pending_testimonials()
+            result = self.admin_repo.get_pending_testimonials()
+
+            # Cache the result for 3 minutes (180 seconds)
+            cache_helper.set(cache_key, result, ttl=180)
+            logger.debug(f"Cached pending testimonials for 3 minutes")
+
+            return result
         except Exception as e:
             logger.error(f"Error getting pending testimonials: {str(e)}")
             raise Exception(f"Error retrieving pending testimonials: {str(e)}")

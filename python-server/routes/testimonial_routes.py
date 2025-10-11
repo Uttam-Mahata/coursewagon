@@ -4,6 +4,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from middleware.auth_middleware import get_current_user_id, get_current_admin_user_id
 from services.testimonial_service import TestimonialService
+from utils.cache_helper import invalidate_cache
 from extensions import get_db
 
 testimonial_router = APIRouter(prefix='/testimonials', tags=['testimonials'])
@@ -58,13 +59,15 @@ async def create_testimonial(
     try:
         if not testimonial_data.quote or not testimonial_data.rating:
             raise HTTPException(status_code=400, detail="Quote and rating are required")
-        
+
         testimonial_service = TestimonialService(db)
         result = testimonial_service.create_testimonial(
-            current_user_id, 
-            testimonial_data.quote, 
+            current_user_id,
+            testimonial_data.quote,
             testimonial_data.rating
         )
+        # Invalidate admin dashboard cache
+        invalidate_cache("admin:*")
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -84,15 +87,16 @@ async def update_testimonial(
     try:
         if not testimonial_data.quote and testimonial_data.rating is None:
             raise HTTPException(status_code=400, detail="At least one field (quote or rating) is required")
-        
+
         testimonial_service = TestimonialService(db)
         result = testimonial_service.update_user_testimonial(
-            current_user_id, 
-            testimonial_id, 
-            quote=testimonial_data.quote, 
+            current_user_id,
+            testimonial_id,
+            quote=testimonial_data.quote,
             rating=testimonial_data.rating
         )
-        
+        # Invalidate admin dashboard cache
+        invalidate_cache("admin:*")
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -112,6 +116,8 @@ async def delete_testimonial(
         testimonial_service = TestimonialService(db)
         result = testimonial_service.delete_user_testimonial(current_user_id, testimonial_id)
         if result:
+            # Invalidate admin dashboard cache
+            invalidate_cache("admin:*")
             return {"message": "Testimonial deleted successfully"}
         else:
             raise HTTPException(status_code=404, detail="Testimonial not found")
@@ -147,6 +153,8 @@ async def admin_approve_testimonial(
     try:
         testimonial_service = TestimonialService(db)
         result = testimonial_service.approve_testimonial(testimonial_id, approval_data.approved)
+        # Invalidate admin dashboard cache
+        invalidate_cache("admin:*")
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

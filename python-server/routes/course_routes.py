@@ -7,6 +7,7 @@ from services.course_service import CourseService
 from repositories.user_repository import UserRepository
 from services.auth_service import AuthService
 from utils.gemini_live_helper import GeminiLiveHelper
+from utils.cache_helper import invalidate_cache
 from extensions import get_db
 from sqlalchemy.orm import Session
 import logging
@@ -42,6 +43,8 @@ async def add_course(
     try:
         course_service = CourseService(db)
         result = course_service.add_course(course_data.name, current_user_id)
+        # Invalidate admin dashboard cache
+        invalidate_cache("admin:*")
         return result
     except Exception as e:
         logger.error(f"Error creating course: {str(e)}")
@@ -115,13 +118,15 @@ async def create_course_manual(
     try:
         if not course_data.name:
             raise HTTPException(status_code=400, detail="Course name is required")
-        
+
         course_service = CourseService(db)
         result = course_service.create_course_manual(
-            course_data.name, 
-            course_data.description, 
+            course_data.name,
+            course_data.description,
             current_user_id
         )
+        # Invalidate admin dashboard cache
+        invalidate_cache("admin:*")
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -139,11 +144,13 @@ async def update_course(
         course = course_service.get_course_by_id(course_id)
         if not course or course.get('user_id') != current_user_id:
             raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
-            
+
         if not course_data.name:
             raise HTTPException(status_code=400, detail="Course name is required")
-            
+
         result = course_service.update_course(course_id, course_data.name, course_data.description)
+        # Invalidate admin dashboard cache
+        invalidate_cache("admin:*")
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -160,8 +167,10 @@ async def delete_course(
         course = course_service.get_course_by_id(course_id)
         if not course or course.get('user_id') != current_user_id:
             raise HTTPException(status_code=403, detail="Course not found or you don't have permission")
-            
+
         result = course_service.delete_course(course_id)
+        # Invalidate admin dashboard cache
+        invalidate_cache("admin:*")
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -190,9 +199,10 @@ async def add_course_audio(
             # Use the new course service method for audio-based course creation
             course_service = CourseService(db)
             result = course_service.add_course_from_audio(temp_audio_path, current_user_id)
-            
+            # Invalidate admin dashboard cache
+            invalidate_cache("admin:*")
             return result
-            
+
         finally:
             # Clean up temporary file
             if os.path.exists(temp_audio_path):

@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from middleware.auth_middleware import get_current_admin_user_id
 from admin.service import AdminService
 from services.auth_service import AuthService
+from utils.cache_helper import invalidate_cache
 import logging
 from typing import Dict, Any, List
 from extensions import get_db
@@ -76,6 +77,8 @@ async def toggle_user_status(
     """Enable/disable a user account"""
     try:
         result = admin_service.toggle_user_status(current_admin_id, user_id, status_update.is_active)
+        # Invalidate admin dashboard cache
+        invalidate_cache("admin:*")
         return result
     except ValueError as e:
         raise HTTPException(status_code=403, detail=str(e))
@@ -93,6 +96,8 @@ async def toggle_admin_status(
     """Grant/revoke admin privileges"""
     try:
         result = admin_service.toggle_admin_status(current_admin_id, user_id, admin_update.is_admin)
+        # Invalidate admin dashboard cache
+        invalidate_cache("admin:*")
         return result
     except ValueError as e:
         raise HTTPException(status_code=403, detail=str(e))

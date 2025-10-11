@@ -10,6 +10,8 @@ import {
 import { CourseStatsService, UserCourseStats, CourseDetail } from '../services/course-stats.service';
 import { LearningService } from '../services/learning.service';
 import { ToastService } from '../services/toast.service';
+import { CacheService } from '../services/cache.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-my-courses-dashboard',
@@ -55,18 +57,24 @@ export class MyCoursesDashboardComponent implements OnInit {
     private courseStatsService: CourseStatsService,
     private learningService: LearningService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private cacheService: CacheService
   ) {}
 
   ngOnInit(): void {
     this.loadStatistics();
   }
 
-  loadStatistics(): void {
+  loadStatistics(skipCache = false): void {
     this.loading = true;
     this.error = '';
 
-    this.courseStatsService.getMyCourseStatistics().subscribe({
+    // Use fresh data if cache should be skipped (e.g., after publish/unpublish)
+    const statsObservable = skipCache
+      ? this.courseStatsService.getMyCourseStatisticsFresh()
+      : this.courseStatsService.getMyCourseStatistics();
+
+    statsObservable.subscribe({
       next: (data) => {
         this.stats = data;
         this.loading = false;
@@ -150,8 +158,13 @@ export class MyCoursesDashboardComponent implements OnInit {
         this.publishingCourses.delete(courseId);
         this.toastService.success('Course published successfully!');
         this.closePublishModal();
-        // Reload statistics to reflect published status
-        this.loadStatistics();
+
+        // Clear the statistics cache to ensure fresh data
+        const statsUrl = `${environment.apiUrl}/courses/my-courses/statistics`;
+        this.cacheService.delete(`http:${statsUrl}`);
+
+        // Reload statistics with cache bypass to get fresh data
+        this.loadStatistics(true);
       },
       error: (err) => {
         this.publishingCourses.delete(courseId);
@@ -171,8 +184,13 @@ export class MyCoursesDashboardComponent implements OnInit {
       next: () => {
         this.publishingCourses.delete(courseId);
         this.toastService.success('Course unpublished successfully!');
-        // Reload statistics to reflect unpublished status
-        this.loadStatistics();
+
+        // Clear the statistics cache to ensure fresh data
+        const statsUrl = `${environment.apiUrl}/courses/my-courses/statistics`;
+        this.cacheService.delete(`http:${statsUrl}`);
+
+        // Reload statistics with cache bypass to get fresh data
+        this.loadStatistics(true);
       },
       error: (err) => {
         this.publishingCourses.delete(courseId);

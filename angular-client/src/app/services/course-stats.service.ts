@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -43,5 +43,14 @@ export class CourseStatsService {
    */
   getMyCourseStatistics(): Observable<UserCourseStats> {
     return this.http.get<UserCourseStats>(`${this.apiUrl}/my-courses/statistics`);
+  }
+
+  /**
+   * Get current user's course statistics with cache bypass
+   * Use this after mutations (publish/unpublish) to get fresh data
+   */
+  getMyCourseStatisticsFresh(): Observable<UserCourseStats> {
+    const headers = new HttpHeaders({ 'X-Skip-Cache': 'true' });
+    return this.http.get<UserCourseStats>(`${this.apiUrl}/my-courses/statistics`, { headers });
   }
 }

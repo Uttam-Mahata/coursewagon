@@ -1,35 +1,35 @@
-<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-blue-100 py-8">
+<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-blue-100 dark:from-slate-900 dark:to-slate-800 py-8">
   <div class="w-full max-w-md">
-    <div class="bg-white shadow-xl rounded-2xl p-8">
+    <div class="bg-white dark:bg-slate-800 shadow-xl rounded-2xl p-8">
       <div class="mb-6 flex flex-col items-center">
         <fa-icon 
           [icon]="isLoginMode ? 'sign-in-alt' : 'user-plus'" 
-          class="text-blue-500 text-4xl mb-2">
+          class="text-blue-500 dark:text-blue-400 text-4xl mb-2">
         </fa-icon>
-        <h3 class="text-2xl font-bold text-center text-gray-800">
+        <h3 class="text-2xl font-bold text-center text-gray-800 dark:text-white">
           {{ isLoginMode ? 'Login' : 'Sign Up' }}
         </h3>
       </div>
-      <div *ngIf="errorMessage" class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm font-medium flex items-start gap-3 shadow-sm" role="alert">
-        <fa-icon [icon]="'exclamation-triangle'" class="text-red-600 text-lg mt-0.5 flex-shrink-0"></fa-icon>
+      <div *ngIf="errorMessage" class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-4 py-3 text-sm font-medium flex items-start gap-3 shadow-sm" role="alert">
+        <fa-icon [icon]="'exclamation-triangle'" class="text-red-600 dark:text-red-400 text-lg mt-0.5 flex-shrink-0"></fa-icon>
         <span class="flex-1">{{ errorMessage }}</span>
         <button 
           type="button" 
           (click)="clearMessages()" 
-          class="text-red-600 hover:text-red-800 flex-shrink-0 focus:outline-none ml-2"
+          class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 flex-shrink-0 focus:outline-none ml-2"
           aria-label="Close error message">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
           </svg>
         </button>
       </div>
-      <div *ngIf="successMessage" class="mb-4 rounded-lg bg-green-50 border border-green-200 text-green-800 px-4 py-3 text-sm font-medium flex items-start gap-3 shadow-sm" role="alert">
-        <fa-icon [icon]="'check-circle'" class="text-green-600 text-lg mt-0.5 flex-shrink-0"></fa-icon>
+      <div *ngIf="successMessage" class="mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 text-sm font-medium flex items-start gap-3 shadow-sm" role="alert">
+        <fa-icon [icon]="'check-circle'" class="text-green-600 dark:text-green-400 text-lg mt-0.5 flex-shrink-0"></fa-icon>
         <span class="flex-1">{{ successMessage }}</span>
         <button 
           type="button" 
           (click)="clearMessages()" 
-          class="text-green-600 hover:text-green-800 flex-shrink-0 focus:outline-none ml-2"
+          class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 flex-shrink-0 focus:outline-none ml-2"
           aria-label="Close success message">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -40,18 +40,18 @@
       <!-- Email Verification Message -->
       <div *ngIf="showVerificationMessage" class="text-center">
         <div class="mb-4">
-          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100">
-            <fa-icon [icon]="'envelope'" class="text-blue-600 text-2xl"></fa-icon>
+          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900/30">
+            <fa-icon [icon]="'envelope'" class="text-blue-600 dark:text-blue-400 text-2xl"></fa-icon>
           </div>
         </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Check Your Email</h3>
-        <p class="text-gray-600 mb-4">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Check Your Email</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-4">
           We've sent a verification email to <strong>{{ registeredEmail }}</strong>.
           Please click the link in the email to verify your account.
         </p>
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 text-sm text-left">
-          <p class="font-medium text-blue-900 mb-2">📬 What to do next:</p>
-          <ul class="list-disc list-inside text-blue-800 space-y-1">
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4 text-sm text-left">
+          <p class="font-medium text-blue-900 dark:text-blue-300 mb-2">📬 What to do next:</p>
+          <ul class="list-disc list-inside text-blue-800 dark:text-blue-400 space-y-1">
             <li>Check your inbox (and spam folder)</li>
             <li>Click the verification link</li>
             <li>Return here to log in</li>
@@ -60,13 +60,13 @@
         <button
           (click)="resendVerificationEmail()"
           [disabled]="resendingVerification"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg shadow transition mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
+          class="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-2 rounded-lg shadow transition mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
           <span *ngIf="!resendingVerification">Resend Verification Email</span>
           <span *ngIf="resendingVerification">Sending...</span>
         </button>
         <button
           (click)="backToLogin()"
-          class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg shadow transition">
+          class="w-full bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-800 dark:text-white font-semibold py-2 rounded-lg shadow transition">
           Back to Login
         </button>
       </div>
@@ -74,35 +74,35 @@
       <!-- Login Form -->
       <form *ngIf="isLoginMode && !showVerificationMessage" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
               <fa-icon [icon]="'envelope'"></fa-icon>
             </span>
             <input 
               type="email" 
-              class="w-full rounded-lg border border-gray-300 px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              class="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 transition"
               id="email" 
               formControlName="email"
               required>
           </div>
         </div>
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
               <fa-icon [icon]="'lock'"></fa-icon>
             </span>
             <input 
               type="password" 
-              class="w-full rounded-lg border border-gray-300 px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              class="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 transition"
               id="password" 
               formControlName="password"
               required>
           </div>
           <!-- Forgot password link -->
           <div class="text-right mt-1">
-            <a routerLink="/forgot-password" class="text-sm text-blue-600 hover:underline transition-colors">
+            <a routerLink="/forgot-password" class="text-sm text-blue-600 dark:text-blue-400 hover:underline transition-colors">
               Forgot password?
             </a>
           </div>
@@ -114,13 +114,13 @@
             type="checkbox" 
             id="rememberMe" 
             formControlName="rememberMe"
-            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-          <label for="rememberMe" class="ml-2 block text-sm text-gray-700">
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 dark:bg-slate-700 rounded">
+          <label for="rememberMe" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
             Remember me
           </label>
         </div>
         
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 hover:shadow-lg text-white font-semibold py-2 rounded-lg shadow transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
+        <button type="submit" class="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 hover:shadow-lg text-white font-semibold py-2 rounded-lg shadow transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2">
           <fa-icon [icon]="'sign-in-alt'"></fa-icon>
           Login
         </button>
@@ -129,14 +129,14 @@
       <!-- Register Form -->
       <form *ngIf="!isLoginMode && !showVerificationMessage" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
         <div>
-          <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+          <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
           <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
               <fa-icon [icon]="'user'"></fa-icon>
             </span>
             <input 
               type="text" 
-              class="w-full rounded-lg border border-gray-300 px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              class="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 transition"
               id="firstName" 
               formControlName="first_name"
               required>

@@ -5,6 +5,7 @@ from models.schemas import CourseContent
 from utils.gemini_helper import GeminiHelper
 from utils.gemini_image_generation_helper import GeminiImageGenerator
 from utils.unified_storage_helper import storage_helper
+from utils.cache_helper import cache_helper, invalidate_cache
 from sqlalchemy.orm import Session
 import logging
 import asyncio
@@ -56,6 +57,10 @@ class CourseService:
                 # Log but don't fail if image generation fails
                 logger.error(f"Error generating course image: {str(img_error)}")
             
+            # Invalidate course caches
+            invalidate_cache(f"courses:user:{user_id}")
+            invalidate_cache("courses:all")
+            
             return {"message": "Course created successfully", "course_id": created_course.id}
                 
         except Exception as e:
@@ -63,19 +68,46 @@ class CourseService:
             raise Exception(f"Error creating course: {e}")
 
     def get_all_courses(self):
+        # Cache all courses for 5 minutes
+        cache_key = "courses:all"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug("Returning cached all courses")
+            return cached
+        
         courses = self.course_repo.get_all_courses()
-        return [course.to_dict() for course in courses]
+        result = [course.to_dict() for course in courses]
+        cache_helper.set(cache_key, result, ttl=300)
+        return result
     
     def get_user_courses(self, user_id):
+        # Cache user courses for 3 minutes
+        cache_key = f"courses:user:{user_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached courses for user {user_id}")
+            return cached
+        
         courses = self.course_repo.get_user_courses(user_id)
-        return [course.to_dict() for course in courses]
+        result = [course.to_dict() for course in courses]
+        cache_helper.set(cache_key, result, ttl=180)
+        return result
     
     def get_course_by_id(self, course_id):
-      course = self.course_repo.get_course_by_id(course_id)
-      if course:
-        return course.to_dict()
-      else:
-        return None
+        # Cache individual course for 5 minutes
+        cache_key = f"course:{course_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached course {course_id}")
+            return cached
+        
+        course = self.course_repo.get_course_by_id(course_id)
+        if course:
+            result = course.to_dict()
+            cache_helper.set(cache_key, result, ttl=300)
+            return result
+        else:
+            return None
 
     # New CRUD methods
     def create_course_manual(self, name, description, user_id):
@@ -104,6 +136,11 @@ class CourseService:
                 # Log but don't fail if image generation fails
                 logger.error(f"Error generating course image: {str(img_error)}")
             
+            # Invalidate course caches
+            invalidate_cache(f"courses:user:{user_id}")
+            invalidate_cache("courses:all")
+            invalidate_cache(f"course:{course.id}")
+            
             return course.to_dict()
         except Exception as e:
             logger.error(f"Error creating course: {str(e)}")
@@ -115,6 +152,10 @@ class CourseService:
         try:
             course = self.course_repo.update_course(course_id, name, description)
             if course:
+                # Invalidate course caches
+                invalidate_cache(f"course:{course_id}")
+                invalidate_cache(f"courses:user:{course.user_id}")
+                invalidate_cache("courses:all")
                 return course.to_dict()
             else:
                 logger.error(f"Course not found for id: {course_id}")
@@ -127,8 +168,15 @@ class CourseService:
         logger.info(f"Deleting course id: {course_id}")
         
         try:
+            # Get course before deleting to invalidate user cache
+            course = self.course_repo.get_course_by_id(course_id)
             success = self.course_repo.delete_course(course_id)
             if success:
+                # Invalidate course caches
+                invalidate_cache(f"course:{course_id}")
+                if course:
+                    invalidate_cache(f"courses:user:{course.user_id}")
+                invalidate_cache("courses:all")
                 return {"message": "Course deleted successfully"}
             else:
                 logger.error(f"Course not found for id: {course_id}")

@@ -6,6 +6,7 @@ from repositories.course_repo import CourseRepository
 from utils.gemini_helper import GeminiHelper, extract_sql_query
 from utils.gemini_image_generation_helper import GeminiImageGenerator
 from utils.unified_storage_helper import storage_helper
+from utils.cache_helper import cache_helper, invalidate_cache
 from sqlalchemy.orm import Session
 import logging
 
@@ -73,6 +74,10 @@ class SubjectService:
             
             # Mark that the course has subjects
             self.course_repo.set_has_subjects(course_id, True)
+            
+            # Invalidate caches
+            invalidate_cache(f"subjects:course:{course_id}")
+            invalidate_cache(f"course:{course_id}")
 
             return {"message": "Subjects generated successfully"}
             
@@ -80,8 +85,17 @@ class SubjectService:
             raise Exception(f"Error generating subjects: {e}")
 
     def get_subjects_by_course_id(self, course_id):
+        # Cache subjects for 5 minutes
+        cache_key = f"subjects:course:{course_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached subjects for course {course_id}")
+            return cached
+        
         subjects = self.subject_repo.get_subjects_by_course_id(course_id)
-        return [subject.to_dict() for subject in subjects]
+        result = [subject.to_dict() for subject in subjects]
+        cache_helper.set(cache_key, result, ttl=300)
+        return result
 
     def create_subject(self, course_id, name):
         logger.info(f"Creating new subject for course_id: {course_id}")
@@ -117,6 +131,9 @@ class SubjectService:
             except Exception as img_error:
                 # Log but don't fail if image generation fails
                 logger.error(f"Error generating subject image: {str(img_error)}")
+            
+            # Invalidate caches
+            invalidate_cache(f"subjects:course:{course_id}")
                 
             return subject.to_dict()
         except Exception as e:
@@ -129,6 +146,9 @@ class SubjectService:
         try:
             subject = self.subject_repo.update_subject(subject_id, name)
             if subject:
+                # Invalidate caches
+                invalidate_cache(f"subjects:course:{subject.course_id}")
+                invalidate_cache(f"subject:{subject_id}")
                 return subject.to_dict()
             else:
                 logger.error(f"Subject not found for id: {subject_id}")
@@ -141,8 +161,14 @@ class SubjectService:
         logger.info(f"Deleting subject id: {subject_id}")
         
         try:
+            # Get subject before deleting to invalidate course cache
+            subject = self.subject_repo.get_subject_by_id(subject_id)
             success = self.subject_repo.delete_subject(subject_id)
             if success:
+                # Invalidate caches
+                if subject:
+                    invalidate_cache(f"subjects:course:{subject.course_id}")
+                invalidate_cache(f"subject:{subject_id}")
                 return {"message": "Subject deleted successfully"}
             else:
                 logger.error(f"Subject not found for id: {subject_id}")

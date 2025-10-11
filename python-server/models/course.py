@@ -22,6 +22,10 @@ class Course(Base):
     estimated_duration_hours = db.Column(db.Integer, nullable=True)  # Estimated time to complete in hours
     enrollment_count = db.Column(db.Integer, default=0, nullable=False)  # Number of enrolled learners
 
+    # Reviews and ratings
+    average_rating = db.Column(db.Float, default=0.0, nullable=False)  # Average rating from reviews (0.0 - 5.0)
+    review_count = db.Column(db.Integer, default=0, nullable=False)  # Total number of reviews
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -36,5 +40,7 @@ class Course(Base):
             'category': self.category,
             'difficulty_level': self.difficulty_level,
             'estimated_duration_hours': self.estimated_duration_hours,
-            'enrollment_count': self.enrollment_count
+            'enrollment_count': self.enrollment_count,
+            'average_rating': self.average_rating,
+            'review_count': self.review_count
         }

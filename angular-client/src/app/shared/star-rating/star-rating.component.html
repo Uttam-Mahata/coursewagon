@@ -1,0 +1,36 @@
+<div class="star-rating-container flex items-center gap-1" (mouseleave)="onMouseLeave()">
+  <!-- Stars -->
+  <div class="stars flex items-center" [class]="sizeClass">
+    <span
+      *ngFor="let star of stars; let i = index"
+      class="star transition-colors duration-150"
+      [class.cursor-pointer]="interactive"
+      [class.hover:scale-110]="interactive"
+      [ngClass]="{
+        'text-yellow-400': star.type === 'full',
+        'text-yellow-400': star.type === 'half',
+        'text-gray-300': star.type === 'empty',
+        'hover:text-yellow-500': interactive
+      }"
+      (click)="onStarClick(i + 1)"
+      (mouseenter)="onStarHover(i + 1)"
+    >
+      <fa-icon [icon]="star.icon"></fa-icon>
+    </span>
+  </div>
+
+  <!-- Rating value (for display mode) -->
+  <span *ngIf="!interactive && rating > 0" class="rating-value text-sm text-gray-600 ml-1">
+    {{ rating | number:'1.1-1' }}
+  </span>
+
+  <!-- Review count (optional) -->
+  <span *ngIf="showCount && !interactive" class="review-count text-sm text-gray-500 ml-1">
+    {{ reviewCountText }}
+  </span>
+
+  <!-- Interactive hint -->
+  <span *ngIf="interactive && hoverRating > 0" class="rating-hint text-sm text-gray-600 ml-2">
+    {{ hoverRating }} star{{ hoverRating > 1 ? 's' : '' }}
+  </span>
+</div>

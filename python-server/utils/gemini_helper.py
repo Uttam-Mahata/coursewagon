@@ -34,6 +34,7 @@ def extract_sql_query(response_text):
 
 
 def mermaid_content(content):
+    """Convert mermaid code blocks to HTML pre tags"""
     start = content.find('```mermaid')
     end = content.find('```', start + 1)
     while start != -1 and end != -1:
@@ -42,6 +43,28 @@ def mermaid_content(content):
         content = content[:start] + mermaid_code + content[end + 3:]
         start = content.find('```mermaid', end + 1)
         end = content.find('```', start + 1)
+    return content
+
+
+def chart_content(content):
+    """Convert chart-json code blocks to HTML divs with data attributes"""
+    import re
+    import html
+    
+    # Pattern to match ```chart-json ... ```
+    pattern = r'```chart-json\s*\n(.*?)```'
+    
+    def replace_chart(match):
+        chart_json = match.group(1).strip()
+        # Generate unique ID for each chart
+        import time
+        chart_id = f"chart-{int(time.time() * 1000)}-{hash(chart_json) % 10000}"
+        # Escape the JSON for HTML attribute
+        escaped_json = html.escape(chart_json)
+        return f'<div class="chart-container" data-chart-id="{chart_id}" data-chart-config="{escaped_json}"></div>'
+    
+    # Replace all chart-json blocks
+    content = re.sub(pattern, replace_chart, content, flags=re.DOTALL)
     return content
 
 

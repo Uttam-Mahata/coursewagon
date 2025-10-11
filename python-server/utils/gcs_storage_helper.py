@@ -33,29 +33,28 @@ class GCSStorageHelper:
             self.bucket_name = os.environ.get('GCS_BUCKET_NAME', 'coursewagon-storage-bucket')
             
             # Initialize the client
-            credentials_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
-            
-            # Handle relative paths from the project root
-            if credentials_path and not os.path.isabs(credentials_path):
-                # Make path relative to the current file's directory (utils/)
-                current_dir = os.path.dirname(os.path.abspath(__file__))
-                project_root = os.path.dirname(current_dir)  # Go up one level from utils/
-                credentials_path = os.path.join(project_root, credentials_path)
-            
-            if credentials_path and os.path.exists(credentials_path):
-                # Use service account credentials
-                credentials = service_account.Credentials.from_service_account_file(credentials_path)
-                self.client = storage.Client(credentials=credentials, project=self.project_id)
-                logger.info(f"GCS initialized with service account credentials from: {credentials_path}")
-            else:
-                # Use Application Default Credentials (ADC)
-                try:
-                    self.client = storage.Client(project=self.project_id)
-                    logger.info("GCS initialized with Application Default Credentials")
-                except Exception as adc_error:
-                    logger.error(f"Failed to initialize with ADC: {str(adc_error)}")
-                    if credentials_path:
-                        logger.error(f"Service account file not found at: {credentials_path}")
+            # Prefer Application Default Credentials (recommended for Cloud Run / GKE / GCE)
+            # This uses the service identity attached to the compute instance
+            try:
+                self.client = storage.Client(project=self.project_id)
+                logger.info("GCS initialized with Application Default Credentials (service identity)")
+            except Exception as adc_error:
+                # Fallback to explicit credentials file (for local development)
+                logger.warning(f"ADC not available, trying explicit credentials: {str(adc_error)}")
+                credentials_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+
+                # Handle relative paths from the project root
+                if credentials_path and not os.path.isabs(credentials_path):
+                    current_dir = os.path.dirname(os.path.abspath(__file__))
+                    project_root = os.path.dirname(current_dir)  # Go up one level from utils/
+                    credentials_path = os.path.join(project_root, credentials_path)
+
+                if credentials_path and os.path.exists(credentials_path):
+                    credentials = service_account.Credentials.from_service_account_file(credentials_path)
+                    self.client = storage.Client(credentials=credentials, project=self.project_id)
+                    logger.info(f"GCS initialized with service account credentials from: {credentials_path}")
+                else:
+                    logger.error("No valid credentials found for GCS. Set up Application Default Credentials or GOOGLE_APPLICATION_CREDENTIALS")
                     raise
             
             # Get or create the bucket

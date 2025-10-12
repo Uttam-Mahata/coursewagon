@@ -2,7 +2,7 @@
   <!-- Loading State -->
   <div *ngIf="loading" class="text-center py-8">
     <fa-icon [icon]="faSpinner" animation="spin" class="text-2xl text-blue-500"></fa-icon>
-    <p class="text-gray-600 mt-2">Loading reviews...</p>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">Loading reviews...</p>
   </div>
 
   <!-- Error State -->
@@ -18,13 +18,13 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
     </svg>
     <h3 class="mt-2 text-lg font-medium text-gray-900">No reviews yet</h3>
-    <p class="mt-1 text-sm text-gray-500">Be the first to review this course!</p>
+    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Be the first to review this course!</p>
   </div>
 
   <!-- Reviews List -->
   <div *ngIf="!loading && !error && reviews.length > 0" class="space-y-6">
     <!-- Review Card -->
-    <div *ngFor="let review of reviews" class="review-card bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md transition">
+    <div *ngFor="let review of reviews" class="review-card bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-5 hover:shadow-md transition">
       <!-- Review Header -->
       <div class="flex items-start justify-between mb-3">
         <div class="flex-1">
@@ -37,7 +37,7 @@
             <!-- Author Name and Date -->
             <div>
               <p class="font-medium text-gray-900">{{ review.author_name || 'Anonymous' }}</p>
-              <p class="text-sm text-gray-500">{{ formatDate(review.created_at) }}</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatDate(review.created_at) }}</p>
             </div>
           </div>
 
@@ -54,7 +54,7 @@
 
       <!-- Review Text -->
       <div *ngIf="review.review_text" class="mt-3">
-        <p class="text-gray-700 leading-relaxed">
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
           {{ truncateText(review.review_text, 300).text }}
         </p>
       </div>
@@ -66,7 +66,7 @@
       <button
         (click)="onPageChange(currentPage - 1)"
         [disabled]="currentPage === 1"
-        class="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+        class="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
       >
         <fa-icon [icon]="faChevronLeft" class="text-sm"></fa-icon>
       </button>
@@ -79,7 +79,7 @@
         [class.text-white]="page === currentPage"
         [class.border-blue-600]="page === currentPage"
         [class.bg-white]="page !== currentPage"
-        [class.text-gray-700]="page !== currentPage"
+        [class.text-gray-700 dark:text-gray-300]="page !== currentPage"
         [class.border-gray-300]="page !== currentPage"
         class="px-4 py-2 border rounded-md hover:bg-blue-50 transition"
       >
@@ -90,14 +90,14 @@
       <button
         (click)="onPageChange(currentPage + 1)"
         [disabled]="currentPage === totalPages"
-        class="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+        class="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
       >
         <fa-icon [icon]="faChevronRight" class="text-sm"></fa-icon>
       </button>
     </div>
 
     <!-- Pagination Info -->
-    <div class="text-center text-sm text-gray-600 mt-4">
+    <div class="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
       Showing {{ ((currentPage - 1) * limit) + 1 }} - {{ Math.min(currentPage * limit, totalCount) }} of {{ totalCount }} reviews
     </div>
   </div>

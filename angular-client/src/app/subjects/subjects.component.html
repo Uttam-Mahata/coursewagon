@@ -72,46 +72,46 @@
   </div>
 
   <!-- Error Message -->
-  <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-3 sm:p-4 mb-6 rounded-md flex items-center">
-    <fa-icon [icon]="faInfoCircle" class="text-red-500 mr-3 text-lg flex-shrink-0"></fa-icon>
-    <p class="text-red-700 text-sm sm:text-base">{{ errorMessage }}</p>
+  <div *ngIf="errorMessage" class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-3 sm:p-4 mb-6 rounded-md flex items-center">
+    <fa-icon [icon]="faInfoCircle" class="text-red-500 dark:text-red-400 mr-3 text-lg flex-shrink-0"></fa-icon>
+    <p class="text-red-700 dark:text-red-300 text-sm sm:text-base">{{ errorMessage }}</p>
   </div>
 
   <!-- Loading Indicator -->
   <div *ngIf="isLoading" class="flex justify-center my-8 sm:my-12">
-    <div class="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <div class="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
   </div>
 
   <!-- No Subjects Message -->
-  <div *ngIf="!isLoading && subjects.length === 0" class="bg-blue-50 border-l-4 border-blue-500 p-4 sm:p-6 rounded-lg text-center">
-    <fa-icon [icon]="faInfoCircle" class="text-blue-500 text-2xl sm:text-3xl mb-3"></fa-icon>
-    <h2 class="text-lg sm:text-xl font-semibold text-gray-800 mb-2">No subjects found</h2>
-    <p class="text-gray-600 text-sm sm:text-base mb-4">Generate subjects to get started with this course</p>
+  <div *ngIf="!isLoading && subjects.length === 0" class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 sm:p-6 rounded-lg text-center">
+    <fa-icon [icon]="faInfoCircle" class="text-blue-500 dark:text-blue-400 text-2xl sm:text-3xl mb-3"></fa-icon>
+    <h2 class="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white mb-2">No subjects found</h2>
+    <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base mb-4">Generate subjects to get started with this course</p>
   </div>
 
   <!-- Subjects Grid - Responsive -->
   <div *ngIf="!isLoading && subjects.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-    <div *ngFor="let subject of subjects" class="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden hover:shadow-lg transition duration-200">
+    <div *ngFor="let subject of subjects" class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-gray-100 dark:border-slate-700 overflow-hidden hover:shadow-lg transition duration-200">
       <!-- Subject Image -->
       <div class="h-40 relative overflow-hidden">
         <!-- Default image placeholder if no image_url -->
-        <div *ngIf="!subject.image_url" class="w-full h-full bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center">
-          <fa-icon [icon]="faBook" class="text-blue-300 text-4xl"></fa-icon>
+        <div *ngIf="!subject.image_url" class="w-full h-full bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 flex items-center justify-center">
+          <fa-icon [icon]="faBook" class="text-blue-300 dark:text-blue-400 text-4xl"></fa-icon>
         </div>
         
         <!-- Show actual image if available -->
         <img *ngIf="subject.image_url" [src]="subject.image_url" [alt]="subject.name" class="w-full h-full object-cover">
         
         <!-- Generate image button overlay -->
-        <button 
+        <button
           *ngIf="userHasApiKey"
-          class="absolute top-2 right-2 bg-white bg-opacity-80 p-2 rounded-full hover:bg-opacity-100 transition-opacity opacity-70 hover:opacity-100"
+          class="absolute top-2 right-2 bg-white dark:bg-slate-700 bg-opacity-80 dark:bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition-opacity opacity-70 hover:opacity-100"
           [disabled]="subject.isGeneratingImage"
           (click)="generateSubjectImage(subject.id, $event)">
-          <fa-icon 
-            [icon]="subject.isGeneratingImage ? faSpinner : faImage" 
+          <fa-icon
+            [icon]="subject.isGeneratingImage ? faSpinner : faImage"
             [class.fa-spin]="subject.isGeneratingImage"
-            class="text-blue-600">
+            class="text-blue-600 dark:text-blue-400">
           </fa-icon>
         </button>
       </div>
@@ -119,32 +119,32 @@
       <div class="p-4 sm:p-6">
         <div class="flex justify-between items-center mb-3">
           <div class="flex items-center">
-            <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-2 sm:mr-3 flex-shrink-0">
+            <div class="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-300 mr-2 sm:mr-3 flex-shrink-0">
               <fa-icon [icon]="faBook"></fa-icon>
             </div>
-            <h3 class="font-bold text-base sm:text-lg text-gray-800 line-clamp-1">{{ subject.name }}</h3>
+            <h3 class="font-bold text-base sm:text-lg text-gray-800 dark:text-white line-clamp-1">{{ subject.name }}</h3>
           </div>
-          
+
           <!-- Edit/Delete buttons for subjects -->
           <div class="flex space-x-1 sm:space-x-2 ml-2 flex-shrink-0">
-            <button 
-              class="text-blue-600 hover:text-blue-800 p-1.5"
+            <button
+              class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 p-1.5"
               (click)="openEditSubjectModal(subject)">
               <fa-icon [icon]="faEdit" class="text-sm"></fa-icon>
             </button>
-            <button 
-              class="text-red-600 hover:text-red-800 p-1.5"
+            <button
+              class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 p-1.5"
               (click)="openDeleteSubjectModal(subject)">
               <fa-icon [icon]="faTrash" class="text-sm"></fa-icon>
             </button>
           </div>
         </div>
-        
+
         <!-- Description with line clamp -->
-        <p *ngIf="subject.description" class="text-gray-600 text-xs sm:text-sm mt-2 mb-4 line-clamp-2">{{ subject.description }}</p>
+        <p *ngIf="subject.description" class="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mt-2 mb-4 line-clamp-2">{{ subject.description }}</p>
         
-        <button 
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md py-2 mt-3 flex items-center justify-center transition duration-200"
+        <button
+          class="w-full bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-md py-2 mt-3 flex items-center justify-center transition duration-200"
           (click)="viewSubjectContent(subject.id)">
           <fa-icon [icon]="faEye" class="mr-2"></fa-icon> View Content
         </button>
@@ -156,25 +156,25 @@
 <!-- Create Subject Modal - Improved for small screens -->
 <div *ngIf="showCreateSubjectModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
   <div class="absolute inset-0 bg-black bg-opacity-50" (click)="closeCreateSubjectModal()"></div>
-  <div class="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10" [formGroup]="createSubjectForm">
-    <h2 class="text-lg font-bold mb-4">Create New Subject</h2>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10" [formGroup]="createSubjectForm">
+    <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-white">Create New Subject</h2>
     <div class="mb-4">
-      <label for="newSubjectName" class="block text-sm font-medium text-gray-700 mb-1">Subject Name</label>
+      <label for="newSubjectName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject Name</label>
       <input
         type="text"
         id="newSubjectName"
         formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
         placeholder="Enter subject name">
     </div>
     <div class="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors order-2 sm:order-1"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors order-2 sm:order-1"
         (click)="closeCreateSubjectModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors order-1 sm:order-2"
+        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors order-1 sm:order-2"
         (click)="submitNewSubject()">
         Create Subject
       </button>
@@ -185,25 +185,25 @@
 <!-- Edit Subject Modal - Improved for small screens -->
 <div *ngIf="showEditSubjectModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
   <div class="absolute inset-0 bg-black bg-opacity-50" (click)="closeEditSubjectModal()"></div>
-  <div class="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10" [formGroup]="editSubjectForm">
-    <h2 class="text-lg font-bold mb-4">Edit Subject</h2>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10" [formGroup]="editSubjectForm">
+    <h2 class="text-lg font-bold mb-4 text-gray-800 dark:text-white">Edit Subject</h2>
     <div class="mb-4">
-      <label for="subjectName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+      <label for="subjectName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
       <input
         type="text"
         id="subjectName"
         formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
         placeholder="Enter subject name">
     </div>
     <div class="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors order-2 sm:order-1"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors order-2 sm:order-1"
         (click)="closeEditSubjectModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors order-1 sm:order-2"
+        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors order-1 sm:order-2"
         (click)="updateSubject()">
         Save Changes
       </button>
@@ -214,17 +214,17 @@
 <!-- Delete Subject Confirmation Modal - Improved for small screens -->
 <div *ngIf="showDeleteSubjectModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
   <div class="absolute inset-0 bg-black bg-opacity-50" (click)="closeDeleteSubjectModal()"></div>
-  <div class="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10">
-    <h2 class="text-lg font-bold mb-3 sm:mb-4">Delete Subject</h2>
-    <p class="mb-5 sm:mb-6 text-gray-700 text-sm sm:text-base">Are you sure you want to delete the subject "<span class="font-semibold">{{ editingSubject?.name }}</span>"? This action cannot be undone.</p>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-4 sm:p-6 w-full max-w-md relative z-10">
+    <h2 class="text-lg font-bold mb-3 sm:mb-4 text-gray-800 dark:text-white">Delete Subject</h2>
+    <p class="mb-5 sm:mb-6 text-gray-700 dark:text-gray-300 text-sm sm:text-base">Are you sure you want to delete the subject "<span class="font-semibold">{{ editingSubject?.name }}</span>"? This action cannot be undone.</p>
     <div class="flex flex-col sm:flex-row sm:justify-end space-y-2 sm:space-y-0 sm:space-x-3">
-      <button 
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors order-2 sm:order-1"
+      <button
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors order-2 sm:order-1"
         (click)="closeDeleteSubjectModal()">
         Cancel
       </button>
-      <button 
-        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center justify-center order-1 sm:order-2"
+      <button
+        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors flex items-center justify-center order-1 sm:order-2"
         [disabled]="isDeletingSubject"
         (click)="deleteSubject()">
         <div *ngIf="isDeletingSubject" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>

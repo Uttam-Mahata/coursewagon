@@ -1,22 +1,22 @@
 <!-- Dashboard Stats - First Row -->
 <div *ngIf="!loading && !error" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
   <!-- Users Card -->
-  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+  <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-slate-700">
     <div class="flex items-center">
-      <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+      <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300">
         <fa-icon [icon]="faUsers" size="2x"></fa-icon>
       </div>
       <div class="ml-5">
-        <div class="text-gray-500 text-sm">Total Users</div>
-        <div class="text-3xl font-bold text-gray-700">{{dashboardStats.total_users || 0}}</div>
+        <div class="text-gray-500 dark:text-gray-400 text-sm">Total Users</div>
+        <div class="text-3xl font-bold text-gray-700 dark:text-white">{{dashboardStats.total_users || 0}}</div>
       </div>
     </div>
     <div class="mt-4">
       <div class="flex justify-between items-center">
-        <span class="text-sm text-gray-500">Active Users</span>
-        <span class="text-sm font-semibold">{{dashboardStats.active_users || 0}}</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400">Active Users</span>
+        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{dashboardStats.active_users || 0}}</span>
       </div>
-      <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+      <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2.5 mt-1">
         <div class="bg-blue-600 h-2.5 rounded-full"
           [style.width.%]="dashboardStats.total_users ? (dashboardStats.active_users / dashboardStats.total_users) * 100 : 0">
         </div>
@@ -25,40 +25,41 @@
   </div>
 
   <!-- Courses Card -->
-  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+  <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-slate-700">
     <div class="flex items-center">
-      <div class="p-3 rounded-full bg-green-100 text-green-600">
+      <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-300">
         <fa-icon [icon]="faGraduationCap" size="2x"></fa-icon>
       </div>
       <div class="ml-5">
-        <div class="text-gray-500 text-sm">Total Courses</div>
-        <div class="text-3xl font-bold text-gray-700">{{dashboardStats.total_courses || 0}}</div>
+        <div class="text-gray-500 dark:text-gray-400 text-sm">Total Courses</div>
+        <div class="text-3xl font-bold text-gray-700 dark:text-white">{{dashboardStats.total_courses || 0}}</div>
       </div>
     </div>
     <div class="mt-4" *ngIf="dashboardStats.recent_courses?.length">
-      <div class="text-sm text-gray-500 mb-2">Recent Courses</div>
-      <div class="text-sm truncate" *ngFor="let course of dashboardStats.recent_courses?.slice(0,3)">
+      <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Recent Courses</div>
+      <div class="text-sm text-gray-700 dark:text-gray-300 truncate" *ngFor="let course of dashboardStats.recent_courses?.slice(0,3)">
         {{course.name}}
       </div>
     </div>
   </div>
 
   <!-- Testimonials Card -->
-  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-100">
+  <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-slate-700">
     <div class="flex items-center">
-      <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+      <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-300">
         <fa-icon [icon]="faStar" size="2x"></fa-icon>
       </div>
       <div class="ml-5">
-        <div class="text-gray-500 text-sm">Total Testimonials</div>
-        <div class="text-3xl font-bold text-gray-700">{{dashboardStats.total_testimonials || 0}}</div>
+        <div class="text-gray-500 dark:text-gray-400 text-sm">Total Testimonials</div>
+        <div class="text-3xl font-bold text-gray-700 dark:text-white">{{dashboardStats.total_testimonials || 0}}</div>
       </div>
     </div>
     <div class="mt-4">
       <div class="flex justify-between items-center">
-        <span class="text-sm text-gray-500">Pending Approval</span>
+        <span class="text-sm text-gray-500 dark:text-gray-400">Pending Approval</span>
         <span
           [class.text-red-600]="dashboardStats.pending_testimonials > 0"
+          [class.dark:text-red-400]="dashboardStats.pending_testimonials > 0"
           class="text-sm font-semibold">
           {{dashboardStats.pending_testimonials || 0}}
         </span>
@@ -75,7 +76,7 @@
 
 <!-- Content Statistics - Second Row -->
 <div *ngIf="!loading && !error" class="mb-8">
-  <h2 class="text-xl font-semibold mb-4 text-gray-800">Content Overview</h2>
+  <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Content Overview</h2>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     <!-- Subjects Card -->
     <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md p-6 text-white">
@@ -125,24 +126,24 @@
 
 <!-- Course Breakdown Table -->
 <div *ngIf="!loading && !error && dashboardStats.course_breakdown?.length" class="mb-8">
-  <h2 class="text-xl font-semibold mb-4 text-gray-800">Course Breakdown</h2>
-  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Course Breakdown</h2>
+  <div class="bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+        <thead class="bg-gray-50 dark:bg-slate-700">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Subjects</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Chapters</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Topics</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Course</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Subjects</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chapters</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Topics</th>
+            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Content</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let course of dashboardStats.course_breakdown" class="hover:bg-gray-50">
+        <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
+          <tr *ngFor="let course of dashboardStats.course_breakdown" class="hover:bg-gray-50 dark:hover:bg-slate-700">
             <td class="px-6 py-4">
-              <div class="text-sm font-medium text-gray-900">{{course.course_name}}</div>
-              <div class="text-sm text-gray-500">{{course.created_at | date:'short'}}</div>
+              <div class="text-sm font-medium text-gray-900 dark:text-white">{{course.course_name}}</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">{{course.created_at | date:'short'}}</div>
             </td>
             <td class="px-6 py-4 text-center">
               <span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded-full">
@@ -173,27 +174,27 @@
 
 <!-- Recent Users -->
 <div *ngIf="!loading && !error && dashboardStats.recent_users?.length" class="mb-8">
-  <h2 class="text-xl font-semibold mb-4">Recent Users</h2>
-  <div class="bg-white shadow-md rounded-lg overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Recent Users</h2>
+  <div class="bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+      <thead class="bg-gray-50 dark:bg-slate-700">
         <tr>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Joined</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
         </tr>
       </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
+      <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
         <tr *ngFor="let user of dashboardStats.recent_users">
           <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900">{{user.first_name}} {{user.last_name}}</div>
+            <div class="text-sm font-medium text-gray-900 dark:text-white">{{user.first_name}} {{user.last_name}}</div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-500">{{user.email}}</div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">{{user.email}}</div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-500">{{user.created_at | date}}</div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">{{user.created_at | date}}</div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap">
             <span 
@@ -224,10 +225,10 @@
 </div>
 
 <!-- Error Message -->
-<div *ngIf="error" class="bg-red-100 text-red-700 p-4 rounded-md mb-6">
+<div *ngIf="error" class="bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-4 rounded-md mb-6">
   <p>{{error}}</p>
-  <button 
-    class="mt-2 text-sm underline"
+  <button
+    class="mt-2 text-sm underline hover:text-red-900 dark:hover:text-red-200"
     (click)="retryLoading()">
     Retry
   </button>

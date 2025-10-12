@@ -11,6 +11,12 @@
   overflow-x: auto;
   border-radius: 0.375rem;
   max-width: 100%;
+  background-color: #f3f4f6;
+}
+
+/* Dark mode for code blocks */
+:is(.dark, .dark *) .markdown-content pre {
+  background-color: #1e293b;
 }
 
 /* Mobile overflows fix */
@@ -142,6 +148,12 @@
   word-break: break-word;
 }
 
+/* Dark mode for inline code */
+:is(.dark, .dark *) .markdown-content code:not(.hljs) {
+  background: #334155;
+  color: #fca5a5;
+}
+
 /* Custom styling for mermaid diagrams */
 .markdown-content .mermaid {
   display: flex;
@@ -271,6 +283,12 @@ html {
   border-left: 3px solid #3b82f6;
 }
 
+/* Dark mode for MathJax blocks */
+:is(.dark, .dark *) .mathjax-block {
+  background-color: #1e293b;
+  border-left-color: #60a5fa;
+}
+
 /* Fix for long equations */
 .MathJax {
   max-width: 100%;
@@ -313,6 +331,12 @@ mjx-container[jax="CHTML"][display="true"] {
   padding: 1rem;
   margin: 1rem 0;
   border-left: 3px solid #10b981; /* Green border for KaTeX */
+}
+
+/* Dark mode for KaTeX display */
+:is(.dark, .dark *) .markdown-content .katex-display {
+  background-color: #1e293b;
+  border-left-color: #34d399;
 }
 
 /* Enhance table styling for equations */
@@ -365,6 +389,12 @@ mjx-container[jax="CHTML"][display="true"] {
   overflow: hidden;
 }
 
+/* Dark mode for chart container */
+:is(.dark, .dark *) .chart-container {
+  background-color: #1e293b;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
 .chart-container canvas {
   max-width: 100%;
   height: auto !important;
@@ -377,6 +407,13 @@ mjx-container[jax="CHTML"][display="true"] {
   border-left: 3px solid #ef4444;
   border-radius: 0.375rem;
   font-size: 0.875rem;
+}
+
+/* Dark mode for chart error */
+:is(.dark, .dark *) .chart-error {
+  color: #fca5a5;
+  background-color: #7f1d1d;
+  border-left-color: #f87171;
 }
 
 /* Responsive chart sizing */

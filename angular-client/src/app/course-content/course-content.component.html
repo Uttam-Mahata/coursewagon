@@ -1,15 +1,15 @@
-<div class="flex h-screen overflow-hidden bg-gray-100">
+<div class="flex h-screen overflow-hidden bg-gray-100 dark:bg-slate-900">
   <!-- Sidebar / Course Outline - Always visible on large screens -->
-  <div 
-    class="bg-gray-900 text-white w-72 flex-shrink-0 overflow-y-auto transition-all duration-300"
+  <div
+    class="bg-gray-900 dark:bg-slate-950 text-white w-72 flex-shrink-0 overflow-y-auto transition-all duration-300"
     [ngClass]="{'translate-x-0': isSidebarOpen, '-translate-x-full md:translate-x-0': !isSidebarOpen, 'fixed md:relative': true, 'h-full z-40': true, 'pt-16 md:pt-0': true}">
     
     <!-- Course Title with Toggle/Back buttons -->
-    <div class="p-4 border-b border-gray-700">
+    <div class="p-4 border-b border-gray-700 dark:border-slate-800">
       <div class="flex items-center justify-between">
-        <h1 class="text-xl font-bold">Course Outline</h1>
+        <h1 class="text-xl font-bold text-white">Course Outline</h1>
         <!-- Back to Subjects link (hidden on mobile) -->
-        <a [routerLink]="['/courses', courseId, 'subjects']" class="text-blue-400 hover:text-blue-300 text-sm hidden md:block">
+        <a [routerLink]="['/courses', courseId, 'subjects']" class="text-blue-400 dark:text-blue-300 hover:text-blue-300 dark:hover:text-blue-200 text-sm hidden md:block">
           Back to Subjects
         </a>
         <!-- Toggle sidebar button (visible only on mobile) -->
@@ -19,7 +19,7 @@
           <fa-icon [icon]="faChevronLeft" class="text-sm"></fa-icon>
         </button>
       </div>
-      <div class="mt-2 text-sm text-gray-400">{{ courseName }}</div>
+      <div class="mt-2 text-sm text-gray-400 dark:text-gray-500">{{ courseName }}</div>
     </div>
 
     <!-- Chapters and Topics List -->
@@ -30,7 +30,7 @@
       </div>
 
       <!-- Chapters List -->
-      <div *ngIf="!isLoadingChapters && chapters.length === 0" class="p-4 text-center text-gray-400">
+      <div *ngIf="!isLoadingChapters && chapters.length === 0" class="p-4 text-center text-gray-400 dark:text-gray-500">
         <p>No chapters found.</p>
         <button 
           (click)="generateChapters()"
@@ -65,13 +65,13 @@
       </div>
 
       <!-- Chapter Items -->
-      <div *ngFor="let chapter of chapters" class="border-b border-gray-800">
+      <div *ngFor="let chapter of chapters" class="border-b border-gray-800 dark:border-slate-900">
         <!-- Chapter Header -->
-        <div 
-          class="flex items-center justify-between py-3 px-4 cursor-pointer hover:bg-gray-800 transition-all"
-          [ngClass]="{'bg-gray-800': expandedChapterId === chapter.id}"
+        <div
+          class="flex items-center justify-between py-3 px-4 cursor-pointer hover:bg-gray-800 dark:hover:bg-slate-900 transition-all"
+          [ngClass]="{'bg-gray-800 dark:bg-slate-900': expandedChapterId === chapter.id}"
           (click)="toggleChapter(chapter.id)">
-          <span class="font-medium">{{ chapter.name }}</span>
+          <span class="font-medium text-white">{{ chapter.name }}</span>
           <div class="flex items-center space-x-2">
             <!-- Edit/Delete buttons for chapters -->
             <button 
@@ -92,7 +92,7 @@
         </div>
         
         <!-- Topics List (Expanded when chapter is selected) -->
-        <div *ngIf="expandedChapterId === chapter.id" class="pl-6 pb-2 bg-gray-800 border-l-2 border-blue-500">
+        <div *ngIf="expandedChapterId === chapter.id" class="pl-6 pb-2 bg-gray-800 dark:bg-slate-900 border-l-2 border-blue-500 dark:border-blue-400">
           <!-- Generate Topics Button -->
           <div *ngIf="!topics[chapter.id] || topics[chapter.id].length === 0" class="py-2 px-4">
             <button 
@@ -126,9 +126,9 @@
           </div>
           
           <!-- Topic Items -->
-          <div *ngFor="let topic of topics[chapter.id]" 
-               class="py-2 px-4 text-sm cursor-pointer hover:bg-gray-700 transition-all flex items-center justify-between"
-               [ngClass]="{'bg-gray-700': selectedTopicId === topic.id}">
+          <div *ngFor="let topic of topics[chapter.id]"
+               class="py-2 px-4 text-sm cursor-pointer hover:bg-gray-700 dark:hover:bg-slate-800 transition-all flex items-center justify-between"
+               [ngClass]="{'bg-gray-700 dark:bg-slate-800': selectedTopicId === topic.id}">
             <div class="flex items-center" (click)="selectTopic(topic)">
               <div class="h-2 w-2 rounded-full mr-2"
                    [ngClass]="{'bg-green-500': topic.has_content, 'bg-gray-400': !topic.has_content}"></div>
@@ -157,7 +157,7 @@
   <!-- Main Content Area -->
   <div class="flex-1 overflow-y-auto w-full">
     <!-- Mobile-friendly top navigation bar that contains topic toggle and breadcrumb -->
-    <div class="bg-white shadow md:shadow-none sticky top-0 z-30 px-2 md:px-4 py-3 md:py-0 md:px-0 md:static w-full">
+    <div class="bg-white dark:bg-slate-800 shadow md:shadow-none sticky top-0 z-30 px-2 md:px-4 py-3 md:py-0 md:px-0 md:static w-full">
       <!-- Mobile Topic Toggle Button -->
       <div class="md:hidden flex items-center justify-between mb-2">
         <button 
@@ -169,15 +169,15 @@
         
         <!-- Topic Navigation on Mobile -->
         <div class="flex space-x-2">
-          <button *ngIf="selectedTopic" 
-            class="bg-white border border-gray-300 text-gray-700 p-2 rounded-md"
+          <button *ngIf="selectedTopic"
+            class="bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 p-2 rounded-md"
             [disabled]="!getPreviousTopic()"
             [ngClass]="{'opacity-50': !getPreviousTopic()}"
             (click)="navigateToPreviousTopic()">
             <fa-icon [icon]="faChevronLeft" class="text-xs"></fa-icon>
           </button>
           <button *ngIf="selectedTopic"
-            class="bg-white border border-gray-300 text-gray-700 p-2 rounded-md"
+            class="bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 p-2 rounded-md"
             [disabled]="!getNextTopic()"
             [ngClass]="{'opacity-50': !getNextTopic()}"
             (click)="navigateToNextTopic()">
@@ -224,22 +224,22 @@
     <div class="w-full px-2 md:px-6">
       <!-- Content Header -->
       <header class="mb-6">
-        <h1 class="text-xl md:text-2xl font-bold text-gray-800 mb-2">{{ selectedTopic?.name || 'Select a Topic' }}</h1>
-        <p *ngIf="selectedTopic" class="text-gray-600 text-sm md:text-base">{{ expandedChapterId ? getChapterNameById(expandedChapterId) : '' }}</p>
+        <h1 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2">{{ selectedTopic?.name || 'Select a Topic' }}</h1>
+        <p *ngIf="selectedTopic" class="text-gray-600 dark:text-gray-300 text-sm md:text-base">{{ expandedChapterId ? getChapterNameById(expandedChapterId) : '' }}</p>
       </header>
 
       <!-- Error Message -->
-      <div *ngIf="errorMessage" class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md flex items-center">
-        <fa-icon [icon]="faInfoCircle" class="text-red-500 mr-3 text-lg"></fa-icon>
-        <p class="text-red-700">{{ errorMessage }}</p>
+      <div *ngIf="errorMessage" class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 mb-6 rounded-md flex items-center">
+        <fa-icon [icon]="faInfoCircle" class="text-red-500 dark:text-red-400 mr-3 text-lg"></fa-icon>
+        <p class="text-red-700 dark:text-red-300">{{ errorMessage }}</p>
       </div>
 
       <!-- Content Display -->
-      <div *ngIf="!selectedTopicId" class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-md flex items-center">
-        <fa-icon [icon]="faInfoCircle" class="text-blue-600 mr-3 text-lg"></fa-icon>
+      <div *ngIf="!selectedTopicId" class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 mb-6 rounded-md flex items-center">
+        <fa-icon [icon]="faInfoCircle" class="text-blue-600 dark:text-blue-400 mr-3 text-lg"></fa-icon>
         <div>
-          <p class="text-blue-700">Please select a topic from the sidebar to view its content.</p>
-          <p *ngIf="chapters.length === 0" class="text-sm text-blue-600 mt-1">
+          <p class="text-blue-700 dark:text-blue-300">Please select a topic from the sidebar to view its content.</p>
+          <p *ngIf="chapters.length === 0" class="text-sm text-blue-600 dark:text-blue-400 mt-1">
             First generate chapters, then topics, then select a topic to view/generate content.
           </p>
         </div>
@@ -281,7 +281,7 @@
       </div>
 
       <!-- Content Display with improved mobile handling -->
-      <div *ngIf="selectedTopicId && !isLoadingContent && content" class="bg-white rounded-xl shadow-md p-3 md:p-6 mb-6 w-full overflow-hidden">
+      <div *ngIf="selectedTopicId && !isLoadingContent && content" class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-3 md:p-6 mb-6 w-full overflow-hidden">
         <!-- We're using a mixed approach: KaTeX for single-line equations and MathJax for multiline equations -->
         <div class="prose max-w-none w-full markdown-content">
           <!-- Use KaTeX for regular markdown and inline/simple equations -->
@@ -304,9 +304,9 @@
       </div>
 
       <!-- Video Section -->
-      <div *ngIf="selectedTopicId && !isLoadingContent" class="bg-white rounded-xl shadow-md p-3 md:p-6 mb-6 w-full">
-        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-          <fa-icon [icon]="faVideo" class="mr-2 text-blue-600"></fa-icon>
+      <div *ngIf="selectedTopicId && !isLoadingContent" class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-3 md:p-6 mb-6 w-full">
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+          <fa-icon [icon]="faVideo" class="mr-2 text-blue-600 dark:text-blue-400"></fa-icon>
           Video Content
         </h3>
 
@@ -331,10 +331,10 @@
         </div>
 
         <!-- Video Upload Section (if no video exists) -->
-        <div *ngIf="!videoUrl" class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+        <div *ngIf="!videoUrl" class="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg p-6">
           <div class="text-center">
-            <fa-icon [icon]="faUpload" class="text-gray-400 text-4xl mb-3"></fa-icon>
-            <p class="text-gray-600 mb-4">Upload a video for this topic</p>
+            <fa-icon [icon]="faUpload" class="text-gray-400 dark:text-gray-500 text-4xl mb-3"></fa-icon>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">Upload a video for this topic</p>
 
             <!-- File Input -->
             <input
@@ -351,11 +351,11 @@
             </label>
 
             <!-- Selected File Info -->
-            <div *ngIf="selectedVideoFile" class="mt-4 p-3 bg-gray-50 rounded-md">
-              <p class="text-sm text-gray-700">
+            <div *ngIf="selectedVideoFile" class="mt-4 p-3 bg-gray-50 dark:bg-slate-700 rounded-md">
+              <p class="text-sm text-gray-700 dark:text-gray-300">
                 <span class="font-semibold">Selected:</span> {{ selectedVideoFile.name }}
               </p>
-              <p class="text-xs text-gray-500 mt-1">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 Size: {{ (selectedVideoFile.size / (1024 * 1024)).toFixed(2) }} MB
               </p>
 
@@ -378,11 +378,11 @@
       </div>
 
       <!-- No Content Message -->
-      <div *ngIf="selectedTopicId && !isLoadingContent && !content" class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md flex items-center">
-        <fa-icon [icon]="faInfoCircle" class="text-blue-600 mr-3 text-lg"></fa-icon>
+      <div *ngIf="selectedTopicId && !isLoadingContent && !content" class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 rounded-md flex items-center">
+        <fa-icon [icon]="faInfoCircle" class="text-blue-600 dark:text-blue-400 mr-3 text-lg"></fa-icon>
         <div>
-          <p class="text-blue-700">No content available for this topic yet.</p>
-          <p class="text-sm text-blue-600 mt-1">Click "Generate Content" to create content for this topic.</p>
+          <p class="text-blue-700 dark:text-blue-300">No content available for this topic yet.</p>
+          <p class="text-sm text-blue-600 dark:text-blue-400 mt-1">Click "Generate Content" to create content for this topic.</p>
         </div>
       </div>
       
@@ -413,25 +413,25 @@
 
 <!-- Edit Chapter Modal -->
 <div *ngIf="showEditChapterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-full max-w-md" [formGroup]="editChapterForm">
-    <h2 class="text-lg font-bold mb-4">Edit Chapter</h2>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" [formGroup]="editChapterForm">
+    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Edit Chapter</h2>
     <div class="mb-4">
-      <label for="chapterName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+      <label for="chapterName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
       <input
         type="text"
         id="chapterName"
         formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
         placeholder="Enter chapter name">
     </div>
     <div class="flex justify-end space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
         (click)="closeEditChapterModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
         (click)="updateChapter()">
         Save Changes
       </button>
@@ -441,17 +441,17 @@
 
 <!-- Delete Chapter Confirmation Modal -->
 <div *ngIf="showDeleteChapterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-full max-w-md">
-    <h2 class="text-lg font-bold mb-4">Delete Chapter</h2>
-    <p class="mb-6 text-gray-700">Are you sure you want to delete the chapter "<span class="font-semibold">{{ editChapterForm.value.name }}</span>"? This action cannot be undone.</p>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md">
+    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Delete Chapter</h2>
+    <p class="mb-6 text-gray-700 dark:text-gray-300">Are you sure you want to delete the chapter "<span class="font-semibold">{{ editChapterForm.value.name }}</span>"? This action cannot be undone.</p>
     <div class="flex justify-end space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
         (click)="closeDeleteChapterModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
+        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors flex items-center"
         [disabled]="isDeletingChapter"
         (click)="deleteChapter()">
         <div *ngIf="isDeletingChapter" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
@@ -463,25 +463,25 @@
 
 <!-- Edit Topic Modal -->
 <div *ngIf="showEditTopicModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-full max-w-md" [formGroup]="editTopicForm">
-    <h2 class="text-lg font-bold mb-4">Edit Topic</h2>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" [formGroup]="editTopicForm">
+    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Edit Topic</h2>
     <div class="mb-4">
-      <label for="topicName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+      <label for="topicName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
       <input
         type="text"
         id="topicName"
         formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
         placeholder="Enter topic name">
     </div>
     <div class="flex justify-end space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
         (click)="closeEditTopicModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
         (click)="updateTopic()">
         Save Changes
       </button>
@@ -491,17 +491,17 @@
 
 <!-- Delete Topic Confirmation Modal -->
 <div *ngIf="showDeleteTopicModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-full max-w-md">
-    <h2 class="text-lg font-bold mb-4">Delete Topic</h2>
-    <p class="mb-6 text-gray-700">Are you sure you want to delete the topic "<span class="font-semibold">{{ editTopicForm.value.name }}</span>"? This action cannot be undone.</p>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md">
+    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Delete Topic</h2>
+    <p class="mb-6 text-gray-700 dark:text-gray-300">Are you sure you want to delete the topic "<span class="font-semibold">{{ editTopicForm.value.name }}</span>"? This action cannot be undone.</p>
     <div class="flex justify-end space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
         (click)="closeDeleteTopicModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
+        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors flex items-center"
         [disabled]="isDeletingTopic"
         (click)="deleteTopic()">
         <div *ngIf="isDeletingTopic" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
@@ -512,25 +512,25 @@
 </div>
 
 <!-- Edit Content Modal -->
-<div *ngIf="showEditContentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col" [formGroup]="editContentForm">
-    <h2 class="text-lg font-bold mb-4">Edit Content</h2>
+<div *ngIf="showEditContentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col" [formGroup]="editContentForm">
+    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Edit Content</h2>
     <div class="mb-4 flex-grow overflow-y-auto">
-      <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Markdown Content</label>
+      <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Markdown Content</label>
       <textarea
         id="content"
         formControlName="content"
-        class="w-full h-[60vh] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+        class="w-full h-[60vh] px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 font-mono text-sm"
         placeholder="Enter markdown content"></textarea>
     </div>
     <div class="flex justify-end space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
         (click)="closeEditContentModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
         (click)="updateContent()">
         Save Changes
       </button>
@@ -540,17 +540,17 @@
 
 <!-- Delete Content Confirmation Modal -->
 <div *ngIf="showDeleteContentConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-full max-w-md">
-    <h2 class="text-lg font-bold mb-4">Delete Content</h2>
-    <p class="mb-6 text-gray-700">Are you sure you want to delete the content for "<span class="font-semibold">{{ selectedTopic?.name }}</span>"? This action cannot be undone.</p>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md">
+    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Delete Content</h2>
+    <p class="mb-6 text-gray-700 dark:text-gray-300">Are you sure you want to delete the content for "<span class="font-semibold">{{ selectedTopic?.name }}</span>"? This action cannot be undone.</p>
     <div class="flex justify-end space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
         (click)="closeDeleteContentConfirm()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center"
+        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors flex items-center"
         [disabled]="isDeletingContent"
         (click)="deleteContent()">
         <div *ngIf="isDeletingContent" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
@@ -562,25 +562,25 @@
 
 <!-- New Chapter Modal -->
 <div *ngIf="showNewChapterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-full max-w-md" [formGroup]="newChapterForm">
-    <h2 class="text-lg font-bold mb-4">Add New Chapter</h2>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" [formGroup]="newChapterForm">
+    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Add New Chapter</h2>
     <div class="mb-4">
-      <label for="newChapterName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+      <label for="newChapterName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
       <input
         type="text"
         id="newChapterName"
         formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
         placeholder="Enter chapter name">
     </div>
     <div class="flex justify-end space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
         (click)="closeNewChapterModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors flex items-center"
         [disabled]="isAddingChapter"
         (click)="createNewChapter()">
         <div *ngIf="isAddingChapter" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
@@ -592,25 +592,25 @@
 
 <!-- New Topic Modal -->
 <div *ngIf="showNewTopicModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-full max-w-md" [formGroup]="newTopicForm">
-    <h2 class="text-lg font-bold mb-4">Add New Topic</h2>
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" [formGroup]="newTopicForm">
+    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Add New Topic</h2>
     <div class="mb-4">
-      <label for="newTopicName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+      <label for="newTopicName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
       <input
         type="text"
         id="newTopicName"
         formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
         placeholder="Enter topic name">
     </div>
     <div class="flex justify-end space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
         (click)="closeNewTopicModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors flex items-center"
         [disabled]="isAddingTopic"
         (click)="createNewTopic()">
         <div *ngIf="isAddingTopic" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
@@ -621,25 +621,25 @@
 </div>
 
 <!-- New Content Modal -->
-<div *ngIf="showNewContentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col" [formGroup]="newContentForm">
-    <h2 class="text-lg font-bold mb-4">Add New Content</h2>
+<div *ngIf="showNewContentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col" [formGroup]="newContentForm">
+    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Add New Content</h2>
     <div class="mb-4 flex-grow overflow-y-auto">
-      <label for="newContent" class="block text-sm font-medium text-gray-700 mb-1">Markdown Content</label>
+      <label for="newContent" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Markdown Content</label>
       <textarea
         id="newContent"
         formControlName="content"
-        class="w-full h-[60vh] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+        class="w-full h-[60vh] px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 font-mono text-sm"
         placeholder="Enter markdown content"></textarea>
     </div>
     <div class="flex justify-end space-x-3">
       <button
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
         (click)="closeNewContentModal()">
         Cancel
       </button>
       <button
-        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
+        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors flex items-center"
         [disabled]="isAddingContent"
         (click)="createNewContent()">
         <div *ngIf="isAddingContent" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>

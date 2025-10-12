@@ -1,11 +1,11 @@
-<div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-6">
-  <h3 class="text-xl font-semibold text-gray-800 mb-4">Your Testimonial</h3>
+<div class="max-w-3xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-6">
+  <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Your Testimonial</h3>
   
   <!-- If user has already submitted a testimonial -->
   <div *ngIf="userTestimonial && !showForm" class="bg-blue-50 p-4 rounded-lg mb-4">
     <div class="flex justify-between items-start">
       <div>
-        <p class="text-gray-700 italic mb-2">{{userTestimonial.quote}}</p>
+        <p class="text-gray-700 dark:text-gray-300 italic mb-2">{{userTestimonial.quote}}</p>
         <div class="flex mb-2">
           <ng-container *ngFor="let star of generateRatingStars(userTestimonial.rating)">
             <fa-icon [icon]="star.icon" class="text-yellow-500"></fa-icon>
@@ -30,28 +30,28 @@
   
   <!-- No testimonial yet or toggle button to show form -->
   <div *ngIf="!userTestimonial && !showForm" class="text-center py-4">
-    <p class="text-gray-600 mb-4">Share your experience with CourseWagon!</p>
+    <p class="text-gray-600 dark:text-gray-400 mb-4">Share your experience with CourseWagon!</p>
     <button 
       (click)="toggleForm()" 
-      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
+      class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition">
       Add Your Testimonial
     </button>
   </div>
   
   <!-- Form to add/edit testimonial -->
-  <div *ngIf="showForm" class="bg-gray-50 p-4 rounded-lg">
+  <div *ngIf="showForm" class="bg-gray-50 dark:bg-slate-700 p-4 rounded-lg">
     <form [formGroup]="testimonialForm" (ngSubmit)="submitTestimonial()">
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Your Testimonial</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Your Testimonial</label>
         <textarea 
           formControlName="quote"
           rows="3" 
-          class="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          class="w-full rounded border border-gray-300 dark:border-slate-600 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="Share your experience with CourseWagon..."></textarea>
       </div>
       
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rating</label>
         <div class="flex space-x-1">
           <ng-container *ngFor="let i of [1, 2, 3, 4, 5]">
             <button 
@@ -90,13 +90,13 @@
           <button 
             type="button"
             (click)="toggleForm()"
-            class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded transition">
+            class="bg-gray-200 hover:bg-gray-300 text-gray-700 dark:text-gray-300 px-4 py-2 rounded transition">
             Cancel
           </button>
           <button 
             type="submit"
             [disabled]="isSubmitting"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition flex items-center"
+            class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition flex items-center"
             [ngClass]="{'opacity-70 cursor-not-allowed': isSubmitting}">
             <div *ngIf="isSubmitting" class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
             {{isSubmitting ? 'Submitting...' : (userTestimonial ? 'Update' : 'Submit')}}

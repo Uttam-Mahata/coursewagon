@@ -1,8 +1,8 @@
-<div class="course-review-form bg-white rounded-lg shadow-md p-6 max-w-2xl">
+<div class="course-review-form bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 max-w-2xl">
   <!-- Loading State -->
   <div *ngIf="checking" class="text-center py-8">
     <fa-icon [icon]="faSpinner" animation="spin" class="text-2xl text-blue-500"></fa-icon>
-    <p class="text-gray-600 mt-2">Checking eligibility...</p>
+    <p class="text-gray-600 dark:text-gray-400 mt-2">Checking eligibility...</p>
   </div>
 
   <!-- Not Eligible Message -->
@@ -15,14 +15,14 @@
           <div class="bg-blue-500 h-2 rounded-full transition-all"
                [style.width.%]="eligibility.progress_percentage"></div>
         </div>
-        <p class="text-sm text-gray-600 mt-2">
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
           Progress: {{ eligibility.progress_percentage | number:'1.0-0' }}%
           (Need {{ eligibility.minimum_required }}%)
         </p>
       </div>
       <button
         (click)="onCancel()"
-        class="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition"
+        class="mt-4 px-4 py-2 bg-gray-200 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 transition"
       >
         Close
       </button>
@@ -33,15 +33,15 @@
   <div *ngIf="!checking && canSubmit" [formGroup]="reviewForm">
     <!-- Header -->
     <div class="mb-6">
-      <h3 class="text-xl font-semibold text-gray-800">
+      <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
         {{ existingReview ? 'Edit Your Review' : 'Write a Review' }}
       </h3>
-      <p class="text-sm text-gray-600 mt-1">Share your experience with this course</p>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Share your experience with this course</p>
     </div>
 
     <!-- Rating Section -->
     <div class="mb-6">
-      <label class="block text-sm font-medium text-gray-700 mb-2">
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         Your Rating <span class="text-red-500">*</span>
       </label>
       <div class="flex items-center gap-2">
@@ -56,7 +56,7 @@
 
     <!-- Review Text Section -->
     <div class="mb-6">
-      <label for="reviewText" class="block text-sm font-medium text-gray-700 mb-2">
+      <label for="reviewText" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         Your Review (Optional)
       </label>
       <textarea
@@ -64,13 +64,13 @@
         formControlName="reviewText"
         rows="5"
         placeholder="Share your thoughts about this course..."
-        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
         [class.border-red-500]="reviewForm.get('reviewText')?.invalid && reviewForm.get('reviewText')?.touched"
       ></textarea>
       <div class="flex justify-between items-center mt-1">
         <span
           class="text-xs"
-          [class.text-gray-500]="charactersRemaining > 50"
+          [class.text-gray-500 dark:text-gray-400]="charactersRemaining > 50"
           [class.text-yellow-600]="charactersRemaining <= 50 && charactersRemaining > 0"
           [class.text-red-600]="charactersRemaining <= 0"
         >
@@ -115,7 +115,7 @@
           type="button"
           (click)="onCancel()"
           [disabled]="loading"
-          class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

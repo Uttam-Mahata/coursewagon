@@ -8,37 +8,37 @@
         </a>
       </li>
       <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
+        <span class="mx-2 text-gray-500 dark:text-gray-400">/</span>
         <a routerLink="/courses" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
           <fa-icon [icon]="faBook" class="mr-1"></fa-icon> Courses
         </a>
       </li>
       <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
+        <span class="mx-2 text-gray-500 dark:text-gray-400">/</span>
         <a [routerLink]="['/courses', courseId, 'subjects-chapters']" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
           <fa-icon [icon]="faLayerGroup" class="mr-1"></fa-icon> {{ courseName }}
         </a>
       </li>
       <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
+        <span class="mx-2 text-gray-500 dark:text-gray-400">/</span>
         <a [routerLink]="['/courses', courseId, 'subjects-chapters']" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
           <fa-icon [icon]="faBookOpen" class="mr-1"></fa-icon> {{ chapterName }}
         </a>
       </li>
       <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <span class="text-gray-700">{{ topicName }}</span>
+        <span class="mx-2 text-gray-500 dark:text-gray-400">/</span>
+        <span class="text-gray-700 dark:text-gray-300">{{ topicName }}</span>
       </li>
     </ol>
   </nav>
 
   <!-- Page Title and Navigation -->
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">{{ topicName }}</h1>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">{{ topicName }}</h1>
     <div class="flex space-x-3">
       <button 
         (click)="backToTopics()" 
-        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded flex items-center text-sm transition duration-200">
+        class="bg-gray-100 hover:bg-gray-200 text-gray-700 dark:text-gray-300 px-4 py-2 rounded flex items-center text-sm transition duration-200">
         <fa-icon [icon]="faList" class="mr-2"></fa-icon> All Topics
       </button>
       <button 
@@ -66,7 +66,7 @@
           [class.bg-blue-600]="topic.id === topicId"
           [class.text-white]="topic.id === topicId"
           [class.bg-white]="topic.id !== topicId"
-          [class.text-gray-700]="topic.id !== topicId"
+          [class.text-gray-700 dark:text-gray-300]="topic.id !== topicId"
           class="px-3 py-2 rounded-full text-sm font-medium cursor-pointer hover:shadow-md transition duration-200 whitespace-nowrap"
           [routerLink]="['/courses', courseId, 'subjects', subjectId, 'chapters', chapterId, 'topics', topic.id, 'content']">
           {{ i + 1 }}. {{ topic.name }}
@@ -75,9 +75,9 @@
     </div>
   </div>
 
-  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-6">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+      <h2 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
         <div class="h-6 w-1 bg-blue-600 rounded mr-2"></div>
         Content
       </h2>
@@ -94,7 +94,7 @@
     </div>
 
     <!-- Content Display -->
-    <div *ngIf="content" class="bg-gray-50 rounded-lg p-6 prose prose-blue max-w-none">
+    <div *ngIf="content" class="bg-gray-50 dark:bg-slate-700 rounded-lg p-6 prose prose-blue max-w-none">
       <div markdown [data]="content" mermaid katex class="markdown-content"></div>
     </div>
 

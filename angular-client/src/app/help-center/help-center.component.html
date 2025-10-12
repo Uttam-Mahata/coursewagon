@@ -1,9 +1,9 @@
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-50 dark:bg-slate-900">
   <!-- Hero Section -->
-  <section class="relative bg-blue-600 text-white py-20 px-4">
+  <section class="relative bg-blue-600 dark:bg-blue-700 text-white py-20 px-4">
     <div class="max-w-6xl mx-auto text-center">
       <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">Help Center</h1>
-      <p class="text-xl md:text-2xl text-blue-50 max-w-3xl mx-auto mb-8">
+      <p class="text-xl md:text-2xl text-blue-50 dark:text-blue-100 max-w-3xl mx-auto mb-8">
         Find answers to your questions and learn how to make the most of Course Wagon
       </p>
 
@@ -14,28 +14,28 @@
   <!-- Quick Links -->
   <section class="max-w-7xl mx-auto px-4 py-12">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div (click)="scrollToSection('getting-started')" class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow cursor-pointer border border-gray-200">
-        <div class="text-blue-600 mb-3 text-3xl">🚀</div>
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Getting Started</h3>
-        <p class="text-gray-600">Learn the basics of using Course Wagon</p>
+      <div (click)="scrollToSection('getting-started')" class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow cursor-pointer border border-gray-200 dark:border-slate-700">
+        <div class="text-blue-600 dark:text-blue-400 mb-3 text-3xl">🚀</div>
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Getting Started</h3>
+        <p class="text-gray-600 dark:text-gray-300">Learn the basics of using Course Wagon</p>
       </div>
 
-      <div (click)="scrollToSection('course-authoring')" class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow cursor-pointer border border-gray-200">
-        <div class="text-purple-600 mb-3 text-3xl">✍️</div>
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Course Authoring</h3>
-        <p class="text-gray-600">Create and structure your courses</p>
+      <div (click)="scrollToSection('course-authoring')" class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow cursor-pointer border border-gray-200 dark:border-slate-700">
+        <div class="text-purple-600 dark:text-purple-400 mb-3 text-3xl">✍️</div>
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Course Authoring</h3>
+        <p class="text-gray-600 dark:text-gray-300">Create and structure your courses</p>
       </div>
 
-      <div (click)="scrollToSection('troubleshooting')" class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow cursor-pointer border border-gray-200">
-        <div class="text-red-600 mb-3 text-3xl">🔧</div>
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Troubleshooting</h3>
-        <p class="text-gray-600">Fix common issues and errors</p>
+      <div (click)="scrollToSection('troubleshooting')" class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow cursor-pointer border border-gray-200 dark:border-slate-700">
+        <div class="text-red-600 dark:text-red-400 mb-3 text-3xl">🔧</div>
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Troubleshooting</h3>
+        <p class="text-gray-600 dark:text-gray-300">Fix common issues and errors</p>
       </div>
 
-      <div (click)="scrollToSection('contact')" class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow cursor-pointer border border-gray-200">
-        <div class="text-green-600 mb-3 text-3xl">💬</div>
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">Contact Us</h3>
-        <p class="text-gray-600">Get in touch with our support team</p>
+      <div (click)="scrollToSection('contact')" class="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow cursor-pointer border border-gray-200 dark:border-slate-700">
+        <div class="text-green-600 dark:text-green-400 mb-3 text-3xl">💬</div>
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">Contact Us</h3>
+        <p class="text-gray-600 dark:text-gray-300">Get in touch with our support team</p>
       </div>
     </div>
   </section>
@@ -45,55 +45,55 @@
 
     <!-- Getting Started -->
     <div id="getting-started" class="mb-16">
-      <h2 class="text-4xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-blue-600">Getting Started</h2>
+      <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-8 pb-4 border-b-2 border-blue-600 dark:border-blue-500">Getting Started</h2>
 
       <div class="space-y-4">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(0)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">How do I create an account?</h3>
-            <span class="text-2xl text-blue-600">{{ openFaqs[0] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(0)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">How do I create an account?</h3>
+            <span class="text-2xl text-blue-600 dark:text-blue-400">{{ openFaqs[0] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[0]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">You can create an account in two ways:</p>
-            <ol class="list-decimal ml-6 space-y-2 text-gray-700">
-              <li><strong>Email/Password:</strong> Click "Sign Up" on the authentication page, fill in your first name, last name, email, and password, then submit.</li>
-              <li><strong>Google Sign-In:</strong> Click "Sign up with Google" and authorize with your Google account for instant access.</li>
+          <div *ngIf="openFaqs[0]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-3">You can create an account in two ways:</p>
+            <ol class="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300 dark:text-gray-300">
+              <li><strong class="text-gray-800 dark:text-white">Email/Password:</strong> Click "Sign Up" on the authentication page, fill in your first name, last name, email, and password, then submit.</li>
+              <li><strong class="text-gray-800 dark:text-white">Google Sign-In:</strong> Click "Sign up with Google" and authorize with your Google account for instant access.</li>
             </ol>
-            <p class="text-gray-700 mt-3">After registration, you'll be automatically logged in and can start creating courses.</p>
+            <p class="text-gray-700 dark:text-gray-300 dark:text-gray-300 mt-3">After registration, you'll be automatically logged in and can start creating courses.</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(1)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">What if I forget my password?</h3>
-            <span class="text-2xl text-blue-600">{{ openFaqs[1] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(1)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">What if I forget my password?</h3>
+            <span class="text-2xl text-blue-600 dark:text-blue-400">{{ openFaqs[1] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[1]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">To reset your password:</p>
-            <ol class="list-decimal ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[1]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-3">To reset your password:</p>
+            <ol class="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300 dark:text-gray-300">
               <li>Go to the login page and click "Forgot password?"</li>
               <li>Enter your registered email address</li>
               <li>Check your email for a password reset link</li>
               <li>Click the link and enter your new password</li>
               <li>Confirm the new password and submit</li>
             </ol>
-            <p class="text-gray-700 mt-3">The reset link expires after a certain time for security reasons. If it expires, request a new one.</p>
+            <p class="text-gray-700 dark:text-gray-300 dark:text-gray-300 mt-3">The reset link expires after a certain time for security reasons. If it expires, request a new one.</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(2)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">How do I navigate the platform?</h3>
-            <span class="text-2xl text-blue-600">{{ openFaqs[2] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(2)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">How do I navigate the platform?</h3>
+            <span class="text-2xl text-blue-600 dark:text-blue-400">{{ openFaqs[2] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[2]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Course Wagon has a simple navigation structure:</p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
-              <li><strong>Home:</strong> Landing page with platform overview</li>
-              <li><strong>Create Course:</strong> AI-powered course generation tool</li>
-              <li><strong>My Courses:</strong> View and manage all your created courses</li>
-              <li><strong>Profile:</strong> Update your account details and change password</li>
-              <li><strong>How It Works:</strong> Step-by-step guide to using the platform</li>
+          <div *ngIf="openFaqs[2]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 dark:text-gray-300 mb-3">Course Wagon has a simple navigation structure:</p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300 dark:text-gray-300">
+              <li><strong class="text-gray-800 dark:text-white">Home:</strong> Landing page with platform overview</li>
+              <li><strong class="text-gray-800 dark:text-white">Create Course:</strong> AI-powered course generation tool</li>
+              <li><strong class="text-gray-800 dark:text-white">My Courses:</strong> View and manage all your created courses</li>
+              <li><strong class="text-gray-800 dark:text-white">Profile:</strong> Update your account details and change password</li>
+              <li><strong class="text-gray-800 dark:text-white">How It Works:</strong> Step-by-step guide to using the platform</li>
             </ul>
           </div>
         </div>
@@ -102,35 +102,35 @@
 
     <!-- Course Authoring -->
     <div id="course-authoring" class="mb-16">
-      <h2 class="text-4xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-purple-600">Course Authoring</h2>
+      <h2 class="text-4xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-purple-600 dark:border-purple-500">Course Authoring</h2>
 
       <div class="space-y-4">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(3)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">How does the AI course generator work?</h3>
-            <span class="text-2xl text-purple-600">{{ openFaqs[3] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(3)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">How does the AI course generator work?</h3>
+            <span class="text-2xl text-purple-600 dark:text-purple-400">{{ openFaqs[3] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[3]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Our AI-powered course generator uses Google Gemini AI to:</p>
-            <ol class="list-decimal ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[3]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Our AI-powered course generator uses Google Gemini AI to:</p>
+            <ol class="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Analyze your course description or voice input</li>
               <li>Generate a structured course outline with subjects</li>
               <li>Create topics for each subject</li>
               <li>Generate detailed educational content for each topic</li>
               <li>Create relevant images for subjects automatically</li>
             </ol>
-            <p class="text-gray-700 mt-3">The entire process typically takes 30-60 seconds depending on course complexity.</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3">The entire process typically takes 30-60 seconds depending on course complexity.</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(4)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">How do I use the voice recording feature?</h3>
-            <span class="text-2xl text-purple-600">{{ openFaqs[4] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(4)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">How do I use the voice recording feature?</h3>
+            <span class="text-2xl text-purple-600 dark:text-purple-400">{{ openFaqs[4] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[4]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">To create a course using voice:</p>
-            <ol class="list-decimal ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[4]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">To create a course using voice:</p>
+            <ol class="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Click "Start Recording" button on the Create Course page</li>
               <li>Allow microphone access when prompted by your browser</li>
               <li>Speak clearly about your course topic and what you want to cover</li>
@@ -138,37 +138,37 @@
               <li>Play back your recording to verify (optional)</li>
               <li>Click "Generate Course from Audio" to create your course</li>
             </ol>
-            <p class="text-gray-700 mt-3"><strong>Pro Tip:</strong> Speak naturally and include key topics you want covered. The more detail you provide, the better the AI can structure your course.</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3"><strong>Pro Tip:</strong> Speak naturally and include key topics you want covered. The more detail you provide, the better the AI can structure your course.</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(5)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Can I edit AI-generated content?</h3>
-            <span class="text-2xl text-purple-600">{{ openFaqs[5] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(5)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Can I edit AI-generated content?</h3>
+            <span class="text-2xl text-purple-600 dark:text-purple-400">{{ openFaqs[5] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[5]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Yes! All content is fully editable:</p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[5]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Yes! All content is fully editable:</p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li><strong>Subjects:</strong> Edit titles, descriptions, or delete entire subjects</li>
               <li><strong>Topics:</strong> Modify topic names, add new topics, or remove existing ones</li>
               <li><strong>Content:</strong> Edit the detailed content using our rich text editor</li>
             </ul>
-            <p class="text-gray-700 mt-3">All changes are saved in real-time to the cloud.</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3">All changes are saved in real-time to the cloud.</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(6)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">What is the course structure hierarchy?</h3>
-            <span class="text-2xl text-purple-600">{{ openFaqs[6] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(6)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">What is the course structure hierarchy?</h3>
+            <span class="text-2xl text-purple-600 dark:text-purple-400">{{ openFaqs[6] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[6]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Course Wagon uses a hierarchical structure:</p>
+          <div *ngIf="openFaqs[6]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Course Wagon uses a hierarchical structure:</p>
             <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-3">
-              <p class="font-mono text-gray-800">Course → Subject → Topic → Content</p>
+              <p class="font-mono "text-gray-800 dark:text-white">Course → Subject → Topic → Content</p>
             </div>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li><strong>Course:</strong> The top-level container (e.g., "Introduction to Web Development")</li>
               <li><strong>Subject:</strong> Major sections of your course (e.g., "HTML Basics", "CSS Styling")</li>
               <li><strong>Topic:</strong> Specific lessons within a subject (e.g., "HTML Tags", "Semantic HTML")</li>
@@ -181,50 +181,50 @@
 
     <!-- Content Management -->
     <div id="content-management" class="mb-16">
-      <h2 class="text-4xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-indigo-600">Content Management</h2>
+      <h2 class="text-4xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-indigo-600 dark:border-indigo-500">Content Management</h2>
 
       <div class="space-y-4">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(7)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">How do I add mathematical equations?</h3>
-            <span class="text-2xl text-indigo-600">{{ openFaqs[7] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(7)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">How do I add mathematical equations?</h3>
+            <span class="text-2xl text-indigo-600 dark:text-indigo-400">{{ openFaqs[7] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[7]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Course Wagon supports mathematical equations using LaTeX syntax with KaTeX and MathJax:</p>
+          <div *ngIf="openFaqs[7]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Course Wagon supports mathematical equations using LaTeX syntax with KaTeX and MathJax:</p>
             <div class="bg-gray-100 p-4 rounded-lg font-mono text-sm mb-3">
-              <p class="text-gray-800">Inline math: $E = mc^2$</p>
-              <p class="text-gray-800">Block math: $$\frac{{ '{{' }}n!{{ '}}' }}{{ '{{' }}k!(n-k)!{{ '}}' }} = \binom{{ '{{' }}n{{ '}}' }}{{ '{{' }}k{{ '}}' }}$$</p>
+              <p class=""text-gray-800 dark:text-white">Inline math: $E = mc^2$</p>
+              <p class=""text-gray-800 dark:text-white">Block math: $$\frac{{ '{{' }}n!{{ '}}' }}{{ '{{' }}k!(n-k)!{{ '}}' }} = \binom{{ '{{' }}n{{ '}}' }}{{ '{{' }}k{{ '}}' }}$$</p>
             </div>
-            <p class="text-gray-700">The AI may automatically generate equations in your content, or you can add them manually when editing.</p>
+            <p class="text-gray-700 dark:text-gray-300">The AI may automatically generate equations in your content, or you can add them manually when editing.</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(8)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Can I add diagrams to my content?</h3>
-            <span class="text-2xl text-indigo-600">{{ openFaqs[8] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(8)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Can I add diagrams to my content?</h3>
+            <span class="text-2xl text-indigo-600 dark:text-indigo-400">{{ openFaqs[8] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[8]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Yes! Course Wagon supports Mermaid.js for creating diagrams:</p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[8]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Yes! Course Wagon supports Mermaid.js for creating diagrams:</p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Flowcharts</li>
               <li>Sequence diagrams</li>
               <li>Class diagrams</li>
               <li>State diagrams</li>
               <li>Gantt charts</li>
             </ul>
-            <p class="text-gray-700 mt-3">The AI can generate Mermaid diagrams automatically, or you can write your own using Mermaid syntax in the content editor.</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3">The AI can generate Mermaid diagrams automatically, or you can write your own using Mermaid syntax in the content editor.</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(9)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Does the platform support Markdown formatting?</h3>
-            <span class="text-2xl text-indigo-600">{{ openFaqs[9] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(9)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Does the platform support Markdown formatting?</h3>
+            <span class="text-2xl text-indigo-600 dark:text-indigo-400">{{ openFaqs[9] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[9]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Yes! All content supports full Markdown formatting including:</p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[9]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Yes! All content supports full Markdown formatting including:</p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Headers (# H1, ## H2, ### H3)</li>
               <li>Bold, italic, and code formatting</li>
               <li>Lists (ordered and unordered)</li>
@@ -233,7 +233,7 @@
               <li>Tables</li>
               <li>Blockquotes</li>
             </ul>
-            <p class="text-gray-700 mt-3">AI-generated content uses Markdown automatically for proper formatting.</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3">AI-generated content uses Markdown automatically for proper formatting.</p>
           </div>
         </div>
       </div>
@@ -241,23 +241,23 @@
 
     <!-- Troubleshooting -->
     <div id="troubleshooting" class="mb-16">
-      <h2 class="text-4xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-red-600">Troubleshooting</h2>
+      <h2 class="text-4xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-red-600 dark:border-red-500">Troubleshooting</h2>
 
       <div class="space-y-4">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(10)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Why am I getting "Invalid credentials" error?</h3>
-            <span class="text-2xl text-red-600">{{ openFaqs[10] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(10)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Why am I getting "Invalid credentials" error?</h3>
+            <span class="text-2xl text-red-600 dark:text-red-400">{{ openFaqs[10] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[10]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">This error occurs when:</p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[10]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">This error occurs when:</p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Your email or password is incorrect</li>
               <li>Your account doesn't exist (you may need to sign up first)</li>
               <li>There's a typo in your email address</li>
             </ul>
-            <p class="text-gray-700 mt-3"><strong>Solutions:</strong></p>
-            <ol class="list-decimal ml-6 space-y-2 text-gray-700">
+            <p class="text-gray-700 dark:text-gray-300 mt-3"><strong>Solutions:</strong></p>
+            <ol class="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Double-check your email and password</li>
               <li>Use "Forgot password?" to reset your password</li>
               <li>Try signing in with Google if you registered that way</li>
@@ -266,14 +266,14 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(11)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Voice recording isn't working. What should I do?</h3>
-            <span class="text-2xl text-red-600">{{ openFaqs[11] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(11)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Voice recording isn't working. What should I do?</h3>
+            <span class="text-2xl text-red-600 dark:text-red-400">{{ openFaqs[11] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[11]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Common causes and solutions:</p>
-            <ol class="list-decimal ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[11]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Common causes and solutions:</p>
+            <ol class="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li><strong>Microphone Permission:</strong> Allow microphone access when your browser prompts you</li>
               <li><strong>Browser Compatibility:</strong> Use Chrome, Firefox, or Edge (latest versions)</li>
               <li><strong>HTTPS Required:</strong> Voice recording only works on secure connections</li>
@@ -283,15 +283,15 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(12)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Why did I get logged out automatically?</h3>
-            <span class="text-2xl text-red-600">{{ openFaqs[12] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(12)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Why did I get logged out automatically?</h3>
+            <span class="text-2xl text-red-600 dark:text-red-400">{{ openFaqs[12] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[12]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Your session expires after 1 hour of inactivity for security reasons.</p>
-            <p class="text-gray-700 mb-3"><strong>To avoid this:</strong></p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[12]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Your session expires after 1 hour of inactivity for security reasons.</p>
+            <p class="text-gray-700 dark:text-gray-300 mb-3"><strong>To avoid this:</strong></p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Check "Remember me" when logging in for extended sessions</li>
               <li>Save your work regularly (content auto-saves, but it's good practice)</li>
               <li>Log back in when prompted - your data is safe</li>
@@ -299,38 +299,38 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(13)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Course generation is taking too long. Is something wrong?</h3>
-            <span class="text-2xl text-red-600">{{ openFaqs[13] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(13)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Course generation is taking too long. Is something wrong?</h3>
+            <span class="text-2xl text-red-600 dark:text-red-400">{{ openFaqs[13] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[13]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Course generation typically takes 30-90 seconds. If it takes longer:</p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[13]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Course generation typically takes 30-90 seconds. If it takes longer:</p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Don't refresh the page - generation is still in progress</li>
               <li>Complex courses with many subjects take longer</li>
               <li>Voice recordings take slightly longer due to audio processing</li>
               <li>If it takes more than 2 minutes, there may be a server issue - try again</li>
             </ul>
-            <p class="text-gray-700 mt-3">You'll see a loading animation while the AI works. Be patient!</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3">You'll see a loading animation while the AI works. Be patient!</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(14)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Images aren't loading. What can I do?</h3>
-            <span class="text-2xl text-red-600">{{ openFaqs[14] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(14)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Images aren't loading. What can I do?</h3>
+            <span class="text-2xl text-red-600 dark:text-red-400">{{ openFaqs[14] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[14]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Try these solutions:</p>
-            <ol class="list-decimal ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[14]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Try these solutions:</p>
+            <ol class="list-decimal ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Check your internet connection</li>
               <li>Refresh the page (Ctrl+R or Cmd+R)</li>
               <li>Clear your browser cache and cookies</li>
               <li>Try a different browser</li>
               <li>Wait a few moments - images may still be generating</li>
             </ol>
-            <p class="text-gray-700 mt-3">Subject images are generated by AI and stored in cloud storage. If issues persist, contact support.</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3">Subject images are generated by AI and stored in cloud storage. If issues persist, contact support.</p>
           </div>
         </div>
       </div>
@@ -341,14 +341,14 @@
       <h2 class="text-4xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-green-600">Frequently Asked Questions</h2>
 
       <div class="space-y-4">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(15)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Is my data secure?</h3>
-            <span class="text-2xl text-green-600">{{ openFaqs[15] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(15)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Is my data secure?</h3>
+            <span class="text-2xl text-green-600 dark:text-green-400">{{ openFaqs[15] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[15]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Yes! Course Wagon takes security seriously:</p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[15]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Yes! Course Wagon takes security seriously:</p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>All data is encrypted in transit using HTTPS/TLS</li>
               <li>Authentication uses Firebase Auth with secure JWT tokens</li>
               <li>Passwords are hashed and never stored in plain text</li>
@@ -359,15 +359,15 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(16)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Can I export my courses?</h3>
-            <span class="text-2xl text-green-600">{{ openFaqs[16] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(16)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Can I export my courses?</h3>
+            <span class="text-2xl text-green-600 dark:text-green-400">{{ openFaqs[16] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[16]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Currently, courses are stored and accessed through your Course Wagon dashboard.</p>
-            <p class="text-gray-700 mb-3"><strong>Coming Soon:</strong></p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[16]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Currently, courses are stored and accessed through your Course Wagon dashboard.</p>
+            <p class="text-gray-700 dark:text-gray-300 mb-3"><strong>Coming Soon:</strong></p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Export to PDF format</li>
               <li>Export to Markdown files</li>
               <li>SCORM package export for LMS integration</li>
@@ -376,32 +376,32 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(17)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Are there any usage limits?</h3>
-            <span class="text-2xl text-green-600">{{ openFaqs[17] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(17)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Are there any usage limits?</h3>
+            <span class="text-2xl text-green-600 dark:text-green-400">{{ openFaqs[17] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[17]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Currently, Course Wagon is free to use with reasonable limits:</p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[17]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Currently, Course Wagon is free to use with reasonable limits:</p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Unlimited course creation</li>
               <li>No limit on subjects per course</li>
               <li>No limit on topics per subject</li>
               <li>Cloud storage for all your content and images</li>
             </ul>
-            <p class="text-gray-700 mt-3">We may introduce pricing plans in the future with additional features and increased limits for power users.</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3">We may introduce pricing plans in the future with additional features and increased limits for power users.</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(18)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Can I share my courses with others?</h3>
-            <span class="text-2xl text-green-600">{{ openFaqs[18] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(18)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Can I share my courses with others?</h3>
+            <span class="text-2xl text-green-600 dark:text-green-400">{{ openFaqs[18] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[18]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Course sharing and publishing features are coming soon!</p>
-            <p class="text-gray-700 mb-3"><strong>Planned features:</strong></p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[18]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Course sharing and publishing features are coming soon!</p>
+            <p class="text-gray-700 dark:text-gray-300 mb-3"><strong>Planned features:</strong></p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>Public course URLs for sharing</li>
               <li>Learner enrollment and tracking</li>
               <li>Progress analytics and completion certificates</li>
@@ -411,30 +411,30 @@
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(19)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">What happens if I delete my account?</h3>
-            <span class="text-2xl text-green-600">{{ openFaqs[19] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(19)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">What happens if I delete my account?</h3>
+            <span class="text-2xl text-green-600 dark:text-green-400">{{ openFaqs[19] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[19]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">If you delete your account:</p>
-            <ul class="list-disc ml-6 space-y-2 text-gray-700">
+          <div *ngIf="openFaqs[19]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">If you delete your account:</p>
+            <ul class="list-disc ml-6 space-y-2 text-gray-700 dark:text-gray-300">
               <li>All your courses and content will be permanently deleted</li>
               <li>Your user data will be removed from our systems</li>
               <li>This action cannot be undone</li>
               <li>You can create a new account at any time</li>
             </ul>
-            <p class="text-gray-700 mt-3 font-semibold">We recommend exporting any courses you want to keep before deleting your account (export feature coming soon).</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3 font-semibold">We recommend exporting any courses you want to keep before deleting your account (export feature coming soon).</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
-          <button (click)="toggleFaq(20)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors">
-            <h3 class="text-xl font-semibold text-gray-800">Which browsers are supported?</h3>
-            <span class="text-2xl text-green-600">{{ openFaqs[20] ? '−' : '+' }}</span>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-slate-700">
+          <button (click)="toggleFaq(20)" class="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <h3 class="text-xl font-semibold "text-gray-800 dark:text-white">Which browsers are supported?</h3>
+            <span class="text-2xl text-green-600 dark:text-green-400">{{ openFaqs[20] ? '−' : '+' }}</span>
           </button>
-          <div *ngIf="openFaqs[20]" class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-            <p class="text-gray-700 mb-3">Course Wagon works best on modern browsers:</p>
+          <div *ngIf="openFaqs[20]" class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-t border-gray-200 dark:border-slate-600">
+            <p class="text-gray-700 dark:text-gray-300 mb-3">Course Wagon works best on modern browsers:</p>
             <div class="grid grid-cols-2 gap-4 my-3">
               <div class="bg-green-50 p-3 rounded-lg border border-green-200">
                 <p class="font-semibold text-green-800">✓ Fully Supported</p>
@@ -453,7 +453,7 @@
                 </ul>
               </div>
             </div>
-            <p class="text-gray-700 mt-3">For the best experience, keep your browser updated to the latest version.</p>
+            <p class="text-gray-700 dark:text-gray-300 mt-3">For the best experience, keep your browser updated to the latest version.</p>
           </div>
         </div>
       </div>
@@ -464,7 +464,7 @@
       <h2 class="text-4xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-blue-600">Contact & Support</h2>
 
       <div class="bg-white rounded-xl p-8 shadow-lg border border-gray-200">
-        <p class="text-lg text-gray-700 mb-6">Can't find the answer you're looking for? We're here to help!</p>
+        <p class="text-lg text-gray-700 dark:text-gray-300 mb-6">Can't find the answer you're looking for? We're here to help!</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>

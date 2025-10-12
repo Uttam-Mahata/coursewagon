@@ -3,19 +3,19 @@
   <nav class="mb-6">
     <ol class="flex items-center space-x-2 text-sm">
       <li class="flex items-center">
-        <a routerLink="/home" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
+        <a routerLink="/home" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 flex items-center transition duration-200">
           <fa-icon [icon]="faHome" class="mr-1"></fa-icon> Home
         </a>
       </li>
       <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <a routerLink="/courses" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
+        <span class="mx-2 text-gray-500 dark:text-gray-400">/</span>
+        <a routerLink="/courses" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 flex items-center transition duration-200">
           <fa-icon [icon]="faBook" class="mr-1"></fa-icon> Courses
         </a>
       </li>
       <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <span class="text-gray-700 flex items-center">
+        <span class="mx-2 text-gray-500 dark:text-gray-400">/</span>
+        <span class="text-gray-700 dark:text-gray-300 flex items-center">
           <fa-icon [icon]="faLayerGroup" class="mr-1"></fa-icon> {{ courseName }}
         </span>
       </li>
@@ -23,25 +23,25 @@
   </nav>
 
   <!-- Page Title -->
-  <h1 class="text-2xl font-bold text-gray-800 mb-8">{{ courseName }}</h1>
+  <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-8">{{ courseName }}</h1>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <!-- Subjects Column -->
     <div class="lg:col-span-4">
-      <div class="bg-white rounded-xl shadow-md p-4 mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 mb-6">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
           <div class="h-6 w-1 bg-blue-600 rounded mr-2"></div>
           Subjects
         </h2>
 
         <div *ngFor="let subject of subjects" class="mb-4">
-          <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-200">
-            <h3 class="text-lg font-medium text-gray-800 mb-2">{{ subject.name }}</h3>
+          <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition duration-200">
+            <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-2">{{ subject.name }}</h3>
             <div class="flex justify-between">
               <!-- If chapters exist, show both View and Update buttons -->
               <ng-container *ngIf="subject.has_chapters; else generateSubjectOnly">
                 <button 
-                  class="flex items-center bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-md text-sm transition duration-200"
+                  class="flex items-center bg-white dark:bg-slate-800 border border-blue-600 text-blue-600 dark:text-blue-400 hover:bg-blue-50 px-3 py-1.5 rounded-md text-sm transition duration-200"
                   (click)="viewChapters(subject.id)">
                   <fa-icon [icon]="faEye" class="mr-1.5"></fa-icon> View Chapters
                 </button>
@@ -77,15 +77,15 @@
     <!-- Chapters and Topics Column -->
     <div class="lg:col-span-8">
       <!-- Chapters Section -->
-      <div class="bg-white rounded-xl shadow-md p-4 mb-6" id="chaptersSection">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+      <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 mb-6" id="chaptersSection">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
           <div class="h-6 w-1 bg-blue-600 rounded mr-2"></div>
           {{ selectedSubjectName ? selectedSubjectName + ' Chapters' : 'Chapters' }}
         </h2>
         
         <!-- No selection info -->
         <div *ngIf="chapters.length === 0 && !selectedSubjectId" class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md flex items-center">
-          <fa-icon [icon]="faInfoCircle" class="text-blue-600 mr-3 text-lg"></fa-icon>
+          <fa-icon [icon]="faInfoCircle" class="text-blue-600 dark:text-blue-400 mr-3 text-lg"></fa-icon>
           <p class="text-blue-700">Please select a subject to view its chapters.</p>
         </div>
 
@@ -93,12 +93,12 @@
         <div *ngIf="chapters.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div *ngFor="let chapter of chapters" class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-lg overflow-hidden hover:shadow-md transition duration-200">
             <div class="p-5">
-              <h3 class="text-lg font-medium text-gray-800 mb-2">{{ chapter.name }}</h3>
+              <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-2">{{ chapter.name }}</h3>
               <div class="flex justify-between">
                 <!-- If topics exist, show both View and Update buttons -->
                 <ng-container *ngIf="chapter.has_topics; else generateChapterOnly">
                   <button 
-                    class="flex items-center bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-md text-sm transition duration-200"
+                    class="flex items-center bg-white dark:bg-slate-800 border border-blue-600 text-blue-600 dark:text-blue-400 hover:bg-blue-50 px-3 py-1.5 rounded-md text-sm transition duration-200"
                     (click)="viewTopics(chapter.id)">
                     <fa-icon [icon]="faBookOpen" class="mr-1.5"></fa-icon> View Topics
                   </button>
@@ -133,8 +133,8 @@
       
       <!-- Topics Section - Only visible when topics are available -->
       <div *ngIf="showTopics && selectedChapterId && topics[selectedChapterId] && topics[selectedChapterId].length > 0" 
-           class="bg-white rounded-xl shadow-md p-4" id="topicsSection">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+           class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-4" id="topicsSection">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
           <div class="h-6 w-1 bg-green-600 rounded mr-2"></div>
           {{ selectedChapterName }} Topics
         </h2>
@@ -142,12 +142,12 @@
         <!-- Topics List -->
         <div class="divide-y divide-gray-200">
           <div *ngFor="let topic of topics[selectedChapterId]" 
-               class="py-3 hover:bg-gray-50 rounded px-3 transition-all cursor-pointer"
+               class="py-3 hover:bg-gray-50 dark:bg-slate-700 rounded px-3 transition-all cursor-pointer"
                (click)="viewContent(topic.id)">
             <div class="flex justify-between items-center">
               <div class="flex items-center">
                 <div class="h-2 w-2 rounded-full bg-indigo-500 mr-3"></div>
-                <h3 class="font-medium text-gray-800">{{ topic.name }}</h3>
+                <h3 class="font-medium text-gray-800 dark:text-white">{{ topic.name }}</h3>
               </div>
               <fa-icon [icon]="faChevronRight" class="text-gray-400"></fa-icon>
             </div>

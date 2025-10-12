@@ -103,6 +103,7 @@ if IS_PRODUCTION:
     allowed_origins = [
         "https://www.coursewagon.live",
         "https://coursewagon.web.app"
+        "https://coursewagon.alphaaiservice.com"
     ]
     logger.info("CORS configured for PRODUCTION - localhost access disabled")
 else:
@@ -111,7 +112,8 @@ else:
         "http://localhost:4200",
         "http://127.0.0.1:4200",
         "https://www.coursewagon.live",
-        "https://coursewagon.web.app"
+        "https://coursewagon.web.app",
+        "https://coursewagon.alphaaiservice.com"
     ]
     logger.info("CORS configured for DEVELOPMENT - localhost access enabled")
 

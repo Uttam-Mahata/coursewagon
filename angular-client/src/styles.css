@@ -1,11 +1,7 @@
 @import "tailwindcss";
 
-/* Tailwind Dark Mode Configuration */
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    color-scheme: dark;
-  }
-}
+/* Tailwind v4 Dark Mode Configuration - Use class-based strategy */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* Font Family Configuration */
 body {

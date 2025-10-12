@@ -2,15 +2,15 @@
   <!-- Header -->
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
     <div>
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 flex items-center">
-        <fa-icon [icon]="faGraduationCap" class="mr-3 text-blue-600"></fa-icon>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center">
+        <fa-icon [icon]="faGraduationCap" class="mr-3 text-blue-600 dark:text-blue-400"></fa-icon>
         My Learning Dashboard
       </h1>
-      <p class="text-gray-600 mt-2">Track your learning progress and continue your courses</p>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Track your learning progress and continue your courses</p>
     </div>
     <button
       (click)="browseCourses()"
-      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition duration-200 shadow-md w-full md:w-auto">
+      class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center transition duration-200 shadow-md w-full md:w-auto">
       <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
       Browse Courses
     </button>
@@ -18,15 +18,15 @@
 
   <!-- Loading State -->
   <div *ngIf="loading" class="flex justify-center items-center py-20">
-    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 dark:border-blue-400"></div>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error && !loading" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6">
+  <div *ngIf="error && !loading" class="bg-red-100 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-300 p-4 rounded-md mb-6">
     <p>{{ error }}</p>
     <button
       (click)="loadEnrollments()"
-      class="mt-2 text-sm underline hover:text-red-900">
+      class="mt-2 text-sm underline hover:text-red-900 dark:hover:text-red-200">
       Retry
     </button>
   </div>
@@ -36,7 +36,7 @@
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <!-- Total Enrollments -->
-      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+      <div class="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-xl shadow-lg p-6 text-white">
         <div class="flex items-center justify-between mb-3">
           <fa-icon [icon]="faBook" size="2x" class="opacity-80"></fa-icon>
           <span class="text-3xl font-bold">{{ totalEnrollments }}</span>
@@ -45,7 +45,7 @@
       </div>
 
       <!-- In Progress -->
-      <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+      <div class="bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-xl shadow-lg p-6 text-white">
         <div class="flex items-center justify-between mb-3">
           <fa-icon [icon]="faBookOpen" size="2x" class="opacity-80"></fa-icon>
           <span class="text-3xl font-bold">{{ inProgressCourses }}</span>
@@ -54,7 +54,7 @@
       </div>
 
       <!-- Completed -->
-      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+      <div class="bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-xl shadow-lg p-6 text-white">
         <div class="flex items-center justify-between mb-3">
           <fa-icon [icon]="faTrophy" size="2x" class="opacity-80"></fa-icon>
           <span class="text-3xl font-bold">{{ completedCourses }}</span>
@@ -63,7 +63,7 @@
       </div>
 
       <!-- Time Spent -->
-      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+      <div class="bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-xl shadow-lg p-6 text-white">
         <div class="flex items-center justify-between mb-3">
           <fa-icon [icon]="faClock" size="2x" class="opacity-80"></fa-icon>
           <span class="text-3xl font-bold">{{ formatTimeSpent(totalTimeSpent) }}</span>
@@ -73,9 +73,9 @@
     </div>
 
     <!-- Active Courses Section -->
-    <div *ngIf="activeEnrollments.length > 0" class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-800">Continue Learning</h2>
+    <div *ngIf="activeEnrollments.length > 0" class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden mb-8">
+      <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Continue Learning</h2>
       </div>
 
       <div class="p-4 sm:p-6">

@@ -1,48 +1,48 @@
-<section class="py-16 md:py-20 bg-gradient-to-b from-white via-indigo-50 to-white">
+<section class="py-16 md:py-20 bg-gradient-to-b from-white via-indigo-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
   <div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">What Our Users Say</h2>
+    <h2 class="text-3xl font-bold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">What Our Users Say</h2>
     
 
     
     <!-- Loading state -->
     <div *ngIf="isLoading" class="flex justify-center mb-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
     </div>
     
     <!-- Error state -->
-    <div *ngIf="error" class="max-w-3xl mx-auto bg-red-100 p-4 rounded-lg text-red-700 mb-8 text-center">
+    <div *ngIf="error" class="max-w-3xl mx-auto bg-red-100 dark:bg-red-900/20 p-4 rounded-lg text-red-700 dark:text-red-300 mb-8 text-center">
       {{error}}
     </div>
     
     <!-- No testimonials -->
-    <div *ngIf="!isLoading && !error && testimonials.length === 0" class="text-center mb-8 text-gray-600">
+    <div *ngIf="!isLoading && !error && testimonials.length === 0" class="text-center mb-8 text-gray-600 dark:text-gray-400">
       No testimonials yet. Be the first to share your experience!
     </div>
     
     <!-- Public testimonials -->
     <div *ngIf="!isLoading && testimonials.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div *ngFor="let testimonial of testimonials" class="bg-white rounded-xl shadow-md p-8 transition-all duration-300 hover:shadow-xl testimonial-card">
+      <div *ngFor="let testimonial of testimonials" class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-8 transition-all duration-300 hover:shadow-xl testimonial-card border border-transparent dark:border-slate-700">
         <div class="flex justify-center mb-4">
-          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
+          <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-500 dark:text-blue-400">
             <fa-icon [icon]="faUser" class="text-2xl"></fa-icon>
           </div>
         </div>
         
         <div class="flex justify-center mb-3">
           <ng-container *ngFor="let star of generateRatingStars(testimonial.rating)">
-            <fa-icon [icon]="star.icon" class="text-yellow-500"></fa-icon>
+            <fa-icon [icon]="star.icon" class="text-yellow-500 dark:text-yellow-400"></fa-icon>
           </ng-container>
         </div>
         
-        <p class="text-gray-700 text-center italic mb-4">"{{testimonial.quote}}"</p>
-        <h6 class="text-center font-semibold text-blue-600">- {{testimonial.author}}</h6>
+        <p class="text-gray-700 dark:text-gray-300 text-center italic mb-4">"{{testimonial.quote}}"</p>
+        <h6 class="text-center font-semibold text-blue-600 dark:text-blue-400">- {{testimonial.author}}</h6>
       </div>
     </div>
 
     <!-- Write  Review Route if Authenticated -->
     <div *ngIf="isAuthenticated" class="mt-12 text-center">
-      <p class="text-gray-600 mb-3">Share your experience with CourseWagon!</p>
-      <a routerLink="/write-review" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
+      <p class="text-gray-600 dark:text-gray-400 mb-3">Share your experience with CourseWagon!</p>
+      <a routerLink="/write-review" class="inline-block bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition">
         Write a Review
       </a>
     </div>
@@ -50,8 +50,8 @@
 
     <!-- Login prompt -->
     <div *ngIf="!isAuthenticated" class="mt-12 text-center">
-      <p class="text-gray-600 mb-3">Would you like to share your experience?</p>
-      <a routerLink="/auth" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">
+      <p class="text-gray-600 dark:text-gray-400 mb-3">Would you like to share your experience?</p>
+      <a routerLink="/auth" class="inline-block bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition">
         Log in to add your testimonial
       </a>
     </div>

@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from dotenv import load_dotenv
+from slowapi.errors import RateLimitExceeded
 
 # Load environment variables from .env file
 load_dotenv()
@@ -84,6 +85,9 @@ from admin.routes import admin_router
 from routes.utility_routes import utility_router
 from routes.test_auth_routes import test_auth_router
 
+# Import rate limiter
+from utils.rate_limiter import limiter, rate_limit_exceeded_handler
+
 # Create FastAPI app
 app = FastAPI(
     title="Course Wagon API",
@@ -91,6 +95,12 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Add rate limiter state to app
+app.state.limiter = limiter
+
+# Add rate limit exceeded handler
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 # CORS configuration
 # Note: When allow_credentials=True, cannot use allow_origins=["*"]

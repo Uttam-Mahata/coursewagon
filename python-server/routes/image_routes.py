@@ -6,6 +6,7 @@ from services.auth_service import AuthService
 from services.course_service import CourseService
 from extensions import get_db
 from sqlalchemy.orm import Session
+from utils.rate_limiter import limiter, get_ai_rate_limit
 import logging
 
 logger = logging.getLogger(__name__)
@@ -28,7 +29,9 @@ class ImageUrlCheck(BaseModel):
     url: str
 
 @image_router.post('/courses/{course_id}/generate')
+@limiter.limit(get_ai_rate_limit("generate_course_image"))
 async def generate_course_image(
+    request: Request,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     image_service: ImageService = Depends(get_image_service),
@@ -50,7 +53,9 @@ async def generate_course_image(
         raise HTTPException(status_code=500, detail=str(e))
 
 @image_router.post('/courses/{course_id}/subjects/{subject_id}/generate')
+@limiter.limit(get_ai_rate_limit("generate_subject_image"))
 async def generate_subject_image(
+    request: Request,
     course_id: int,
     subject_id: int,
     current_user_id: int = Depends(get_current_user_id),
@@ -73,7 +78,9 @@ async def generate_subject_image(
         raise HTTPException(status_code=500, detail=str(e))
 
 @image_router.post('/courses/{course_id}/subjects/generate-all')
+@limiter.limit(get_ai_rate_limit("generate_image"))
 async def generate_all_subject_images(
+    request: Request,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     image_service: ImageService = Depends(get_image_service),

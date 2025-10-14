@@ -1,5 +1,5 @@
 import asyncio
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
 from pydantic import BaseModel
 from typing import Optional, List
 from middleware.auth_middleware import get_current_user_id
@@ -8,6 +8,7 @@ from repositories.user_repository import UserRepository
 from services.auth_service import AuthService
 from utils.gemini_live_helper import GeminiLiveHelper
 from utils.cache_helper import invalidate_cache
+from utils.rate_limiter import limiter, get_content_rate_limit, get_public_rate_limit
 from extensions import get_db
 from sqlalchemy.orm import Session
 import logging
@@ -32,7 +33,9 @@ class CourseUpdate(BaseModel):
     description: Optional[str] = None
 
 @course_router.post('/add_course')
+@limiter.limit(get_content_rate_limit("create_course"))
 async def add_course(
+    request: Request,
     course_data: CourseCreate,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -89,7 +92,8 @@ async def get_available_categories(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @course_router.get('')
-async def get_courses(db: Session = Depends(get_db)):
+@limiter.limit(get_public_rate_limit("get_courses"))
+async def get_courses(request: Request, db: Session = Depends(get_db)):
     try:
         course_service = CourseService(db)
         courses = course_service.get_all_courses()
@@ -110,7 +114,9 @@ async def get_course(course_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @course_router.post('/create-manual')
+@limiter.limit(get_content_rate_limit("create_course"))
 async def create_course_manual(
+    request: Request,
     course_data: CourseCreateManual,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -132,7 +138,9 @@ async def create_course_manual(
         raise HTTPException(status_code=500, detail=str(e))
 
 @course_router.put('/{course_id}')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def update_course(
+    request: Request,
     course_id: int,
     course_data: CourseUpdate,
     current_user_id: int = Depends(get_current_user_id),
@@ -156,7 +164,9 @@ async def update_course(
         raise HTTPException(status_code=500, detail=str(e))
 
 @course_router.delete('/{course_id}')
+@limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_course(
+    request: Request,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -176,7 +186,9 @@ async def delete_course(
         raise HTTPException(status_code=500, detail=str(e))
 
 @course_router.post('/add_course_audio')
+@limiter.limit(get_content_rate_limit("create_course"))
 async def add_course_audio(
+    request: Request,
     audio: UploadFile = File(...),
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)

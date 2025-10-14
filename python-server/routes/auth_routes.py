@@ -9,6 +9,7 @@ from services.email_service import EmailService
 from middleware.auth_middleware import get_current_user_id, JWTAuth
 from extensions import get_db
 from utils.email_validator import validate_email
+from utils.rate_limiter import limiter, get_auth_rate_limit
 from datetime import timedelta
 import logging
 import os
@@ -138,7 +139,9 @@ class ResendVerification(BaseModel):
     email: EmailStr
 
 @auth_router.post('/check-email')
+@limiter.limit(get_auth_rate_limit("check_email"))
 async def check_email(
+    request: Request,
     email_data: CheckEmail,
     db: Session = Depends(get_db)
 ):
@@ -156,7 +159,8 @@ async def check_email(
         raise HTTPException(status_code=500, detail='Internal server error')
 
 @auth_router.post('/validate-email')
-async def validate_email_endpoint(email_data: CheckEmail):
+@limiter.limit(get_auth_rate_limit("validate_email"))
+async def validate_email_endpoint(request: Request, email_data: CheckEmail):
     """
     Validate if an email address is deliverable by checking:
     - Email format
@@ -189,7 +193,9 @@ async def validate_email_endpoint(email_data: CheckEmail):
         }
 
 @auth_router.post('/register', status_code=status.HTTP_201_CREATED)
+@limiter.limit(get_auth_rate_limit("register"))
 async def register(
+    request: Request,
     user_data: UserRegister, 
     db: Session = Depends(get_db),
     auth_service: AuthService = Depends(get_auth_service)
@@ -217,7 +223,8 @@ async def register(
         raise HTTPException(status_code=500, detail={'error': 'Registration failed. Please try again later.'})
 
 @auth_router.post('/login')
-async def login(login_data: UserLogin, response: Response, db: Session = Depends(get_db)):
+@limiter.limit(get_auth_rate_limit("login"))
+async def login(request: Request, login_data: UserLogin, response: Response, db: Session = Depends(get_db)):
     """Login user with email and password"""
     try:
         logger.debug(f"Login attempt for {login_data.email}, remember_me={login_data.remember_me}")
@@ -264,6 +271,7 @@ async def login(login_data: UserLogin, response: Response, db: Session = Depends
         raise HTTPException(status_code=500, detail={'error': 'An unexpected error occurred. Please try again later.'})
 
 @auth_router.post('/refresh')
+@limiter.limit(get_auth_rate_limit("refresh_token"))
 async def refresh_token_endpoint(request: Request, response: Response, db: Session = Depends(get_db)):
     """
     Refresh access token using refresh token from HttpOnly cookie
@@ -337,7 +345,8 @@ async def update_profile(
 
 
 @auth_router.post('/forgot-password')
-async def forgot_password(forgot_data: ForgotPassword, db: Session = Depends(get_db)):
+@limiter.limit(get_auth_rate_limit("forgot_password"))
+async def forgot_password(request: Request, forgot_data: ForgotPassword, db: Session = Depends(get_db)):
     """Request password reset email"""
     try:
         if not forgot_data.email:
@@ -372,7 +381,8 @@ async def verify_reset_token(token_data: VerifyResetToken, db: Session = Depends
         raise HTTPException(status_code=500, detail={'error': 'Failed to verify reset token. Please try again later.'})
 
 @auth_router.post('/reset-password')
-async def reset_password(reset_data: ResetPasswordRequest, db: Session = Depends(get_db)):
+@limiter.limit(get_auth_rate_limit("reset_password"))
+async def reset_password(request: Request, reset_data: ResetPasswordRequest, db: Session = Depends(get_db)):
     """Reset password using reset token"""
     try:
         if not reset_data.token or not reset_data.password:
@@ -424,7 +434,8 @@ async def change_password(
         raise HTTPException(status_code=500, detail={'error': 'Failed to change password. Please try again later.'})
 
 @auth_router.post('/verify-email')
-async def verify_email(verify_data: VerifyEmail, db: Session = Depends(get_db)):
+@limiter.limit(get_auth_rate_limit("verify_email"))
+async def verify_email(request: Request, verify_data: VerifyEmail, db: Session = Depends(get_db)):
     """Verify user's email address with token"""
     try:
         if not verify_data.token:
@@ -444,7 +455,8 @@ async def verify_email(verify_data: VerifyEmail, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail={'error': 'Email verification failed. Please try again or request a new verification email.'})
 
 @auth_router.post('/resend-verification')
-async def resend_verification(resend_data: ResendVerification, db: Session = Depends(get_db)):
+@limiter.limit(get_auth_rate_limit("resend_verification"))
+async def resend_verification(request: Request, resend_data: ResendVerification, db: Session = Depends(get_db)):
     """Resend verification email to user"""
     try:
         if not resend_data.email:

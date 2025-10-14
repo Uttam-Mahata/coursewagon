@@ -1,12 +1,13 @@
 """
 Test authentication endpoints
 """
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
 from sqlalchemy.orm import Session
 from services.auth_service import AuthService
 from services.email_service import EmailService
 from services.background_task_service import background_task_service
 from extensions import get_db
+from utils.rate_limiter import limiter, get_public_rate_limit
 import logging
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,9 @@ def get_email_service():
     return EmailService()
 
 @test_auth_router.post('/send-test-welcome-email')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def test_welcome_email(
+    request: Request,
     email: str,
     auth_service: AuthService = Depends(get_auth_service),
     email_service: EmailService = Depends(get_email_service)
@@ -51,7 +54,9 @@ async def test_welcome_email(
         raise HTTPException(status_code=500, detail=str(e))
 
 @test_auth_router.post('/send-test-reset-email')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def test_reset_email(
+    request: Request,
     email: str,
     auth_service: AuthService = Depends(get_auth_service)
 ):
@@ -69,7 +74,8 @@ async def test_reset_email(
         raise HTTPException(status_code=500, detail=str(e))
 
 @test_auth_router.get('/email-config')
-async def test_email_config(email_service: EmailService = Depends(get_email_service)):
+@limiter.limit(get_public_rate_limit("get_content"))
+async def test_email_config(request: Request, email_service: EmailService = Depends(get_email_service)):
     """Test endpoint to check email configuration"""
     try:
         config_status = {
@@ -89,7 +95,8 @@ async def test_email_config(email_service: EmailService = Depends(get_email_serv
         raise HTTPException(status_code=500, detail=str(e))
 
 @test_auth_router.post('/test-smtp-connection')
-async def test_smtp_connection(email_service: EmailService = Depends(get_email_service)):
+@limiter.limit(get_public_rate_limit("get_content"))
+async def test_smtp_connection(request: Request, email_service: EmailService = Depends(get_email_service)):
     """Test SMTP connection"""
     try:
         result = email_service.test_smtp_connection()
@@ -100,7 +107,8 @@ async def test_smtp_connection(email_service: EmailService = Depends(get_email_s
         raise HTTPException(status_code=500, detail=str(e))
 
 @test_auth_router.get('/firebase-auth-test')
-async def test_firebase_auth():
+@limiter.limit(get_public_rate_limit("get_content"))
+async def test_firebase_auth(request: Request):
     """Test Firebase Admin authentication setup"""
     try:
         from services.firebase_admin_service import firebase_admin_service
@@ -133,7 +141,8 @@ async def test_firebase_auth():
         }
 
 @test_auth_router.post('/verify-firebase-token')
-async def test_verify_firebase_token(firebase_token: str):
+@limiter.limit(get_public_rate_limit("get_content"))
+async def test_verify_firebase_token(request: Request, firebase_token: str):
     """Test Firebase token verification"""
     try:
         from services.firebase_admin_service import firebase_admin_service

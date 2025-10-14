@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_user_id
 from services.content_service import ContentService
@@ -7,6 +7,7 @@ from repositories.user_repository import UserRepository
 from services.auth_service import AuthService
 from extensions import get_db
 from sqlalchemy.orm import Session
+from utils.rate_limiter import limiter, get_content_rate_limit, get_public_rate_limit
 import logging
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,9 @@ class ContentUpdate(BaseModel):
 @content_router.post(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/generate_content'
 )
+@limiter.limit(get_content_rate_limit("update_content"))
 async def generate_content(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -60,7 +63,9 @@ async def generate_content(
 @content_router.get(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/content'
 )
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_content(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -84,7 +89,9 @@ async def get_content(
 @content_router.post(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/content'
 )
+@limiter.limit(get_content_rate_limit("update_content"))
 async def create_content_manual(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -114,7 +121,9 @@ async def create_content_manual(
 @content_router.put(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/content'
 )
+@limiter.limit(get_content_rate_limit("update_content"))
 async def update_content(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -144,7 +153,9 @@ async def update_content(
 @content_router.delete(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/content'
 )
+@limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_content(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -171,7 +182,9 @@ async def delete_content(
 @content_router.post(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/video'
 )
+@limiter.limit(get_content_rate_limit("update_content"))
 async def upload_video(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -203,7 +216,9 @@ async def upload_video(
 @content_router.delete(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}/video'
 )
+@limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_video(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,

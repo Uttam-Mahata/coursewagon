@@ -1,11 +1,12 @@
 # routes/enrollment_routes.py
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from typing import Optional
 from middleware.auth_middleware import get_current_user_id
 from services.enrollment_service import EnrollmentService
 from extensions import get_db
 from sqlalchemy.orm import Session
+from utils.rate_limiter import limiter, get_content_rate_limit, get_public_rate_limit
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,9 @@ class EnrollRequest(BaseModel):
     course_id: int
 
 @enrollment_router.post('/enroll')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def enroll_in_course(
+    request: Request,
     enrollment_data: EnrollRequest,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -35,7 +38,9 @@ async def enroll_in_course(
         raise HTTPException(status_code=500, detail=str(e))
 
 @enrollment_router.delete('/unenroll/{course_id}')
+@limiter.limit(get_content_rate_limit("delete_content"))
 async def unenroll_from_course(
+    request: Request,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -52,7 +57,9 @@ async def unenroll_from_course(
         raise HTTPException(status_code=500, detail=str(e))
 
 @enrollment_router.get('/my-enrollments')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_my_enrollments(
+    request: Request,
     status: Optional[str] = Query(None, description="Filter by status: active, completed, dropped"),
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -67,7 +74,9 @@ async def get_my_enrollments(
         raise HTTPException(status_code=500, detail=str(e))
 
 @enrollment_router.get('/check/{course_id}')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def check_enrollment(
+    request: Request,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -82,7 +91,9 @@ async def check_enrollment(
         raise HTTPException(status_code=500, detail=str(e))
 
 @enrollment_router.get('/course/{course_id}')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_course_enrollments(
+    request: Request,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -99,7 +110,9 @@ async def get_course_enrollments(
         raise HTTPException(status_code=500, detail=str(e))
 
 @enrollment_router.put('/{enrollment_id}/update-progress')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def update_enrollment_progress(
+    request: Request,
     enrollment_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)

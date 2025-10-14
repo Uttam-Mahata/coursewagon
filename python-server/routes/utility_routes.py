@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 import requests
 import logging
@@ -9,6 +9,7 @@ import uuid
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
+from utils.rate_limiter import limiter, get_utility_rate_limit
 
 load_dotenv()
 
@@ -17,7 +18,8 @@ logger = logging.getLogger(__name__)
 utility_router = APIRouter(prefix='/proxy', tags=['utilities'])
 
 @utility_router.get('/image')
-async def proxy_image(url: str = Query(..., description="Image URL to proxy")):
+@limiter.limit(get_utility_rate_limit("proxy_image"))
+async def proxy_image(request: Request, url: str = Query(..., description="Image URL to proxy")):
     """Proxy for images to bypass CORS issues"""
     if not url:
         raise HTTPException(status_code=400, detail="URL parameter required")
@@ -45,7 +47,8 @@ async def proxy_image(url: str = Query(..., description="Image URL to proxy")):
         raise HTTPException(status_code=500, detail=str(e))
 
 @utility_router.get('/check-image')
-async def check_image(url: str = Query(..., description="Image URL to check")):
+@limiter.limit(get_utility_rate_limit("check_image"))
+async def check_image(request: Request, url: str = Query(..., description="Image URL to check")):
     """Check if an image URL is accessible"""
     if not url:
         raise HTTPException(status_code=400, detail="URL parameter required")
@@ -70,7 +73,8 @@ async def check_image(url: str = Query(..., description="Image URL to check")):
         }
 
 @utility_router.get('/direct-image')
-async def generate_direct_image(prompt: str = Query('A beautiful 3D rendered educational concept', description="Image generation prompt")):
+@limiter.limit(get_utility_rate_limit("direct_image"))
+async def generate_direct_image(request: Request, prompt: str = Query('A beautiful 3D rendered educational concept', description="Image generation prompt")):
     """Generate an image directly and return it to the browser"""
     try:
         # Get API key

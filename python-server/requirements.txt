@@ -81,6 +81,7 @@ python-multipart
 redis
 requests
 rsa
+slowapi
 scikit-learn
 scipy
 six

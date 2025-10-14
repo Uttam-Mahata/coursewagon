@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_admin_user_id
 from admin.service import AdminService
 from services.auth_service import AuthService
 from utils.cache_helper import invalidate_cache
+from utils.rate_limiter import limiter, get_admin_rate_limit
 import logging
 from typing import Dict, Any, List
 from extensions import get_db
@@ -29,7 +30,9 @@ class AdminStatusUpdate(BaseModel):
     is_admin: bool
 
 @admin_router.get('/dashboard')
+@limiter.limit(get_admin_rate_limit("dashboard"))
 async def get_dashboard(
+    request: Request,
     current_admin_id: int = Depends(get_current_admin_user_id),
     admin_service: AdminService = Depends(get_admin_service)
 ) -> Dict[str, Any]:
@@ -42,7 +45,9 @@ async def get_dashboard(
         raise HTTPException(status_code=500, detail=str(e))
 
 @admin_router.get('/users')
+@limiter.limit(get_admin_rate_limit("user_management"))
 async def get_all_users(
+    request: Request,
     current_admin_id: int = Depends(get_current_admin_user_id),
     admin_service: AdminService = Depends(get_admin_service)
 ) -> List[Dict[str, Any]]:
@@ -55,7 +60,9 @@ async def get_all_users(
         raise HTTPException(status_code=500, detail=str(e))
 
 @admin_router.get('/testimonials/pending')
+@limiter.limit(get_admin_rate_limit("user_management"))
 async def get_pending_testimonials(
+    request: Request,
     current_admin_id: int = Depends(get_current_admin_user_id),
     admin_service: AdminService = Depends(get_admin_service)
 ) -> List[Dict[str, Any]]:
@@ -68,7 +75,9 @@ async def get_pending_testimonials(
         raise HTTPException(status_code=500, detail=str(e))
 
 @admin_router.put('/users/{user_id}/status')
+@limiter.limit(get_admin_rate_limit("user_management"))
 async def toggle_user_status(
+    request: Request,
     user_id: int,
     status_update: UserStatusUpdate,
     current_admin_id: int = Depends(get_current_admin_user_id),
@@ -87,7 +96,9 @@ async def toggle_user_status(
         raise HTTPException(status_code=500, detail=str(e))
 
 @admin_router.put('/users/{user_id}/admin')
+@limiter.limit(get_admin_rate_limit("user_management"))
 async def toggle_admin_status(
+    request: Request,
     user_id: int,
     admin_update: AdminStatusUpdate,
     current_admin_id: int = Depends(get_current_admin_user_id),

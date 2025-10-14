@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_user_id
 from services.topic_service import TopicService
@@ -7,6 +7,7 @@ from repositories.user_repository import UserRepository
 from services.auth_service import AuthService
 from extensions import get_db
 from sqlalchemy.orm import Session
+from utils.rate_limiter import limiter, get_content_rate_limit, get_public_rate_limit
 
 topic_router = APIRouter(prefix='/courses', tags=['topics'])
 
@@ -30,7 +31,9 @@ class TopicUpdate(BaseModel):
 @topic_router.post(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/generate_topics',
     status_code=201)
+@limiter.limit(get_content_rate_limit("update_content"))
 async def generate_topics(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -53,7 +56,9 @@ async def generate_topics(
 
 @topic_router.get(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_topics(
+    request: Request,
     course_id: int, 
     subject_id: int, 
     chapter_id: int,
@@ -66,7 +71,9 @@ async def get_topics(
         raise HTTPException(status_code=500, detail=str(e))
     
 @topic_router.get('/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_topic(
+    request: Request,
     course_id: int, 
     subject_id: int, 
     chapter_id: int, 
@@ -87,7 +94,9 @@ async def get_topic(
 @topic_router.post(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics',
     status_code=201)
+@limiter.limit(get_content_rate_limit("update_content"))
 async def create_topic(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -114,7 +123,9 @@ async def create_topic(
 
 @topic_router.put(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def update_topic(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -142,7 +153,9 @@ async def update_topic(
 
 @topic_router.delete(
     '/{course_id}/subjects/{subject_id}/chapters/{chapter_id}/topics/{topic_id}')
+@limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_topic(
+    request: Request,
     course_id: int,
     subject_id: int,
     chapter_id: int,

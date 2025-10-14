@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy.orm import Session
 from middleware.auth_middleware import get_current_user_id, get_current_admin_user_id
 from services.testimonial_service import TestimonialService
 from utils.cache_helper import invalidate_cache
+from utils.rate_limiter import limiter, get_public_rate_limit, get_content_rate_limit
 from extensions import get_db
 
 testimonial_router = APIRouter(prefix='/testimonials', tags=['testimonials'])
@@ -22,7 +23,8 @@ class TestimonialApproval(BaseModel):
     approved: bool = True
 
 @testimonial_router.get('')
-async def get_approved_testimonials(db: Session = Depends(get_db)):
+@limiter.limit(get_public_rate_limit("get_content"))
+async def get_approved_testimonials(request: Request, db: Session = Depends(get_db)):
     """Get all approved testimonials for public display"""
     try:
         testimonial_service = TestimonialService(db)
@@ -32,7 +34,9 @@ async def get_approved_testimonials(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @testimonial_router.get('/my-testimonial')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_my_testimonial(
+    request: Request,
     current_user_id: int = Depends(get_current_user_id), 
     db: Session = Depends(get_db)
 ):
@@ -50,7 +54,9 @@ async def get_my_testimonial(
         raise HTTPException(status_code=500, detail=str(e))
 
 @testimonial_router.post('', status_code=201)
+@limiter.limit(get_content_rate_limit("update_content"))
 async def create_testimonial(
+    request: Request,
     testimonial_data: TestimonialCreate,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -77,7 +83,9 @@ async def create_testimonial(
         raise HTTPException(status_code=500, detail=str(e))
 
 @testimonial_router.put('/{testimonial_id}')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def update_testimonial(
+    request: Request,
     testimonial_id: int,
     testimonial_data: TestimonialUpdate,
     current_user_id: int = Depends(get_current_user_id),
@@ -106,7 +114,9 @@ async def update_testimonial(
         raise HTTPException(status_code=500, detail=str(e))
 
 @testimonial_router.delete('/{testimonial_id}')
+@limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_testimonial(
+    request: Request,
     testimonial_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -130,7 +140,9 @@ async def delete_testimonial(
 
 # Admin routes
 @testimonial_router.get('/admin/all')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def admin_get_all_testimonials(
+    request: Request,
     admin_user_id: int = Depends(get_current_admin_user_id),
     db: Session = Depends(get_db)
 ):
@@ -143,7 +155,9 @@ async def admin_get_all_testimonials(
         raise HTTPException(status_code=500, detail=str(e))
 
 @testimonial_router.put('/admin/{testimonial_id}/approve')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def admin_approve_testimonial(
+    request: Request,
     testimonial_id: int,
     approval_data: TestimonialApproval,
     admin_user_id: int = Depends(get_current_admin_user_id),

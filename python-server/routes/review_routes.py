@@ -1,11 +1,12 @@
 # routes/review_routes.py
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from typing import Optional
 from sqlalchemy.orm import Session
 from middleware.auth_middleware import get_current_user_id
 from services.course_review_service import CourseReviewService
 from extensions import get_db
+from utils.rate_limiter import limiter, get_public_rate_limit, get_content_rate_limit
 import logging
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,9 @@ class ReviewUpdate(BaseModel):
 
 # Public endpoint - anyone can view reviews
 @review_router.get('/course/{course_id}')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_course_reviews(
+    request: Request,
     course_id: int,
     page: int = Query(1, ge=1, description="Page number"),
     limit: int = Query(10, ge=1, le=50, description="Items per page (max 50)"),
@@ -44,7 +47,9 @@ async def get_course_reviews(
 
 # Public endpoint - get review statistics
 @review_router.get('/course/{course_id}/stats')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_review_stats(
+    request: Request,
     course_id: int,
     db: Session = Depends(get_db)
 ):
@@ -61,7 +66,9 @@ async def get_review_stats(
 
 # Protected endpoint - check if user can review
 @review_router.get('/can-review/{course_id}')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def can_review_course(
+    request: Request,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -77,7 +84,9 @@ async def can_review_course(
 
 # Protected endpoint - get user's review for a course
 @review_router.get('/my-review/{course_id}')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_my_review(
+    request: Request,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -100,7 +109,9 @@ async def get_my_review(
 
 # Protected endpoint - create review
 @review_router.post('', status_code=201)
+@limiter.limit(get_content_rate_limit("update_content"))
 async def create_review(
+    request: Request,
     review_data: ReviewCreate,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -124,7 +135,9 @@ async def create_review(
 
 # Protected endpoint - update review
 @review_router.put('/{review_id}')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def update_review(
+    request: Request,
     review_id: int,
     review_data: ReviewUpdate,
     current_user_id: int = Depends(get_current_user_id),
@@ -156,7 +169,9 @@ async def update_review(
 
 # Protected endpoint - delete review
 @review_router.delete('/{review_id}')
+@limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_review(
+    request: Request,
     review_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)

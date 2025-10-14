@@ -101,8 +101,9 @@ IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
 if IS_PRODUCTION:
     # Production: ONLY allow production domains (NO localhost!)
     allowed_origins = [
+        "https://coursewagon.live",
         "https://www.coursewagon.live",
-        "https://coursewagon.web.app"
+        "https://coursewagon.web.app",
         "https://coursewagon.alphaaiservice.com"
     ]
     logger.info("CORS configured for PRODUCTION - localhost access disabled")
@@ -111,6 +112,7 @@ else:
     allowed_origins = [
         "http://localhost:4200",
         "http://127.0.0.1:4200",
+        "https://coursewagon.live",
         "https://www.coursewagon.live",
         "https://coursewagon.web.app",
         "https://coursewagon.alphaaiservice.com"

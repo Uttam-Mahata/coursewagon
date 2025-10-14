@@ -100,9 +100,11 @@ Three boolean flags track the email check state:
 - Prevents email enumeration beyond yes/no answer
 
 ### Rate Limiting
-- **Recommendation**: Implement rate limiting at API gateway level
+- **✓ IMPLEMENTED**: Application-level rate limiting using SlowAPI
 - Prevents abuse and email enumeration attacks
-- Suggested limit: 10 requests per minute per IP
+- Current limit: 10 requests per minute per user/IP
+- See `python-server/docs/RATE_LIMITING.md` for complete documentation
+- Infrastructure-level rate limiting (CDN/WAF) recommended for additional protection
 
 ### Input Validation
 - Email format validation occurs before async check
@@ -146,7 +148,7 @@ Three boolean flags track the email check state:
 
 ## Future Enhancements
 
-1. **Rate Limiting**: Add backend rate limiting to prevent abuse
+1. **✓ Rate Limiting**: ~~Add backend rate limiting to prevent abuse~~ (COMPLETED)
 2. **Caching**: Cache recent checks to reduce API calls
 3. **Analytics**: Track email availability patterns
 4. **Internationalization**: Translate messages to multiple languages

@@ -202,7 +202,8 @@ class UserInput(BaseModel):
 3. **API Deployment**
    * Enable WAF (Web Application Firewall) if available
    * Use HTTPS/TLS 1.2+ only
-   * Implement rate limiting at infrastructure level
+   * Application-level rate limiting implemented (SlowAPI with Redis)
+   * Infrastructure-level rate limiting recommended (CDN/WAF)
    * Enable DDoS protection
    * Regular security scanning and penetration testing
 
@@ -245,7 +246,9 @@ class UserInput(BaseModel):
 
 3. **API Security**
    * CORS configured for specific origins
-   * Rate limiting implemented on critical endpoints
+   * Comprehensive rate limiting implemented throughout the API (see `python-server/docs/RATE_LIMITING.md`)
+   * Rate limits vary by endpoint category (auth, AI, content, public)
+   * Redis-backed distributed rate limiting in production
    * Input validation using Pydantic models
    * SQL injection prevention via SQLAlchemy ORM
 

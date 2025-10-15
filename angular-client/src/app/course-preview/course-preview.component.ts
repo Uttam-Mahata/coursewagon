@@ -10,6 +10,7 @@ import { LearningService, CoursePreview } from '../services/learning.service';
 import { EnrollmentService, EnrollmentCheck } from '../services/enrollment.service';
 import { AuthService } from '../services/auth/auth.service';
 import { ReviewService, ReviewStats, CourseReview } from '../services/review.service';
+import { CacheService } from '../services/cache.service';
 import { StarRatingComponent } from '../shared/star-rating/star-rating.component';
 import { CourseReviewComponent } from '../course-review/course-review.component';
 import { CourseReviewsListComponent } from '../course-reviews-list/course-reviews-list.component';
@@ -67,7 +68,8 @@ export class CoursePreviewComponent implements OnInit {
     private learningService: LearningService,
     private enrollmentService: EnrollmentService,
     private authService: AuthService,
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+    private cacheService: CacheService
   ) {}
 
   ngOnInit(): void {
@@ -135,12 +137,21 @@ export class CoursePreviewComponent implements OnInit {
 
     this.enrollmentService.enrollInCourse(this.courseId).subscribe({
       next: (response) => {
-        this.enrolling = false;
         if (response.success) {
-          // Refresh enrollment status
-          this.checkEnrollmentStatus();
+          // Update enrollment status immediately
+          this.enrollmentCheck = {
+            enrolled: true,
+            enrollment: response.enrollment || null
+          };
+
+          // Clear enrollment cache to ensure fresh data on next check
+          this.cacheService.invalidateHttp('/enrollment');
+
+          this.enrolling = false;
           // Navigate to learning view
           this.startLearning();
+        } else {
+          this.enrolling = false;
         }
       },
       error: (err) => {

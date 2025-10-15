@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy.orm import Session
@@ -24,7 +24,7 @@ class TestimonialApproval(BaseModel):
 
 @testimonial_router.get('')
 @limiter.limit(get_public_rate_limit("get_content"))
-async def get_approved_testimonials(request: Request, db: Session = Depends(get_db)):
+async def get_approved_testimonials(request: Request, response: Response, db: Session = Depends(get_db)):
     """Get all approved testimonials for public display"""
     try:
         testimonial_service = TestimonialService(db)
@@ -37,6 +37,7 @@ async def get_approved_testimonials(request: Request, db: Session = Depends(get_
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_my_testimonial(
     request: Request,
+    response: Response,
     current_user_id: int = Depends(get_current_user_id), 
     db: Session = Depends(get_db)
 ):
@@ -57,6 +58,7 @@ async def get_my_testimonial(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def create_testimonial(
     request: Request,
+    response: Response,
     testimonial_data: TestimonialCreate,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -86,6 +88,7 @@ async def create_testimonial(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def update_testimonial(
     request: Request,
+    response: Response,
     testimonial_id: int,
     testimonial_data: TestimonialUpdate,
     current_user_id: int = Depends(get_current_user_id),
@@ -117,6 +120,7 @@ async def update_testimonial(
 @limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_testimonial(
     request: Request,
+    response: Response,
     testimonial_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -143,6 +147,7 @@ async def delete_testimonial(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def admin_get_all_testimonials(
     request: Request,
+    response: Response,
     admin_user_id: int = Depends(get_current_admin_user_id),
     db: Session = Depends(get_db)
 ):
@@ -158,6 +163,7 @@ async def admin_get_all_testimonials(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def admin_approve_testimonial(
     request: Request,
+    response: Response,
     testimonial_id: int,
     approval_data: TestimonialApproval,
     admin_user_id: int = Depends(get_current_admin_user_id),

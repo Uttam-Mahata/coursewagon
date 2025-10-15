@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 from dotenv import load_dotenv
 from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 # Load environment variables from .env file
 load_dotenv()
@@ -98,6 +99,9 @@ app = FastAPI(
 
 # Add rate limiter state to app
 app.state.limiter = limiter
+
+# Add SlowAPI middleware
+app.add_middleware(SlowAPIMiddleware)
 
 # Add rate limit exceeded handler
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)

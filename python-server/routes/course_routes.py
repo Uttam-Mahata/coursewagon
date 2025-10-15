@@ -1,5 +1,5 @@
 import asyncio
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request, Response
 from pydantic import BaseModel
 from typing import Optional, List
 from middleware.auth_middleware import get_current_user_id
@@ -36,6 +36,7 @@ class CourseUpdate(BaseModel):
 @limiter.limit(get_content_rate_limit("create_course"))
 async def add_course(
     request: Request,
+    response: Response,
     course_data: CourseCreate,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -93,7 +94,7 @@ async def get_available_categories(db: Session = Depends(get_db)):
 
 @course_router.get('')
 @limiter.limit(get_public_rate_limit("get_courses"))
-async def get_courses(request: Request, db: Session = Depends(get_db)):
+async def get_courses(request: Request, response: Response, db: Session = Depends(get_db)):
     try:
         course_service = CourseService(db)
         courses = course_service.get_all_courses()
@@ -117,6 +118,7 @@ async def get_course(course_id: int, db: Session = Depends(get_db)):
 @limiter.limit(get_content_rate_limit("create_course"))
 async def create_course_manual(
     request: Request,
+    response: Response,
     course_data: CourseCreateManual,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -141,6 +143,7 @@ async def create_course_manual(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def update_course(
     request: Request,
+    response: Response,
     course_id: int,
     course_data: CourseUpdate,
     current_user_id: int = Depends(get_current_user_id),
@@ -167,6 +170,7 @@ async def update_course(
 @limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_course(
     request: Request,
+    response: Response,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -189,6 +193,7 @@ async def delete_course(
 @limiter.limit(get_content_rate_limit("create_course"))
 async def add_course_audio(
     request: Request,
+    response: Response,
     audio: UploadFile = File(...),
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)

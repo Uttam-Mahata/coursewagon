@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_user_id
 from services.subject_service import SubjectService
@@ -7,6 +7,7 @@ from repositories.user_repository import UserRepository
 from services.auth_service import AuthService
 from extensions import get_db
 from sqlalchemy.orm import Session
+from utils.rate_limiter import limiter, get_content_rate_limit, get_public_rate_limit
 
 # Convert Flask Blueprint to FastAPI Router
 subject_router = APIRouter(prefix='/courses', tags=['subjects'])
@@ -29,7 +30,10 @@ class SubjectUpdate(BaseModel):
     name: str
 
 @subject_router.post('/{id}/generate_subjects', status_code=201)
+@limiter.limit(get_content_rate_limit("update_content"))
 async def generate_subjects(
+    request: Request,
+    response: Response,
     id: int,
     current_user_id: int = Depends(get_current_user_id),
     subject_service: SubjectService = Depends(get_subject_service),
@@ -49,8 +53,11 @@ async def generate_subjects(
         raise HTTPException(status_code=500, detail=str(e))
 
 @subject_router.get('/{id}/subjects')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_subjects(
-    id: int, 
+    request: Request,
+    response: Response,
+    id: int,
     subject_service: SubjectService = Depends(get_subject_service)
 ):
     try:
@@ -60,8 +67,11 @@ async def get_subjects(
         raise HTTPException(status_code=500, detail=str(e))
 
 @subject_router.get('/{course_id}/subjects/{subject_id}')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_subject(
-    course_id: int, 
+    request: Request,
+    response: Response,
+    course_id: int,
     subject_id: int,
     subject_service: SubjectService = Depends(get_subject_service)
 ):
@@ -80,7 +90,10 @@ async def get_subject(
         raise HTTPException(status_code=500, detail=str(e))
 
 @subject_router.post('/{course_id}/subjects', status_code=201)
+@limiter.limit(get_content_rate_limit("update_content"))
 async def create_subject(
+    request: Request,
+    response: Response,
     course_id: int,
     subject_data: SubjectCreate,
     current_user_id: int = Depends(get_current_user_id),
@@ -104,7 +117,10 @@ async def create_subject(
         raise HTTPException(status_code=500, detail=str(e))
 
 @subject_router.put('/{course_id}/subjects/{subject_id}')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def update_subject(
+    request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     subject_data: SubjectUpdate,
@@ -129,7 +145,10 @@ async def update_subject(
         raise HTTPException(status_code=500, detail=str(e))
 
 @subject_router.delete('/{course_id}/subjects/{subject_id}')
+@limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_subject(
+    request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     current_user_id: int = Depends(get_current_user_id),

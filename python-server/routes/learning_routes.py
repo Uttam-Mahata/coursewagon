@@ -1,5 +1,5 @@
 # routes/learning_routes.py
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel
 from typing import Optional
 from middleware.auth_middleware import get_current_user_id
@@ -8,6 +8,7 @@ from services.learning_progress_service import LearningProgressService
 from services.course_service import CourseService
 from extensions import get_db
 from sqlalchemy.orm import Session
+from utils.rate_limiter import limiter, get_public_rate_limit, get_content_rate_limit
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,10 @@ class TopicComplete(BaseModel):
 
 # Course Discovery Routes
 @learning_router.get('/courses')
+@limiter.limit(get_public_rate_limit("get_courses"))
 async def browse_published_courses(
+    request: Request,
+    response: Response,
     limit: int = Query(20, description="Number of courses to return"),
     offset: int = Query(0, description="Offset for pagination"),
     db: Session = Depends(get_db)
@@ -45,7 +49,10 @@ async def browse_published_courses(
         raise HTTPException(status_code=500, detail=str(e))
 
 @learning_router.get('/courses/search')
+@limiter.limit(get_public_rate_limit("search"))
 async def search_courses(
+    request: Request,
+    response: Response,
     q: str = Query(..., description="Search query"),
     limit: int = Query(20, description="Number of results"),
     db: Session = Depends(get_db)
@@ -60,7 +67,10 @@ async def search_courses(
         raise HTTPException(status_code=500, detail=str(e))
 
 @learning_router.get('/courses/category/{category}')
+@limiter.limit(get_public_rate_limit("get_courses"))
 async def get_courses_by_category(
+    request: Request,
+    response: Response,
     category: str,
     limit: int = Query(20, description="Number of courses"),
     db: Session = Depends(get_db)
@@ -75,7 +85,10 @@ async def get_courses_by_category(
         raise HTTPException(status_code=500, detail=str(e))
 
 @learning_router.get('/courses/popular')
+@limiter.limit(get_public_rate_limit("get_courses"))
 async def get_popular_courses(
+    request: Request,
+    response: Response,
     limit: int = Query(10, description="Number of popular courses"),
     db: Session = Depends(get_db)
 ):
@@ -89,7 +102,10 @@ async def get_popular_courses(
         raise HTTPException(status_code=500, detail=str(e))
 
 @learning_router.get('/courses/{course_id}/preview')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_course_preview(
+    request: Request,
+    response: Response,
     course_id: int,
     db: Session = Depends(get_db)
 ):
@@ -106,7 +122,10 @@ async def get_course_preview(
 
 # Progress Tracking Routes
 @learning_router.post('/progress/track')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def track_progress(
+    request: Request,
+    response: Response,
     progress_data: ProgressUpdate,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -131,7 +150,10 @@ async def track_progress(
         raise HTTPException(status_code=500, detail=str(e))
 
 @learning_router.post('/progress/complete-topic')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def mark_topic_complete(
+    request: Request,
+    response: Response,
     completion_data: TopicComplete,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -152,7 +174,10 @@ async def mark_topic_complete(
         raise HTTPException(status_code=500, detail=str(e))
 
 @learning_router.get('/progress/enrollment/{enrollment_id}')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_course_progress(
+    request: Request,
+    response: Response,
     enrollment_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -169,7 +194,10 @@ async def get_course_progress(
         raise HTTPException(status_code=500, detail=str(e))
 
 @learning_router.get('/progress/enrollment/{enrollment_id}/resume')
+@limiter.limit(get_public_rate_limit("get_content"))
 async def get_resume_point(
+    request: Request,
+    response: Response,
     enrollment_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -192,7 +220,10 @@ class PublishCourseRequest(BaseModel):
     estimated_duration_hours: Optional[int] = None
 
 @learning_router.post('/courses/{course_id}/publish')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def publish_course(
+    request: Request,
+    response: Response,
     course_id: int,
     publish_data: PublishCourseRequest,
     current_user_id: int = Depends(get_current_user_id),
@@ -214,7 +245,10 @@ async def publish_course(
         raise HTTPException(status_code=500, detail=str(e))
 
 @learning_router.post('/courses/{course_id}/unpublish')
+@limiter.limit(get_content_rate_limit("update_content"))
 async def unpublish_course(
+    request: Request,
+    response: Response,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)

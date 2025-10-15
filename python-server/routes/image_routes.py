@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_user_id
 from services.image_service import ImageService
@@ -32,6 +32,7 @@ class ImageUrlCheck(BaseModel):
 @limiter.limit(get_ai_rate_limit("generate_course_image"))
 async def generate_course_image(
     request: Request,
+    response: Response,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     image_service: ImageService = Depends(get_image_service),
@@ -56,6 +57,7 @@ async def generate_course_image(
 @limiter.limit(get_ai_rate_limit("generate_subject_image"))
 async def generate_subject_image(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     current_user_id: int = Depends(get_current_user_id),
@@ -81,6 +83,7 @@ async def generate_subject_image(
 @limiter.limit(get_ai_rate_limit("generate_image"))
 async def generate_all_subject_images(
     request: Request,
+    response: Response,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     image_service: ImageService = Depends(get_image_service),

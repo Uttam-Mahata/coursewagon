@@ -28,7 +28,7 @@ class EmailService:
         self.sender_email = os.environ.get('MAIL_DEFAULT_SENDER', self.smtp_username)
         self.contact_email = os.environ.get('MAIL_CONTACT_EMAIL', 'contact@coursewagon.live')
         self.app_name = os.environ.get('APP_NAME', 'Course Wagon')
-        self.frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:4200')
+        self.frontend_url = os.environ.get('FRONTEND_URL', 'https://www.coursewagon.live')
         
         logger.debug(f"Email service using Gmail SMTP: {self.smtp_server}:{self.smtp_port}")
         

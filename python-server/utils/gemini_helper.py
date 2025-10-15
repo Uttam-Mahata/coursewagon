@@ -111,7 +111,7 @@ class GeminiHelper:
         self.generation_config = {
             "max_output_tokens": 8192
         }
-        self.model_name = "gemini-2.0-flash"  # Default model
+        self.model_name = "gemini-2.5-flash-lite"  # Default model
 
     @property
     def client(self):

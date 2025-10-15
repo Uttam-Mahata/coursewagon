@@ -20,7 +20,7 @@ class GeminiImageGenerator:
         if not self.api_key:
             logger.warning("No API_KEY found in environment variables. Image generation functionality will not work.")
             
-        self.model_name = "gemini-2.0-flash-exp-image-generation"
+        self.model_name = "gemini-2.5-flash-image"
         self._client = None
     
     @property

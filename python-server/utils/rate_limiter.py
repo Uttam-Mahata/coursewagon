@@ -93,6 +93,10 @@ redis_host = os.environ.get('REDIS_HOST')
 redis_port = os.environ.get('REDIS_PORT', '6379')
 redis_password = os.environ.get('REDIS_PASSWORD')
 
+# Handle None/empty string for redis_password
+if redis_password and redis_password.lower() in ('none', 'null', ''):
+    redis_password = None
+
 storage_uri = None
 if redis_host:
     # Use Redis for distributed rate limiting (recommended for production)

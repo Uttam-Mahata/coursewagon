@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_user_id
 from services.chapter_service import ChapterService
@@ -33,6 +33,7 @@ class ChapterUpdate(BaseModel):
 @limiter.limit(get_content_rate_limit("update_content"))
 async def generate_chapters(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     current_user_id: int = Depends(get_current_user_id),
@@ -54,6 +55,7 @@ async def generate_chapters(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_chapters(
     request: Request,
+    response: Response,
     course_id: int, 
     subject_id: int,
     chapter_service: ChapterService = Depends(get_chapter_service)
@@ -68,6 +70,7 @@ async def get_chapters(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_chapter(
     request: Request,
+    response: Response,
     course_id: int, 
     subject_id: int, 
     chapter_id: int,
@@ -86,6 +89,7 @@ async def get_chapter(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def create_chapter(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_data: ChapterCreate,
@@ -111,6 +115,7 @@ async def create_chapter(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def update_chapter(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -137,6 +142,7 @@ async def update_chapter(
 @limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_chapter(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,

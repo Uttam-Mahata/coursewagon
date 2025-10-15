@@ -1,5 +1,5 @@
 # routes/learning_routes.py
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel
 from typing import Optional
 from middleware.auth_middleware import get_current_user_id
@@ -34,6 +34,7 @@ class TopicComplete(BaseModel):
 @limiter.limit(get_public_rate_limit("get_courses"))
 async def browse_published_courses(
     request: Request,
+    response: Response,
     limit: int = Query(20, description="Number of courses to return"),
     offset: int = Query(0, description="Offset for pagination"),
     db: Session = Depends(get_db)
@@ -51,6 +52,7 @@ async def browse_published_courses(
 @limiter.limit(get_public_rate_limit("search"))
 async def search_courses(
     request: Request,
+    response: Response,
     q: str = Query(..., description="Search query"),
     limit: int = Query(20, description="Number of results"),
     db: Session = Depends(get_db)
@@ -68,6 +70,7 @@ async def search_courses(
 @limiter.limit(get_public_rate_limit("get_courses"))
 async def get_courses_by_category(
     request: Request,
+    response: Response,
     category: str,
     limit: int = Query(20, description="Number of courses"),
     db: Session = Depends(get_db)
@@ -85,6 +88,7 @@ async def get_courses_by_category(
 @limiter.limit(get_public_rate_limit("get_courses"))
 async def get_popular_courses(
     request: Request,
+    response: Response,
     limit: int = Query(10, description="Number of popular courses"),
     db: Session = Depends(get_db)
 ):
@@ -101,6 +105,7 @@ async def get_popular_courses(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_course_preview(
     request: Request,
+    response: Response,
     course_id: int,
     db: Session = Depends(get_db)
 ):
@@ -120,6 +125,7 @@ async def get_course_preview(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def track_progress(
     request: Request,
+    response: Response,
     progress_data: ProgressUpdate,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -147,6 +153,7 @@ async def track_progress(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def mark_topic_complete(
     request: Request,
+    response: Response,
     completion_data: TopicComplete,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -170,6 +177,7 @@ async def mark_topic_complete(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_course_progress(
     request: Request,
+    response: Response,
     enrollment_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -189,6 +197,7 @@ async def get_course_progress(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_resume_point(
     request: Request,
+    response: Response,
     enrollment_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -214,6 +223,7 @@ class PublishCourseRequest(BaseModel):
 @limiter.limit(get_content_rate_limit("update_content"))
 async def publish_course(
     request: Request,
+    response: Response,
     course_id: int,
     publish_data: PublishCourseRequest,
     current_user_id: int = Depends(get_current_user_id),
@@ -238,6 +248,7 @@ async def publish_course(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def unpublish_course(
     request: Request,
+    response: Response,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)

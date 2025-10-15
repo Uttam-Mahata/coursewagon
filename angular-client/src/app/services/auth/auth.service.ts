@@ -29,8 +29,14 @@ export class AuthService {
     private firebaseAuthService: FirebaseAuthService
   ) {
     // Initialize from localStorage immediately (synchronous - no flash!)
-    // Then verify with backend (asynchronous - security check)
-    this.checkAuthState();
+    // Auth state is verified on protected routes via guards
+    // No need to check on every app load - prevents unwanted redirects
+    const userStr = localStorage.getItem(this.userKey);
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      this.currentUserSource.next(user);
+      this.isLoggedInSource.next(true);
+    }
   }
 
   /**

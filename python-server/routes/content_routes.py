@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request, Response
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_user_id
 from services.content_service import ContentService
@@ -38,6 +38,7 @@ class ContentUpdate(BaseModel):
 @limiter.limit(get_content_rate_limit("update_content"))
 async def generate_content(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -66,6 +67,7 @@ async def generate_content(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_content(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -92,6 +94,7 @@ async def get_content(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def create_content_manual(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -124,6 +127,7 @@ async def create_content_manual(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def update_content(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -156,6 +160,7 @@ async def update_content(
 @limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_content(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -185,6 +190,7 @@ async def delete_content(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def upload_video(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -219,6 +225,7 @@ async def upload_video(
 @limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_video(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,

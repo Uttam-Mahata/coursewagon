@@ -78,6 +78,12 @@ export class CacheInterceptor implements HttpInterceptor {
       patterns.push('/learning');
     }
 
+    // Enrollment endpoints - CRITICAL: invalidate enrollment checks when enrolling/unenrolling
+    if (url.includes('/enrollment')) {
+      patterns.push('/enrollment');
+      patterns.push('/my-enrollment');
+    }
+
     // Subject endpoints
     if (url.includes('/subjects')) {
       patterns.push('/subjects');
@@ -101,6 +107,16 @@ export class CacheInterceptor implements HttpInterceptor {
     // Statistics endpoints
     if (url.includes('/statistics')) {
       patterns.push('/statistics');
+    }
+
+    // Review endpoints
+    if (url.includes('/review')) {
+      patterns.push('/review');
+    }
+
+    // Progress endpoints
+    if (url.includes('/progress')) {
+      patterns.push('/progress');
     }
 
     // Invalidate all matching caches

@@ -19,6 +19,8 @@ export class AuthComponent implements OnInit {
   isLoginMode = true;
   errorMessage = '';
   successMessage = '';
+  isLoginLoading = false;
+  isRegisterLoading = false;
   isGoogleLoading = false;
   registeredEmail = '';
   showVerificationMessage = false;
@@ -64,8 +66,8 @@ export class AuthComponent implements OnInit {
     // Don't subscribe to changes to avoid redirecting during active sign-in
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
-      console.log('User already logged in. Redirecting to courses page.');
-      this.router.navigate(['/courses']);
+      console.log('User already logged in. Redirecting to home page.');
+      this.router.navigate(['/home']);
     }
 
     this.route.queryParams.subscribe(params => {
@@ -99,6 +101,7 @@ export class AuthComponent implements OnInit {
       return;
     }
 
+    this.isLoginLoading = true;
     const { email, password, rememberMe } = this.loginForm.value;
     console.log('Attempting login with email:', email, 'Remember me:', rememberMe);
 
@@ -107,12 +110,16 @@ export class AuthComponent implements OnInit {
         next: (response) => {
           console.log('Login successful, response:', response);
           this.successMessage = 'Login successful! Redirecting...';
+
+          // Check for returnUrl in query params, otherwise go to home
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
           setTimeout(() => {
-            this.router.navigate(['/courses']);
+            this.router.navigate([returnUrl]);
           }, 100);
         },
         error: (error) => {
           console.error('Login error:', error);
+          this.isLoginLoading = false;
 
           // Check if this is an unverified email error
           if (error.error?.detail?.error === 'EMAIL_NOT_VERIFIED') {
@@ -133,9 +140,11 @@ export class AuthComponent implements OnInit {
       return;
     }
 
+    this.isRegisterLoading = true;
     this.authService.register(this.registerForm.value)
       .subscribe({
         next: (response) => {
+          this.isRegisterLoading = false;
           this.registeredEmail = this.registerForm.value.email;
           this.showVerificationMessage = true;
           this.successMessage = '';
@@ -144,6 +153,7 @@ export class AuthComponent implements OnInit {
         },
         error: (error) => {
           console.error('Registration error:', error);
+          this.isRegisterLoading = false;
           this.errorMessage = this.getErrorMessage(error);
         }
       });
@@ -197,9 +207,11 @@ export class AuthComponent implements OnInit {
       
       // Show success message
       this.successMessage = 'Google sign-in successful! Redirecting...';
-      
+
+      // Check for returnUrl in query params, otherwise go to home
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
       setTimeout(() => {
-        this.router.navigate(['/courses']);
+        this.router.navigate([returnUrl]);
       }, 1000);
     } catch (error: any) {
       console.error('Google sign-in error:', error);

@@ -1,5 +1,5 @@
 # routes/enrollment_routes.py
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel
 from typing import Optional
 from middleware.auth_middleware import get_current_user_id
@@ -22,6 +22,7 @@ class EnrollRequest(BaseModel):
 @limiter.limit(get_content_rate_limit("update_content"))
 async def enroll_in_course(
     request: Request,
+    response: Response,
     enrollment_data: EnrollRequest,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -41,6 +42,7 @@ async def enroll_in_course(
 @limiter.limit(get_content_rate_limit("delete_content"))
 async def unenroll_from_course(
     request: Request,
+    response: Response,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -60,6 +62,7 @@ async def unenroll_from_course(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_my_enrollments(
     request: Request,
+    response: Response,
     status: Optional[str] = Query(None, description="Filter by status: active, completed, dropped"),
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -77,6 +80,7 @@ async def get_my_enrollments(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def check_enrollment(
     request: Request,
+    response: Response,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -94,6 +98,7 @@ async def check_enrollment(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_course_enrollments(
     request: Request,
+    response: Response,
     course_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
@@ -113,6 +118,7 @@ async def get_course_enrollments(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def update_enrollment_progress(
     request: Request,
+    response: Response,
     enrollment_id: int,
     current_user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)

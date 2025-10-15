@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request, Response
 from fastapi.responses import StreamingResponse, JSONResponse
 import requests
 import logging
@@ -19,7 +19,7 @@ utility_router = APIRouter(prefix='/proxy', tags=['utilities'])
 
 @utility_router.get('/image')
 @limiter.limit(get_utility_rate_limit("proxy_image"))
-async def proxy_image(request: Request, url: str = Query(..., description="Image URL to proxy")):
+async def proxy_image(request: Request, response: Response, url: str = Query(..., description="Image URL to proxy")):
     """Proxy for images to bypass CORS issues"""
     if not url:
         raise HTTPException(status_code=400, detail="URL parameter required")
@@ -48,7 +48,7 @@ async def proxy_image(request: Request, url: str = Query(..., description="Image
 
 @utility_router.get('/check-image')
 @limiter.limit(get_utility_rate_limit("check_image"))
-async def check_image(request: Request, url: str = Query(..., description="Image URL to check")):
+async def check_image(request: Request, response: Response, url: str = Query(..., description="Image URL to check")):
     """Check if an image URL is accessible"""
     if not url:
         raise HTTPException(status_code=400, detail="URL parameter required")
@@ -74,7 +74,7 @@ async def check_image(request: Request, url: str = Query(..., description="Image
 
 @utility_router.get('/direct-image')
 @limiter.limit(get_utility_rate_limit("direct_image"))
-async def generate_direct_image(request: Request, prompt: str = Query('A beautiful 3D rendered educational concept', description="Image generation prompt")):
+async def generate_direct_image(request: Request, response: Response, prompt: str = Query('A beautiful 3D rendered educational concept', description="Image generation prompt")):
     """Generate an image directly and return it to the browser"""
     try:
         # Get API key

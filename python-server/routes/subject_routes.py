@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_user_id
 from services.subject_service import SubjectService
@@ -33,6 +33,7 @@ class SubjectUpdate(BaseModel):
 @limiter.limit(get_content_rate_limit("update_content"))
 async def generate_subjects(
     request: Request,
+    response: Response,
     id: int,
     current_user_id: int = Depends(get_current_user_id),
     subject_service: SubjectService = Depends(get_subject_service),
@@ -55,7 +56,8 @@ async def generate_subjects(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_subjects(
     request: Request,
-    id: int, 
+    response: Response,
+    id: int,
     subject_service: SubjectService = Depends(get_subject_service)
 ):
     try:
@@ -68,7 +70,8 @@ async def get_subjects(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_subject(
     request: Request,
-    course_id: int, 
+    response: Response,
+    course_id: int,
     subject_id: int,
     subject_service: SubjectService = Depends(get_subject_service)
 ):
@@ -90,6 +93,7 @@ async def get_subject(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def create_subject(
     request: Request,
+    response: Response,
     course_id: int,
     subject_data: SubjectCreate,
     current_user_id: int = Depends(get_current_user_id),
@@ -116,6 +120,7 @@ async def create_subject(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def update_subject(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     subject_data: SubjectUpdate,
@@ -143,6 +148,7 @@ async def update_subject(
 @limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_subject(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     current_user_id: int = Depends(get_current_user_id),

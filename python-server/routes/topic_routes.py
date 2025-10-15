@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_user_id
 from services.topic_service import TopicService
@@ -34,6 +34,7 @@ class TopicUpdate(BaseModel):
 @limiter.limit(get_content_rate_limit("update_content"))
 async def generate_topics(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -59,6 +60,7 @@ async def generate_topics(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_topics(
     request: Request,
+    response: Response,
     course_id: int, 
     subject_id: int, 
     chapter_id: int,
@@ -74,6 +76,7 @@ async def get_topics(
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_topic(
     request: Request,
+    response: Response,
     course_id: int, 
     subject_id: int, 
     chapter_id: int, 
@@ -97,6 +100,7 @@ async def get_topic(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def create_topic(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -126,6 +130,7 @@ async def create_topic(
 @limiter.limit(get_content_rate_limit("update_content"))
 async def update_topic(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,
@@ -156,6 +161,7 @@ async def update_topic(
 @limiter.limit(get_content_rate_limit("delete_content"))
 async def delete_topic(
     request: Request,
+    response: Response,
     course_id: int,
     subject_id: int,
     chapter_id: int,

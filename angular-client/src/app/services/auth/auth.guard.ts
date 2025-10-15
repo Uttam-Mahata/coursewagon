@@ -54,8 +54,8 @@ export class NonAuthGuard implements CanActivate {
       return true;
     }
 
-    // If user is logged in, redirect to courses page
-    this.router.navigate(['/courses']);
+    // If user is logged in, redirect to home page
+    this.router.navigate(['/home']);
     return false;
   }
 }

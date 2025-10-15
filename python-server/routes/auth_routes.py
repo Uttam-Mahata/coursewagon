@@ -142,6 +142,7 @@ class ResendVerification(BaseModel):
 @limiter.limit(get_auth_rate_limit("check_email"))
 async def check_email(
     request: Request,
+    response: Response,
     email_data: CheckEmail,
     db: Session = Depends(get_db)
 ):
@@ -160,7 +161,7 @@ async def check_email(
 
 @auth_router.post('/validate-email')
 @limiter.limit(get_auth_rate_limit("validate_email"))
-async def validate_email_endpoint(request: Request, email_data: CheckEmail):
+async def validate_email_endpoint(request: Request, response: Response, email_data: CheckEmail):
     """
     Validate if an email address is deliverable by checking:
     - Email format
@@ -196,7 +197,8 @@ async def validate_email_endpoint(request: Request, email_data: CheckEmail):
 @limiter.limit(get_auth_rate_limit("register"))
 async def register(
     request: Request,
-    user_data: UserRegister, 
+    response: Response,
+    user_data: UserRegister,
     db: Session = Depends(get_db),
     auth_service: AuthService = Depends(get_auth_service)
 ):
@@ -346,7 +348,7 @@ async def update_profile(
 
 @auth_router.post('/forgot-password')
 @limiter.limit(get_auth_rate_limit("forgot_password"))
-async def forgot_password(request: Request, forgot_data: ForgotPassword, db: Session = Depends(get_db)):
+async def forgot_password(request: Request, response: Response, forgot_data: ForgotPassword, db: Session = Depends(get_db)):
     """Request password reset email"""
     try:
         if not forgot_data.email:
@@ -382,7 +384,7 @@ async def verify_reset_token(token_data: VerifyResetToken, db: Session = Depends
 
 @auth_router.post('/reset-password')
 @limiter.limit(get_auth_rate_limit("reset_password"))
-async def reset_password(request: Request, reset_data: ResetPasswordRequest, db: Session = Depends(get_db)):
+async def reset_password(request: Request, response: Response, reset_data: ResetPasswordRequest, db: Session = Depends(get_db)):
     """Reset password using reset token"""
     try:
         if not reset_data.token or not reset_data.password:
@@ -435,7 +437,7 @@ async def change_password(
 
 @auth_router.post('/verify-email')
 @limiter.limit(get_auth_rate_limit("verify_email"))
-async def verify_email(request: Request, verify_data: VerifyEmail, db: Session = Depends(get_db)):
+async def verify_email(request: Request, response: Response, verify_data: VerifyEmail, db: Session = Depends(get_db)):
     """Verify user's email address with token"""
     try:
         if not verify_data.token:
@@ -456,7 +458,7 @@ async def verify_email(request: Request, verify_data: VerifyEmail, db: Session =
 
 @auth_router.post('/resend-verification')
 @limiter.limit(get_auth_rate_limit("resend_verification"))
-async def resend_verification(request: Request, resend_data: ResendVerification, db: Session = Depends(get_db)):
+async def resend_verification(request: Request, response: Response, resend_data: ResendVerification, db: Session = Depends(get_db)):
     """Resend verification email to user"""
     try:
         if not resend_data.email:

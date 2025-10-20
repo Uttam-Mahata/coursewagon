@@ -133,3 +133,59 @@ class CourseDiscoveryService:
         except Exception as e:
             logger.error(f"Error getting course preview: {str(e)}")
             raise HTTPException(status_code=500, detail=str(e))
+
+    def get_course_structure_for_learning(self, course_id: int):
+        """Get full course structure optimized for learning view (cached for 5 minutes)"""
+        cache_key = f"course_structure:learning:{course_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached course structure for learning for course {course_id}")
+            return cached
+        
+        try:
+            course = self.course_repo.get_course_by_id(course_id)
+            if not course:
+                raise HTTPException(status_code=404, detail="Course not found")
+
+            # Use optimized query to get all structure data at once
+            from sqlalchemy.orm import joinedload
+            from models.subject import Subject
+            from models.chapter import Chapter
+            from models.topic import Topic
+            
+            # Load subjects with eager loading of chapters and topics
+            subjects = self.db.query(Subject).filter(
+                Subject.course_id == course_id
+            ).options(
+                joinedload(Subject.chapters).joinedload(Chapter.topics)
+            ).all()
+
+            # Build complete structure with full hierarchy
+            structure = []
+            for subject in subjects:
+                subject_dict = subject.to_dict()
+                
+                # Build chapters with their topics
+                chapters_list = []
+                for chapter in subject.chapters:
+                    chapter_dict = chapter.to_dict()
+                    chapter_dict['topics'] = [topic.to_dict() for topic in chapter.topics]
+                    chapters_list.append(chapter_dict)
+                
+                subject_dict['chapters'] = chapters_list
+                structure.append(subject_dict)
+
+            result = {
+                "course": course.to_dict(),
+                "subjects": structure
+            }
+            
+            # Cache for 5 minutes
+            cache_helper.set(cache_key, result, ttl=300)
+            return result
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Error getting course structure for learning: {str(e)}")
+            raise HTTPException(status_code=500, detail=str(e))

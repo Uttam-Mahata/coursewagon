@@ -120,6 +120,35 @@ async def get_course_preview(
         logger.error(f"Error getting course preview: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@learning_router.get('/courses/{course_id}/structure')
+@limiter.limit(get_public_rate_limit("get_content"))
+async def get_course_structure(
+    request: Request,
+    response: Response,
+    course_id: int,
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """Get full course structure with subjects, chapters, and topics for enrolled users"""
+    try:
+        # Check enrollment
+        from services.enrollment_service import EnrollmentService
+        enrollment_service = EnrollmentService(db)
+        check = enrollment_service.check_enrollment(current_user_id, course_id)
+        
+        if not check['enrolled']:
+            raise HTTPException(status_code=403, detail="Not enrolled in this course")
+        
+        # Get course structure using optimized query
+        discovery_service = CourseDiscoveryService(db)
+        structure = discovery_service.get_course_structure_for_learning(course_id)
+        return structure
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting course structure: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Progress Tracking Routes
 @learning_router.post('/progress/track')
 @limiter.limit(get_content_rate_limit("update_content"))

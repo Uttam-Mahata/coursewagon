@@ -166,97 +166,48 @@ export class LearningViewComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   loadCourseDetails(): void {
-    // Load course
-    this.courseService.getCourseDetails(this.courseId).subscribe({
-      next: (course) => {
-        this.course = course;
+    // Use optimized endpoint that returns course + full structure in one call
+    this.learningService.getCourseStructure(this.courseId).subscribe({
+      next: (data) => {
+        this.course = data.course;
+        this.subjects = data.subjects;
 
-        // Load subjects and topics
-        this.loadSubjectsAndTopics();
-      },
-      error: (err) => {
-        this.error = 'Failed to load course details';
-        this.loading = false;
-        console.error('Error loading course:', err);
-      }
-    });
-  }
-
-  loadSubjectsAndTopics(): void {
-    this.subjectService.getSubjects(this.courseId).subscribe({
-      next: (subjects) => {
-        this.subjects = subjects;
-
-        if (subjects.length === 0) {
-          this.error = 'No subjects found in this course';
-          this.loading = false;
-          return;
-        }
-
-        // Load all chapters for all subjects in parallel using Promise.all
-        const chapterPromises = subjects.map((subject: any) => {
-          return new Promise<void>((resolve, reject) => {
-            this.chapterService.getChapters(this.courseId, subject.id).subscribe({
-              next: (chapters) => {
-                subject.chapters = chapters;
-                
-                if (chapters.length === 0) {
-                  resolve();
-                  return;
-                }
-
-                // Load all topics for all chapters in parallel
-                const topicPromises = chapters.map((chapter: any) => {
-                  return new Promise<void>((resolveTopics, rejectTopics) => {
-                    this.topicService.getTopics(this.courseId, subject.id, chapter.id).subscribe({
-                      next: (topics) => {
-                        chapter.topics = topics;
-
-                        // Add topics to allTopics with full context
-                        topics.forEach((topic: any) => {
-                          this.allTopics.push({
-                            ...topic,
-                            subject_id: subject.id,
-                            subject_name: subject.name,
-                            chapter_id: chapter.id,
-                            chapter_name: chapter.name
-                          });
-                        });
-
-                        resolveTopics();
-                      },
-                      error: (err) => {
-                        console.error(`Error loading topics for chapter ${chapter.id}:`, err);
-                        resolveTopics(); // Continue even if one fails
-                      }
-                    });
-                  });
-                });
-
-                Promise.all(topicPromises).then(() => resolve()).catch(() => resolve());
-              },
-              error: (err) => {
-                console.error(`Error loading chapters for subject ${subject.id}:`, err);
-                resolve(); // Continue even if one fails
-              }
-            });
-          });
-        });
-
-        Promise.all(chapterPromises).then(() => {
-          this.finishLoadingStructure();
-        }).catch((err) => {
-          console.error('Error loading course structure:', err);
-          this.finishLoadingStructure();
-        });
+        // Process the structure to build allTopics array
+        this.processStructure();
+        this.finishLoadingStructure();
       },
       error: (err) => {
         this.error = 'Failed to load course structure';
         this.loading = false;
-        console.error('Error loading subjects:', err);
+        console.error('Error loading course structure:', err);
       }
     });
   }
+
+  processStructure(): void {
+    // Build allTopics array from the loaded structure
+    this.allTopics = [];
+    
+    this.subjects.forEach((subject: any) => {
+      if (subject.chapters && subject.chapters.length > 0) {
+        subject.chapters.forEach((chapter: any) => {
+          if (chapter.topics && chapter.topics.length > 0) {
+            chapter.topics.forEach((topic: any) => {
+              this.allTopics.push({
+                ...topic,
+                subject_id: subject.id,
+                subject_name: subject.name,
+                chapter_id: chapter.id,
+                chapter_name: chapter.name
+              });
+            });
+          }
+        });
+      }
+    });
+  }
+
+
 
   finishLoadingStructure(): void {
     // Determine which topic to load

@@ -94,4 +94,14 @@ export class EnrollmentService {
       {}
     );
   }
+
+  /**
+   * Check enrollment status for multiple courses at once (batch operation)
+   */
+  checkEnrollmentsBatch(courseIds: number[]): Observable<{ [courseId: string]: EnrollmentCheck }> {
+    return this.http.post<{ [courseId: string]: EnrollmentCheck }>(
+      `${this.apiUrl}/enrollments/check-batch`,
+      courseIds
+    );
+  }
 }

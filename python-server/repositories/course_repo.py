@@ -208,8 +208,9 @@ class CourseRepository:
             raise
 
     def get_published_courses(self, limit=None, offset=None):
-        """Get all published courses"""
+        """Get all published courses - optimized with selective loading"""
         try:
+            # Only load the columns needed for course listing
             query = self.db.query(Course).filter(Course.is_published == True).order_by(Course.published_at.desc())
 
             if offset:

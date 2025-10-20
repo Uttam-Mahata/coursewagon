@@ -107,16 +107,33 @@ export class CourseCatalogComponent implements OnInit {
   }
 
   checkEnrollmentStatus(): void {
-    // Check enrollment status for each course
-    this.courses.forEach(course => {
-      this.enrollmentService.checkEnrollment(course.id).subscribe({
-        next: (check) => {
-          course.is_enrolled = check.enrolled;
-        },
-        error: (err) => {
-          console.error(`Error checking enrollment for course ${course.id}:`, err);
-        }
-      });
+    // Use batch enrollment check to reduce API calls
+    if (this.courses.length === 0) return;
+
+    const courseIds = this.courses.map(course => course.id);
+    
+    this.enrollmentService.checkEnrollmentsBatch(courseIds).subscribe({
+      next: (enrollmentMap) => {
+        // Update enrollment status for each course
+        this.courses.forEach(course => {
+          const check = enrollmentMap[course.id.toString()];
+          course.is_enrolled = check?.enrolled || false;
+        });
+      },
+      error: (err) => {
+        console.error('Error checking batch enrollments:', err);
+        // Fall back to individual checks on error
+        this.courses.forEach(course => {
+          this.enrollmentService.checkEnrollment(course.id).subscribe({
+            next: (check) => {
+              course.is_enrolled = check.enrolled;
+            },
+            error: (err) => {
+              console.error(`Error checking enrollment for course ${course.id}:`, err);
+            }
+          });
+        });
+      }
     });
   }
 

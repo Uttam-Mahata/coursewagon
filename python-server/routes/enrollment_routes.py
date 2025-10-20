@@ -94,6 +94,24 @@ async def check_enrollment(
         logger.error(f"Error checking enrollment: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@enrollment_router.post('/check-batch')
+@limiter.limit(get_public_rate_limit("get_content"))
+async def check_enrollments_batch(
+    request: Request,
+    response: Response,
+    course_ids: list[int],
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """Check enrollment status for multiple courses at once (batch operation)"""
+    try:
+        enrollment_service = EnrollmentService(db)
+        result = enrollment_service.check_enrollments_batch(current_user_id, course_ids)
+        return result
+    except Exception as e:
+        logger.error(f"Error checking batch enrollments: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @enrollment_router.get('/course/{course_id}')
 @limiter.limit(get_public_rate_limit("get_content"))
 async def get_course_enrollments(

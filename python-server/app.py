@@ -37,12 +37,14 @@ async def lifespan(app: FastAPI):
         from migrations.add_video_url_to_content import add_video_url_to_content
         from migrations.add_database_indexes import add_database_indexes
         from migrations.add_course_reviews import run_migration as run_course_reviews_migration
+        from migrations.add_enrollment_composite_index import add_enrollment_composite_index
 
         add_welcome_email_sent_column()
         run_email_verification_migration()
         run_all_migrations()  # New learner functionality migrations
         add_video_url_to_content()  # Add video_url to content table
         add_database_indexes()  # Add performance indexes
+        add_enrollment_composite_index()  # Add composite index for enrollment lookups
         run_course_reviews_migration()  # Add course reviews and ratings
         logger.info("Database migrations completed successfully")
     except Exception as e:

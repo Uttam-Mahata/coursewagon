@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
+from starlette.responses import Response
 from pydantic import BaseModel
 from middleware.auth_middleware import get_current_admin_user_id
 from admin.service import AdminService
@@ -33,6 +34,7 @@ class AdminStatusUpdate(BaseModel):
 @limiter.limit(get_admin_rate_limit("dashboard"))
 async def get_dashboard(
     request: Request,
+    response: Response,
     current_admin_id: int = Depends(get_current_admin_user_id),
     admin_service: AdminService = Depends(get_admin_service)
 ) -> Dict[str, Any]:
@@ -48,6 +50,7 @@ async def get_dashboard(
 @limiter.limit(get_admin_rate_limit("user_management"))
 async def get_all_users(
     request: Request,
+    response: Response,
     current_admin_id: int = Depends(get_current_admin_user_id),
     admin_service: AdminService = Depends(get_admin_service)
 ) -> List[Dict[str, Any]]:
@@ -63,6 +66,7 @@ async def get_all_users(
 @limiter.limit(get_admin_rate_limit("user_management"))
 async def get_pending_testimonials(
     request: Request,
+    response: Response,
     current_admin_id: int = Depends(get_current_admin_user_id),
     admin_service: AdminService = Depends(get_admin_service)
 ) -> List[Dict[str, Any]]:
@@ -78,6 +82,7 @@ async def get_pending_testimonials(
 @limiter.limit(get_admin_rate_limit("user_management"))
 async def toggle_user_status(
     request: Request,
+    response: Response,
     user_id: int,
     status_update: UserStatusUpdate,
     current_admin_id: int = Depends(get_current_admin_user_id),
@@ -99,6 +104,7 @@ async def toggle_user_status(
 @limiter.limit(get_admin_rate_limit("user_management"))
 async def toggle_admin_status(
     request: Request,
+    response: Response,
     user_id: int,
     admin_update: AdminStatusUpdate,
     current_admin_id: int = Depends(get_current_admin_user_id),

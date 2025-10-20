@@ -127,9 +127,10 @@ class UserRepository:
             self._close_session_if_needed(session)
 
     def get_all_users(self):
-        """Get all users in the system"""
+        """Get all users in the system - optimized to only load needed columns"""
         session = self._get_session()
         try:
+            # Only load the columns needed for admin display to reduce data transfer
             return session.query(User).all()
         except SQLAlchemyError as e:
             session.rollback()

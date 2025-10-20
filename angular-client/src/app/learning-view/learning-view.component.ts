@@ -187,79 +187,67 @@ export class LearningViewComponent implements OnInit, OnDestroy, AfterViewChecke
       next: (subjects) => {
         this.subjects = subjects;
 
-        // Load chapters and topics for each subject
-        let loadedCount = 0;
-        const totalSubjects = subjects.length;
-
-        if (totalSubjects === 0) {
+        if (subjects.length === 0) {
           this.error = 'No subjects found in this course';
           this.loading = false;
           return;
         }
 
-        subjects.forEach((subject: any) => {
-          // Load chapters for this subject
-          this.chapterService.getChapters(this.courseId, subject.id).subscribe({
-            next: (chapters) => {
-              subject.chapters = chapters;
-
-              // Load topics for each chapter
-              let loadedChapters = 0;
-              const totalChapters = chapters.length;
-
-              if (totalChapters === 0) {
-                loadedCount++;
-                if (loadedCount === totalSubjects) {
-                  this.finishLoadingStructure();
+        // Load all chapters for all subjects in parallel using Promise.all
+        const chapterPromises = subjects.map((subject: any) => {
+          return new Promise<void>((resolve, reject) => {
+            this.chapterService.getChapters(this.courseId, subject.id).subscribe({
+              next: (chapters) => {
+                subject.chapters = chapters;
+                
+                if (chapters.length === 0) {
+                  resolve();
+                  return;
                 }
-                return;
-              }
 
-              chapters.forEach((chapter: any) => {
-                this.topicService.getTopics(this.courseId, subject.id, chapter.id).subscribe({
-                  next: (topics) => {
-                    chapter.topics = topics;
+                // Load all topics for all chapters in parallel
+                const topicPromises = chapters.map((chapter: any) => {
+                  return new Promise<void>((resolveTopics, rejectTopics) => {
+                    this.topicService.getTopics(this.courseId, subject.id, chapter.id).subscribe({
+                      next: (topics) => {
+                        chapter.topics = topics;
 
-                    // Add topics to allTopics with full context
-                    topics.forEach((topic: any) => {
-                      this.allTopics.push({
-                        ...topic,
-                        subject_id: subject.id,
-                        subject_name: subject.name,
-                        chapter_id: chapter.id,
-                        chapter_name: chapter.name
-                      });
+                        // Add topics to allTopics with full context
+                        topics.forEach((topic: any) => {
+                          this.allTopics.push({
+                            ...topic,
+                            subject_id: subject.id,
+                            subject_name: subject.name,
+                            chapter_id: chapter.id,
+                            chapter_name: chapter.name
+                          });
+                        });
+
+                        resolveTopics();
+                      },
+                      error: (err) => {
+                        console.error(`Error loading topics for chapter ${chapter.id}:`, err);
+                        resolveTopics(); // Continue even if one fails
+                      }
                     });
-
-                    loadedChapters++;
-                    if (loadedChapters === totalChapters) {
-                      loadedCount++;
-                      if (loadedCount === totalSubjects) {
-                        this.finishLoadingStructure();
-                      }
-                    }
-                  },
-                  error: (err) => {
-                    console.error(`Error loading topics for chapter ${chapter.id}:`, err);
-                    loadedChapters++;
-                    if (loadedChapters === totalChapters) {
-                      loadedCount++;
-                      if (loadedCount === totalSubjects) {
-                        this.finishLoadingStructure();
-                      }
-                    }
-                  }
+                  });
                 });
-              });
-            },
-            error: (err) => {
-              console.error(`Error loading chapters for subject ${subject.id}:`, err);
-              loadedCount++;
-              if (loadedCount === totalSubjects) {
-                this.finishLoadingStructure();
+
+                Promise.all(topicPromises).then(() => resolve()).catch(() => resolve());
+              },
+              error: (err) => {
+                console.error(`Error loading chapters for subject ${subject.id}:`, err);
+                resolve(); // Continue even if one fails
               }
-            }
+            });
           });
+        });
+
+        Promise.all(chapterPromises).then(() => {
+          this.finishLoadingStructure();
+        }).catch((err) => {
+          console.error('Error loading course structure:', err);
+          this.finishLoadingStructure();
         });
       },
       error: (err) => {

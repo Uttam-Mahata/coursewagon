@@ -5,6 +5,7 @@ from repositories.subject_repo import SubjectRepository
 from repositories.chapter_repo import ChapterRepository
 from repositories.topic_repo import TopicRepository
 from fastapi import HTTPException
+from utils.cache_helper import cache_helper
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,10 +19,20 @@ class CourseDiscoveryService:
         self.topic_repo = TopicRepository(db)
 
     def get_published_courses(self, limit: int = 20, offset: int = 0):
-        """Get all published courses for browsing"""
+        """Get all published courses for browsing (cached for 3 minutes)"""
+        cache_key = f"published_courses:limit:{limit}:offset:{offset}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached published courses (limit={limit}, offset={offset})")
+            return cached
+        
         try:
             courses = self.course_repo.get_published_courses(limit=limit, offset=offset)
-            return [course.to_dict() for course in courses]
+            result = [course.to_dict() for course in courses]
+            
+            # Cache for 3 minutes
+            cache_helper.set(cache_key, result, ttl=180)
+            return result
 
         except Exception as e:
             logger.error(f"Error getting published courses: {str(e)}")
@@ -48,17 +59,33 @@ class CourseDiscoveryService:
             raise HTTPException(status_code=500, detail=str(e))
 
     def get_popular_courses(self, limit: int = 10):
-        """Get most popular courses by enrollment count"""
+        """Get most popular courses by enrollment count (cached for 5 minutes)"""
+        cache_key = f"popular_courses:limit:{limit}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached popular courses (limit={limit})")
+            return cached
+        
         try:
             courses = self.course_repo.get_popular_courses(limit=limit)
-            return [course.to_dict() for course in courses]
+            result = [course.to_dict() for course in courses]
+            
+            # Cache for 5 minutes (popular courses don't change frequently)
+            cache_helper.set(cache_key, result, ttl=300)
+            return result
 
         except Exception as e:
             logger.error(f"Error getting popular courses: {str(e)}")
             raise HTTPException(status_code=500, detail=str(e))
 
     def get_course_preview(self, course_id: int):
-        """Get course preview including structure (subjects with flattened topics) but not detailed content"""
+        """Get course preview including structure (subjects with flattened topics) but not detailed content (cached for 5 minutes)"""
+        cache_key = f"course_preview:{course_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Returning cached course preview for course {course_id}")
+            return cached
+        
         try:
             course = self.course_repo.get_course_by_id(course_id)
             if not course:
@@ -67,29 +94,39 @@ class CourseDiscoveryService:
             if not course.is_published:
                 raise HTTPException(status_code=403, detail="Course is not published")
 
-            # Get course structure - flatten topics under subjects for preview
-            subjects = self.subject_repo.get_subjects_by_course_id(course_id)
+            # Use optimized query to get all structure data at once
+            from sqlalchemy.orm import joinedload
+            from models.subject import Subject
+            from models.chapter import Chapter
+            from models.topic import Topic
+            
+            # Load subjects with eager loading of chapters and topics
+            subjects = self.db.query(Subject).filter(
+                Subject.course_id == course_id
+            ).options(
+                joinedload(Subject.chapters).joinedload(Chapter.topics)
+            ).all()
 
             structure = []
             for subject in subjects:
                 subject_dict = subject.to_dict()
-
-                # Get all chapters for this subject
-                chapters = self.chapter_repo.get_chapters_by_subject_id(subject.id)
-
+                
                 # Flatten all topics from all chapters into a single list
                 all_topics = []
-                for chapter in chapters:
-                    topics = self.topic_repo.get_topics_by_chapter_id(chapter.id)
-                    all_topics.extend([topic.to_dict() for topic in topics])
+                for chapter in subject.chapters:
+                    all_topics.extend([topic.to_dict() for topic in chapter.topics])
 
                 subject_dict['topics'] = all_topics
                 structure.append(subject_dict)
 
-            return {
+            result = {
                 "course": course.to_dict(),
                 "structure": structure
             }
+            
+            # Cache for 5 minutes
+            cache_helper.set(cache_key, result, ttl=300)
+            return result
 
         except HTTPException:
             raise

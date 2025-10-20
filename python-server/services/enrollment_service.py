@@ -36,6 +36,12 @@ class EnrollmentService:
 
             # Increment enrollment count for the course
             self.course_repo.increment_enrollment_count(course_id)
+            
+            # Invalidate caches related to course enrollment counts
+            from utils.cache_helper import invalidate_cache
+            invalidate_cache(f"course:{course_id}")
+            invalidate_cache("published_courses:*")
+            invalidate_cache("popular_courses:*")
 
             return {
                 "success": True,

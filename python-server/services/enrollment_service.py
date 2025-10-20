@@ -36,6 +36,12 @@ class EnrollmentService:
 
             # Increment enrollment count for the course
             self.course_repo.increment_enrollment_count(course_id)
+            
+            # Invalidate caches related to course enrollment counts
+            from utils.cache_helper import invalidate_cache
+            invalidate_cache(f"course:{course_id}")
+            invalidate_cache("published_courses:*")
+            invalidate_cache("popular_courses:*")
 
             return {
                 "success": True,
@@ -111,6 +117,34 @@ class EnrollmentService:
 
         except Exception as e:
             logger.error(f"Error checking enrollment: {str(e)}")
+            raise HTTPException(status_code=500, detail=str(e))
+
+    def check_enrollments_batch(self, user_id: int, course_ids: list[int]):
+        """Check enrollment status for multiple courses at once (batch operation)"""
+        try:
+            enrollments = self.enrollment_repo.get_enrollments_batch(user_id, course_ids)
+            
+            # Create a map of course_id -> enrollment
+            enrollment_map = {e.course_id: e for e in enrollments}
+            
+            # Build result for all requested course_ids
+            result = {}
+            for course_id in course_ids:
+                if course_id in enrollment_map:
+                    result[str(course_id)] = {
+                        "enrolled": True,
+                        "enrollment": enrollment_map[course_id].to_dict()
+                    }
+                else:
+                    result[str(course_id)] = {
+                        "enrolled": False,
+                        "enrollment": None
+                    }
+            
+            return result
+
+        except Exception as e:
+            logger.error(f"Error checking batch enrollments: {str(e)}")
             raise HTTPException(status_code=500, detail=str(e))
 
     def get_course_enrollments(self, course_id: int, user_id: int):

@@ -37,12 +37,14 @@ async def lifespan(app: FastAPI):
         from migrations.add_video_url_to_content import add_video_url_to_content
         from migrations.add_database_indexes import add_database_indexes
         from migrations.add_course_reviews import run_migration as run_course_reviews_migration
+        from migrations.add_enrollment_composite_index import add_enrollment_composite_index
 
         add_welcome_email_sent_column()
         run_email_verification_migration()
         run_all_migrations()  # New learner functionality migrations
         add_video_url_to_content()  # Add video_url to content table
         add_database_indexes()  # Add performance indexes
+        add_enrollment_composite_index()  # Add composite index for enrollment lookups
         run_course_reviews_migration()  # Add course reviews and ratings
         logger.info("Database migrations completed successfully")
     except Exception as e:
@@ -89,12 +91,25 @@ from routes.test_auth_routes import test_auth_router
 # Import rate limiter
 from utils.rate_limiter import limiter, rate_limit_exceeded_handler
 
-# Create FastAPI app
+# Import origin validation middleware
+from middleware.origin_validation_middleware import OriginValidationMiddleware
+
+# CORS configuration
+# Note: When allow_credentials=True, cannot use allow_origins=["*"]
+# Must specify exact origins for cookie-based authentication
+# SECURITY: Different origins for production vs development to prevent cookie theft
+IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
+
+# Create FastAPI app with conditional docs
+# Disable docs in production for security
 app = FastAPI(
     title="Course Wagon API",
     description="API for Course Wagon application",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None if IS_PRODUCTION else "/redoc",
+    openapi_url=None if IS_PRODUCTION else "/openapi.json"
 )
 
 # Add rate limiter state to app
@@ -105,12 +120,6 @@ app.add_middleware(SlowAPIMiddleware)
 
 # Add rate limit exceeded handler
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
-
-# CORS configuration
-# Note: When allow_credentials=True, cannot use allow_origins=["*"]
-# Must specify exact origins for cookie-based authentication
-# SECURITY: Different origins for production vs development to prevent cookie theft
-IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
 
 if IS_PRODUCTION:
     # Production: ONLY allow production domains (NO localhost!)
@@ -149,6 +158,10 @@ app.add_middleware(
     ],
     expose_headers=["Set-Cookie"]
 )
+
+# Add origin validation middleware to restrict API access to allowed frontends
+# This ensures public API endpoints are only accessible from trusted domains
+app.add_middleware(OriginValidationMiddleware, allowed_origins=allowed_origins)
 
 # Database error handling middleware
 @app.middleware("http")

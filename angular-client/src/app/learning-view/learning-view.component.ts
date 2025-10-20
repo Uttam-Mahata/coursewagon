@@ -166,109 +166,48 @@ export class LearningViewComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   loadCourseDetails(): void {
-    // Load course
-    this.courseService.getCourseDetails(this.courseId).subscribe({
-      next: (course) => {
-        this.course = course;
+    // Use optimized endpoint that returns course + full structure in one call
+    this.learningService.getCourseStructure(this.courseId).subscribe({
+      next: (data) => {
+        this.course = data.course;
+        this.subjects = data.subjects;
 
-        // Load subjects and topics
-        this.loadSubjectsAndTopics();
-      },
-      error: (err) => {
-        this.error = 'Failed to load course details';
-        this.loading = false;
-        console.error('Error loading course:', err);
-      }
-    });
-  }
-
-  loadSubjectsAndTopics(): void {
-    this.subjectService.getSubjects(this.courseId).subscribe({
-      next: (subjects) => {
-        this.subjects = subjects;
-
-        // Load chapters and topics for each subject
-        let loadedCount = 0;
-        const totalSubjects = subjects.length;
-
-        if (totalSubjects === 0) {
-          this.error = 'No subjects found in this course';
-          this.loading = false;
-          return;
-        }
-
-        subjects.forEach((subject: any) => {
-          // Load chapters for this subject
-          this.chapterService.getChapters(this.courseId, subject.id).subscribe({
-            next: (chapters) => {
-              subject.chapters = chapters;
-
-              // Load topics for each chapter
-              let loadedChapters = 0;
-              const totalChapters = chapters.length;
-
-              if (totalChapters === 0) {
-                loadedCount++;
-                if (loadedCount === totalSubjects) {
-                  this.finishLoadingStructure();
-                }
-                return;
-              }
-
-              chapters.forEach((chapter: any) => {
-                this.topicService.getTopics(this.courseId, subject.id, chapter.id).subscribe({
-                  next: (topics) => {
-                    chapter.topics = topics;
-
-                    // Add topics to allTopics with full context
-                    topics.forEach((topic: any) => {
-                      this.allTopics.push({
-                        ...topic,
-                        subject_id: subject.id,
-                        subject_name: subject.name,
-                        chapter_id: chapter.id,
-                        chapter_name: chapter.name
-                      });
-                    });
-
-                    loadedChapters++;
-                    if (loadedChapters === totalChapters) {
-                      loadedCount++;
-                      if (loadedCount === totalSubjects) {
-                        this.finishLoadingStructure();
-                      }
-                    }
-                  },
-                  error: (err) => {
-                    console.error(`Error loading topics for chapter ${chapter.id}:`, err);
-                    loadedChapters++;
-                    if (loadedChapters === totalChapters) {
-                      loadedCount++;
-                      if (loadedCount === totalSubjects) {
-                        this.finishLoadingStructure();
-                      }
-                    }
-                  }
-                });
-              });
-            },
-            error: (err) => {
-              console.error(`Error loading chapters for subject ${subject.id}:`, err);
-              loadedCount++;
-              if (loadedCount === totalSubjects) {
-                this.finishLoadingStructure();
-              }
-            }
-          });
-        });
+        // Process the structure to build allTopics array
+        this.processStructure();
+        this.finishLoadingStructure();
       },
       error: (err) => {
         this.error = 'Failed to load course structure';
         this.loading = false;
-        console.error('Error loading subjects:', err);
+        console.error('Error loading course structure:', err);
       }
     });
   }
+
+  processStructure(): void {
+    // Build allTopics array from the loaded structure
+    this.allTopics = [];
+    
+    this.subjects.forEach((subject: any) => {
+      if (subject.chapters && subject.chapters.length > 0) {
+        subject.chapters.forEach((chapter: any) => {
+          if (chapter.topics && chapter.topics.length > 0) {
+            chapter.topics.forEach((topic: any) => {
+              this.allTopics.push({
+                ...topic,
+                subject_id: subject.id,
+                subject_name: subject.name,
+                chapter_id: chapter.id,
+                chapter_name: chapter.name
+              });
+            });
+          }
+        });
+      }
+    });
+  }
+
+
 
   finishLoadingStructure(): void {
     // Determine which topic to load

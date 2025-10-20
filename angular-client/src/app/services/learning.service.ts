@@ -108,6 +108,16 @@ export class LearningService {
     );
   }
 
+  /**
+   * Get full course structure with subjects, chapters, and topics (for enrolled users)
+   * This is optimized to reduce multiple API calls in the learning view
+   */
+  getCourseStructure(courseId: number): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}/learning/courses/${courseId}/structure`
+    );
+  }
+
   // Progress Tracking Methods
 
   /**

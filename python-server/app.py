@@ -91,12 +91,20 @@ from routes.test_auth_routes import test_auth_router
 # Import rate limiter
 from utils.rate_limiter import limiter, rate_limit_exceeded_handler
 
-# Create FastAPI app
+# Import origin validation middleware
+from middleware.origin_validation_middleware import OriginValidationMiddleware
+
+# Create FastAPI app with conditional docs
+# Disable docs in production for security
+IS_PRODUCTION_ENV = os.environ.get('ENVIRONMENT', 'development') == 'production'
 app = FastAPI(
     title="Course Wagon API",
     description="API for Course Wagon application",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    docs_url=None if IS_PRODUCTION_ENV else "/docs",
+    redoc_url=None if IS_PRODUCTION_ENV else "/redoc",
+    openapi_url=None if IS_PRODUCTION_ENV else "/openapi.json"
 )
 
 # Add rate limiter state to app
@@ -151,6 +159,10 @@ app.add_middleware(
     ],
     expose_headers=["Set-Cookie"]
 )
+
+# Add origin validation middleware to restrict API access to allowed frontends
+# This ensures public API endpoints are only accessible from trusted domains
+app.add_middleware(OriginValidationMiddleware, allowed_origins=allowed_origins)
 
 # Database error handling middleware
 @app.middleware("http")

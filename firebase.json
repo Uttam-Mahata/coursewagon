@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/course-wagon-angular/browser",
+    "public": "angular-client/dist/course-wagon-angular/browser",
     "ignore": [
       "firebase.json",
       "**/.*",

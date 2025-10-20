@@ -94,17 +94,22 @@ from utils.rate_limiter import limiter, rate_limit_exceeded_handler
 # Import origin validation middleware
 from middleware.origin_validation_middleware import OriginValidationMiddleware
 
+# CORS configuration
+# Note: When allow_credentials=True, cannot use allow_origins=["*"]
+# Must specify exact origins for cookie-based authentication
+# SECURITY: Different origins for production vs development to prevent cookie theft
+IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
+
 # Create FastAPI app with conditional docs
 # Disable docs in production for security
-IS_PRODUCTION_ENV = os.environ.get('ENVIRONMENT', 'development') == 'production'
 app = FastAPI(
     title="Course Wagon API",
     description="API for Course Wagon application",
     version="1.0.0",
     lifespan=lifespan,
-    docs_url=None if IS_PRODUCTION_ENV else "/docs",
-    redoc_url=None if IS_PRODUCTION_ENV else "/redoc",
-    openapi_url=None if IS_PRODUCTION_ENV else "/openapi.json"
+    docs_url=None if IS_PRODUCTION else "/docs",
+    redoc_url=None if IS_PRODUCTION else "/redoc",
+    openapi_url=None if IS_PRODUCTION else "/openapi.json"
 )
 
 # Add rate limiter state to app
@@ -115,12 +120,6 @@ app.add_middleware(SlowAPIMiddleware)
 
 # Add rate limit exceeded handler
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
-
-# CORS configuration
-# Note: When allow_credentials=True, cannot use allow_origins=["*"]
-# Must specify exact origins for cookie-based authentication
-# SECURITY: Different origins for production vs development to prevent cookie theft
-IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
 
 if IS_PRODUCTION:
     # Production: ONLY allow production domains (NO localhost!)

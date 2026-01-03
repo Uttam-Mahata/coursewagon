@@ -9,6 +9,9 @@ from utils.unified_storage_helper import storage_helper
 from utils.cache_helper import cache_helper, invalidate_cache
 from sqlalchemy.orm import Session
 import logging
+import json
+from agents.curriculum_agents import get_subject_agent
+from utils.async_helper import run_async_in_sync
 
 logger = logging.getLogger(__name__)
 
@@ -20,25 +23,32 @@ class SubjectService:
 
     def generate_subjects(self, course_id):
         course = self.course_repo.get_course_by_id(course_id)
-        gemini_helper = GeminiHelper()
 
         if not course:
             raise Exception("Course not found")
 
-        prompt = f"""Based on the course '{course.name}' with description '{course.description}', 
-        generate a list of  relevant subjects that should be included in this course.
-        Consider the following:
-        1. If it's a school/college/university course, align with their typical curriculum
-        2. Don't include the course name as a subject
-        3. Keep subjects relevant and practical
-        4. Generate maximum 5 core subjects for the course
+        # Use ADK Agent
+        agent = get_subject_agent()
+        prompt = f"""
+        Course Name: {course.name}
+        Course Description: {course.description}
+
+        Generate subjects for this course.
         """
         
         try:
-            response = gemini_helper.generate_content(
-                prompt,
-                response_schema=SubjectContent
-            )
+            # Helper to run async agent synchronously
+            async def run_agent():
+                final_response = None
+                async for event in agent.run_async(prompt):
+                    if event.turn_complete:
+                         if event.content and event.content.parts:
+                             final_response = event.content.parts[0].text
+                return final_response
+
+            response_text = run_async_in_sync(run_agent())
+
+            response_data = json.loads(response_text)
             
             # If updating, clear existing subjects first
             if course.has_subjects:
@@ -48,7 +58,7 @@ class SubjectService:
             image_generator = GeminiImageGenerator()
             created_subjects = []
             
-            for subject_name in response['subjects']:
+            for subject_name in response_data['subjects']:
                 subject = Subject(
                     course_id=course_id,
                     name=subject_name

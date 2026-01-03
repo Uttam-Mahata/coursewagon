@@ -8,7 +8,9 @@ from utils.unified_storage_helper import storage_helper
 from utils.cache_helper import cache_helper, invalidate_cache
 from sqlalchemy.orm import Session
 import logging
-import asyncio
+import json
+from agents.curriculum_agents import get_course_agent
+from utils.async_helper import run_async_in_sync
 
 logger = logging.getLogger(__name__)
 
@@ -19,21 +21,28 @@ class CourseService:
 
     def add_course(self, course_name, user_id):
         try:
-            # Initialize GeminiHelper using environment variables
-            gemini_helper = GeminiHelper()
+            # Use ADK Agent
+            agent = get_course_agent()
             
-            prompt = f"""Generate a course name and description(max 100 words) based on '{course_name}'.
-            The description should be comprehensive and educational.
-            Return only the course details without any additional text."""
+            prompt = f"Create a course based on this input: '{course_name}'"
             
-            response = gemini_helper.generate_content(
-                prompt,
-                response_schema=CourseContent
-            )
+            # Helper to run async agent synchronously
+            async def run_agent():
+                final_response = None
+                async for event in agent.run_async(prompt):
+                    if event.turn_complete:
+                         if event.content and event.content.parts:
+                             final_response = event.content.parts[0].text
+                return final_response
+
+            response_text = run_async_in_sync(run_agent())
             
+            # The response_text should be JSON string.
+            response_data = json.loads(response_text)
+
             course = Course(
-                name=response['name'],
-                description=response['description'],
+                name=response_data['name'],
+                description=response_data['description'],
                 user_id=user_id
             )
             created_course = self.course_repo.add_course(course)
@@ -212,21 +221,26 @@ class CourseService:
             
             logger.info(f"Transcribed text: {transcribed_text[:100]}...")
             
-            # Use the same course generation logic as text-based course creation
-            gemini_helper = GeminiHelper()
+            # Use ADK Agent
+            agent = get_course_agent()
+            prompt = f"Create a course based on this input: '{transcribed_text}'"
             
-            prompt = f"""Generate a course name and description(max 100 words) based on '{transcribed_text}'.
-            The description should be comprehensive and educational.
-            Return only the course details without any additional text."""
+            # Helper to run async agent synchronously
+            async def run_agent():
+                final_response = None
+                async for event in agent.run_async(prompt):
+                    if event.turn_complete:
+                         if event.content and event.content.parts:
+                             final_response = event.content.parts[0].text
+                return final_response
+
+            response_text = run_async_in_sync(run_agent())
             
-            response = gemini_helper.generate_content(
-                prompt,
-                response_schema=CourseContent
-            )
+            response_data = json.loads(response_text)
             
             course = Course(
-                name=response['name'],
-                description=response['description'],
+                name=response_data['name'],
+                description=response_data['description'],
                 user_id=user_id
             )
             created_course = self.course_repo.add_course(course)

@@ -101,3 +101,5 @@ urllib3
 uvicorn
 websockets
 werkzeug
+google-adk
+nest_asyncio

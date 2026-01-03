@@ -6,6 +6,9 @@ from repositories.subject_repo import SubjectRepository
 from repositories.course_repo import CourseRepository
 from utils.gemini_helper import GeminiHelper, extract_sql_query
 from sqlalchemy.orm import Session
+import json
+from agents.curriculum_agents import get_chapter_agent
+from utils.async_helper import run_async_in_sync
 
 # Configure logging
 logging.basicConfig(
@@ -40,31 +43,38 @@ class ChapterService:
             
             logger.debug(f"Found course: {course.name}")
             
-            gemini_helper = GeminiHelper()
+            # Use ADK Agent
+            agent = get_chapter_agent()
+            prompt = f"""
+            Course Name: {course.name}
+            Course Description: {course.description}
+            Subject Name: {subject_name}
 
-            prompt = f"""Generate a comprehensive list of chapters for the subject '{subject_name}' 
-            under course '{course.name}'.
-            Consider the following:
-            1. Include chapters from basic to advanced level
-            2. Each chapter should be a distinct topic within the subject
-            3. Chapters should follow a logical learning progression
-            4. Include 8-15 chapters depending on the subject scope
-            5. Use standard academic curriculum terminology
+            Generate chapters for this subject.
             """
             
-            logger.debug("Calling Gemini API for content generation")
-            response = gemini_helper.generate_content(
-                prompt,
-                response_schema=ChapterContent
-            )
-            logger.debug(f"Received response from Gemini: {response}")
+            logger.debug("Calling Gemini API via ADK agent")
+
+            # Helper to run async agent synchronously
+            async def run_agent():
+                final_response = None
+                async for event in agent.run_async(prompt):
+                    if event.turn_complete:
+                         if event.content and event.content.parts:
+                             final_response = event.content.parts[0].text
+                return final_response
+
+            response_text = run_async_in_sync(run_agent())
+
+            response_data = json.loads(response_text)
+            logger.debug(f"Received response from Gemini via ADK: {response_data}")
             
             # If updating, clear existing chapters first
             if subject_info.has_chapters:
                 self.chapter_repo.delete_chapters_by_subject_id(subject_id)
             
             chapters_added = 0
-            for chapter_name in response['chapters']:
+            for chapter_name in response_data['chapters']:
                 chapter = Chapter(
                     subject_id=subject_id,
                     name=chapter_name

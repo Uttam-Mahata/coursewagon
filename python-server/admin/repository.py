@@ -6,6 +6,7 @@ from models.topic import Topic
 from models.content import Content
 from models.testimonial import Testimonial
 from admin.models import AdminStats
+from utils.cache_helper import cache_helper
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 import logging
@@ -71,9 +72,11 @@ class AdminRepository:
     def get_course_breakdown(self):
         """Get detailed breakdown of each course with content counts"""
         try:
-            # Use a single optimized query with LEFT JOINs and GROUP BY
-            # This replaces the N+1 query problem (1 query per course)
-            from sqlalchemy.orm import aliased
+            cache_key = "admin:course_breakdown"
+            cached = cache_helper.get(cache_key)
+            if cached is not None:
+                logger.debug(f"Cache hit [{cache_key}]")
+                return cached
 
             query = self.db.query(
                 Course.id,
@@ -126,6 +129,7 @@ class AdminRepository:
                     'enrollment_count': row.enrollment_count
                 })
 
+            cache_helper.set(cache_key, breakdown, ttl=120)
             return breakdown
         except Exception as e:
             logger.error(f"Error getting course breakdown: {str(e)}")
@@ -134,6 +138,12 @@ class AdminRepository:
     def get_user_course_breakdown(self, user_id: int):
         """Get detailed breakdown of courses for a specific user"""
         try:
+            cache_key = f"admin:user_breakdown:{user_id}"
+            cached = cache_helper.get(cache_key)
+            if cached is not None:
+                logger.debug(f"Cache hit [{cache_key}]")
+                return cached
+
             query = self.db.query(
                 Course.id,
                 Course.name,
@@ -186,6 +196,7 @@ class AdminRepository:
                     'enrollment_count': row.enrollment_count
                 })
 
+            cache_helper.set(cache_key, breakdown, ttl=120)
             return breakdown
         except Exception as e:
             logger.error(f"Error getting user course breakdown: {str(e)}")

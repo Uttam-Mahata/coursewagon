@@ -190,24 +190,30 @@ class CourseReviewService:
     def get_course_reviews(self, course_id: int, page: int = 1, limit: int = 10) -> dict:
         """Get paginated reviews for a course"""
         try:
-            offset = (page - 1) * limit
+            from utils.cache_helper import cache_helper
+            cache_key = f"reviews:course:{course_id}:page:{page}:limit:{limit}"
+            cached = cache_helper.get(cache_key)
+            if cached is not None:
+                logger.debug(f"Cache hit [{cache_key}]")
+                return cached
 
+            offset = (page - 1) * limit
             reviews = self.review_repo.get_course_reviews(
                 course_id=course_id,
                 limit=limit,
                 offset=offset,
                 visible_only=True
             )
-
             total_count = self.review_repo.get_course_reviews_count(course_id, visible_only=True)
-
-            return {
+            result = {
                 'reviews': [review.to_dict() for review in reviews],
                 'total_count': total_count,
                 'page': page,
                 'limit': limit,
                 'total_pages': (total_count + limit - 1) // limit
             }
+            cache_helper.set(cache_key, result, ttl=180)
+            return result
 
         except Exception as e:
             logger.error(f"Error getting course reviews: {str(e)}")
@@ -224,7 +230,14 @@ class CourseReviewService:
     def get_review_stats(self, course_id: int) -> dict:
         """Get review statistics for a course"""
         try:
+            from utils.cache_helper import cache_helper
+            cache_key = f"reviews:stats:{course_id}"
+            cached = cache_helper.get(cache_key)
+            if cached is not None:
+                logger.debug(f"Cache hit [{cache_key}]")
+                return cached
             stats = self.review_repo.get_review_stats(course_id)
+            cache_helper.set(cache_key, stats, ttl=300)
             return stats
         except Exception as e:
             logger.error(f"Error getting review stats: {str(e)}")
@@ -261,6 +274,7 @@ class CourseReviewService:
         """Invalidate review and course caches"""
         try:
             invalidate_cache(f"reviews:course:{course_id}:*")
+            invalidate_cache(f"reviews:stats:{course_id}")
             invalidate_cache(f"course:{course_id}:*")
             invalidate_cache("courses:*")
             logger.debug(f"Invalidated review caches for course {course_id}")

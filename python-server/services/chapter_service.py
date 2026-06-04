@@ -5,6 +5,7 @@ from models.schemas import ChapterContent
 from repositories.subject_repo import SubjectRepository
 from repositories.course_repo import CourseRepository
 from utils.gemini_helper import GeminiHelper, extract_sql_query
+from utils.cache_helper import cache_helper, invalidate_cache
 from sqlalchemy.orm import Session
 import json
 from agents.curriculum_agents import get_chapter_agent
@@ -86,19 +87,36 @@ class ChapterService:
             self.subject_repo.set_has_chapters(subject_id, True)
             
             logger.info(f"Successfully added {chapters_added} chapters")
+            invalidate_cache(f"chapters:subject:{subject_id}")
+            invalidate_cache(f"subjects:course:{course_id}")
             return {"message": f"Successfully generated {chapters_added} chapters"}
-            
+
         except Exception as e:
             logger.error(f"Error in generate_chapters: {str(e)}", exc_info=True)
             raise Exception(f"Error generating chapters: {str(e)}")
 
-    def get_chapters_by_subject_id(self, subject_id):  # Changed from module_id to subject_id
+    def get_chapters_by_subject_id(self, subject_id):
+        cache_key = f"chapters:subject:{subject_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Cache hit [{cache_key}]")
+            return cached
         chapters = self.chapter_repo.get_chapters_by_subject_id(subject_id)
-        return [chapter.to_dict() for chapter in chapters]
-        
+        result = [chapter.to_dict() for chapter in chapters]
+        cache_helper.set(cache_key, result, ttl=300)
+        return result
+
     def get_chapter_by_id(self, chapter_id):
+        cache_key = f"chapter:{chapter_id}"
+        cached = cache_helper.get(cache_key)
+        if cached is not None:
+            logger.debug(f"Cache hit [{cache_key}]")
+            return cached
         chapter = self.chapter_repo.get_chapter_by_id(chapter_id)
-        return chapter.to_dict() if chapter else None
+        result = chapter.to_dict() if chapter else None
+        if result:
+            cache_helper.set(cache_key, result, ttl=300)
+        return result
 
     # New CRUD methods
     def create_chapter(self, subject_id, name):
@@ -112,11 +130,11 @@ class ChapterService:
             
         try:
             chapter = self.chapter_repo.create_chapter(subject_id, name)
-            
-            # If this is first chapter, mark subject as having chapters
+
             if not subject.has_chapters:
                 self.subject_repo.set_has_chapters(subject_id, True)
-                
+
+            invalidate_cache(f"chapters:subject:{subject_id}")
             return chapter.to_dict()
         except Exception as e:
             logger.error(f"Error creating chapter: {str(e)}")
@@ -128,6 +146,8 @@ class ChapterService:
         try:
             chapter = self.chapter_repo.update_chapter(chapter_id, name)
             if chapter:
+                invalidate_cache(f"chapter:{chapter_id}")
+                invalidate_cache(f"chapters:subject:{chapter.subject_id}")
                 return chapter.to_dict()
             else:
                 logger.error(f"Chapter not found for id: {chapter_id}")
@@ -140,8 +160,13 @@ class ChapterService:
         logger.info(f"Deleting chapter id: {chapter_id}")
         
         try:
+            chapter = self.chapter_repo.get_chapter_by_id(chapter_id)
+            subject_id = chapter.subject_id if chapter else None
             success = self.chapter_repo.delete_chapter(chapter_id)
             if success:
+                invalidate_cache(f"chapter:{chapter_id}")
+                if subject_id:
+                    invalidate_cache(f"chapters:subject:{subject_id}")
                 return {"message": "Chapter deleted successfully"}
             else:
                 logger.error(f"Chapter not found for id: {chapter_id}")

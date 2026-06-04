@@ -1,8 +1,12 @@
 from repositories.testimonial_repo import TestimonialRepository
 from repositories.course_repo import CourseRepository
 from models.testimonial import Testimonial
+from utils.cache_helper import cache_helper, invalidate_cache
 from sqlalchemy.orm import Session
 import logging
+
+_TESTIMONIALS_CACHE_KEY = "testimonials:approved"
+_TESTIMONIALS_TTL = 600
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +41,9 @@ class TestimonialService:
             )
             
             result = self.testimonial_repo.add_testimonial(testimonial)
+            invalidate_cache(_TESTIMONIALS_CACHE_KEY)
             return result.to_dict()
-            
+
         except Exception as e:
             logger.error(f"Error creating testimonial: {str(e)}")
             raise Exception(f"Error creating testimonial: {str(e)}")
@@ -46,8 +51,14 @@ class TestimonialService:
     def get_approved_testimonials(self):
         """Get all approved testimonials for public display"""
         try:
+            cached = cache_helper.get(_TESTIMONIALS_CACHE_KEY)
+            if cached is not None:
+                logger.debug(f"Cache hit [{_TESTIMONIALS_CACHE_KEY}]")
+                return cached
             testimonials = self.testimonial_repo.get_approved_testimonials()
-            return [t.to_dict() for t in testimonials]
+            result = [t.to_dict() for t in testimonials]
+            cache_helper.set(_TESTIMONIALS_CACHE_KEY, result, ttl=_TESTIMONIALS_TTL)
+            return result
         except Exception as e:
             logger.error(f"Error getting testimonials: {str(e)}")
             raise Exception(f"Error getting testimonials: {str(e)}")
@@ -88,9 +99,10 @@ class TestimonialService:
             )
             
             if result:
+                invalidate_cache(_TESTIMONIALS_CACHE_KEY)
                 return result.to_dict()
             return None
-            
+
         except Exception as e:
             logger.error(f"Error updating testimonial: {str(e)}")
             raise Exception(f"Error updating testimonial: {str(e)}")
@@ -107,8 +119,10 @@ class TestimonialService:
             if testimonial.user_id != user_id:
                 raise ValueError("You don't have permission to delete this testimonial")
             
-            return self.testimonial_repo.delete_testimonial(testimonial_id)
-            
+            result = self.testimonial_repo.delete_testimonial(testimonial_id)
+            invalidate_cache(_TESTIMONIALS_CACHE_KEY)
+            return result
+
         except Exception as e:
             logger.error(f"Error deleting testimonial: {str(e)}")
             raise Exception(f"Error deleting testimonial: {str(e)}")
@@ -132,9 +146,10 @@ class TestimonialService:
             )
             
             if result:
+                invalidate_cache(_TESTIMONIALS_CACHE_KEY)
                 return result.to_dict()
             raise ValueError("Testimonial not found")
-            
+
         except Exception as e:
             logger.error(f"Error approving testimonial: {str(e)}")
             raise Exception(f"Error approving testimonial: {str(e)}")

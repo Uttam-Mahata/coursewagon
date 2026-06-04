@@ -2,6 +2,7 @@
 from sqlalchemy.orm import Session
 from repositories.learning_progress_repository import LearningProgressRepository
 from repositories.enrollment_repository import EnrollmentRepository
+from utils.cache_helper import cache_helper, invalidate_cache
 from fastapi import HTTPException
 import logging
 
@@ -32,9 +33,8 @@ class LearningProgressService:
                 time_spent_seconds=time_spent_seconds,
                 last_position=last_position
             )
-
-            # Update last accessed time for enrollment
             self.enrollment_repo.update_last_accessed(enrollment_id)
+            invalidate_cache(f"progress:enrollment:{enrollment_id}")
 
             return {
                 "success": True,
@@ -56,6 +56,7 @@ class LearningProgressService:
                 raise HTTPException(status_code=403, detail="Not authorized")
 
             progress = self.progress_repo.mark_topic_complete(enrollment_id, topic_id)
+            invalidate_cache(f"progress:enrollment:{enrollment_id}")
 
             return {
                 "success": True,
@@ -72,14 +73,18 @@ class LearningProgressService:
     def get_course_progress(self, user_id: int, enrollment_id: int):
         """Get all progress for a course enrollment"""
         try:
-            # Verify enrollment belongs to user
             enrollment = self.enrollment_repo.get_enrollment_by_id(enrollment_id)
             if not enrollment or enrollment.user_id != user_id:
                 raise HTTPException(status_code=403, detail="Not authorized")
 
-            progress_records = self.progress_repo.get_progress_by_enrollment(enrollment_id)
+            cache_key = f"progress:enrollment:{enrollment_id}"
+            cached = cache_helper.get(cache_key)
+            if cached is not None:
+                logger.debug(f"Cache hit [{cache_key}]")
+                return cached
 
-            return {
+            progress_records = self.progress_repo.get_progress_by_enrollment(enrollment_id)
+            result = {
                 "enrollment_id": enrollment_id,
                 "course_id": enrollment.course_id,
                 "progress_percentage": enrollment.progress_percentage,
@@ -87,6 +92,8 @@ class LearningProgressService:
                 "total_time_spent_seconds": self.progress_repo.get_total_time_spent(enrollment_id),
                 "progress_records": [p.to_dict() for p in progress_records]
             }
+            cache_helper.set(cache_key, result, ttl=60)
+            return result
 
         except HTTPException:
             raise

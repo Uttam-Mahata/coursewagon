@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from repositories.enrollment_repository import EnrollmentRepository
 from repositories.course_repo import CourseRepository
 from repositories.learning_progress_repository import LearningProgressRepository
+from utils.cache_helper import cache_helper, invalidate_cache
 from fastapi import HTTPException
 import logging
 
@@ -37,9 +38,9 @@ class EnrollmentService:
             # Increment enrollment count for the course
             self.course_repo.increment_enrollment_count(course_id)
             
-            # Invalidate caches related to course enrollment counts
-            from utils.cache_helper import invalidate_cache
             invalidate_cache(f"course:{course_id}")
+            invalidate_cache(f"enrollment:check:{user_id}:{course_id}")
+            invalidate_cache(f"enrollments:user:{user_id}")
             invalidate_cache("published_courses:*")
             invalidate_cache("popular_courses:*")
 
@@ -66,9 +67,12 @@ class EnrollmentService:
             success = self.enrollment_repo.unenroll_user(user_id, course_id)
 
             if success:
-                # Decrement enrollment count
                 self.course_repo.decrement_enrollment_count(course_id)
-
+                invalidate_cache(f"course:{course_id}")
+                invalidate_cache(f"enrollment:check:{user_id}:{course_id}")
+                invalidate_cache(f"enrollments:user:{user_id}")
+                invalidate_cache("published_courses:*")
+                invalidate_cache("popular_courses:*")
                 return {
                     "success": True,
                     "message": "Successfully unenrolled from course"
@@ -85,8 +89,13 @@ class EnrollmentService:
     def get_my_enrollments(self, user_id: int, status: str = None):
         """Get all enrollments for a user with course details"""
         try:
-            enrollments = self.enrollment_repo.get_user_enrollments(user_id, status)
+            cache_key = f"enrollments:user:{user_id}" + (f":status:{status}" if status else "")
+            cached = cache_helper.get(cache_key)
+            if cached is not None:
+                logger.debug(f"Cache hit [{cache_key}]")
+                return cached
 
+            enrollments = self.enrollment_repo.get_user_enrollments(user_id, status)
             result = []
             for enrollment in enrollments:
                 course = self.course_repo.get_course_by_id(enrollment.course_id)
@@ -94,6 +103,7 @@ class EnrollmentService:
                 enrollment_dict['course'] = course.to_dict() if course else None
                 result.append(enrollment_dict)
 
+            cache_helper.set(cache_key, result, ttl=180)
             return result
 
         except Exception as e:
@@ -103,17 +113,19 @@ class EnrollmentService:
     def check_enrollment(self, user_id: int, course_id: int):
         """Check if user is enrolled in a course"""
         try:
+            cache_key = f"enrollment:check:{user_id}:{course_id}"
+            cached = cache_helper.get(cache_key)
+            if cached is not None:
+                logger.debug(f"Cache hit [{cache_key}]")
+                return cached
+
             enrollment = self.enrollment_repo.get_enrollment(user_id, course_id)
-            if enrollment:
-                return {
-                    "enrolled": True,
-                    "enrollment": enrollment.to_dict()
-                }
-            else:
-                return {
-                    "enrolled": False,
-                    "enrollment": None
-                }
+            result = {
+                "enrolled": bool(enrollment),
+                "enrollment": enrollment.to_dict() if enrollment else None
+            }
+            cache_helper.set(cache_key, result, ttl=300)
+            return result
 
         except Exception as e:
             logger.error(f"Error checking enrollment: {str(e)}")

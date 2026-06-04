@@ -11,11 +11,11 @@ import { AuthInterceptor } from './app/services/auth/auth.interceptor';
 import { CacheInterceptor } from './app/interceptors/cache.interceptor';
 import { routes } from './app/app.routes';
 import { provideMarkdown, MARKED_OPTIONS } from 'ngx-markdown';
-import { SecurityContext } from '@angular/core';
+import { SecurityContext, provideZoneChangeDetection } from '@angular/core';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideRouter(routes),
+    provideZoneChangeDetection(),provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimationsAsync(),
     CourseService,

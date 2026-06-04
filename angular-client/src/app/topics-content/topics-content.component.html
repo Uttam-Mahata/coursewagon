@@ -1,109 +1,133 @@
-<div class="container mx-auto px-4 py-8 max-w-7xl">
-  <!-- Breadcrumb Navigation -->
-  <nav class="mb-6">
-    <ol class="flex items-center text-sm flex-wrap">
-      <li class="flex items-center">
-        <a routerLink="/home" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-          <fa-icon [icon]="faHome" class="mr-1"></fa-icon> Home
-        </a>
-      </li>
-      <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <a routerLink="/courses" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-          <fa-icon [icon]="faBook" class="mr-1"></fa-icon> Courses
-        </a>
-      </li>
-      <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <a [routerLink]="['/courses', courseId, 'subjects-chapters']" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-          <fa-icon [icon]="faLayerGroup" class="mr-1"></fa-icon> {{ courseName }}
-        </a>
-      </li>
-      <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <a [routerLink]="['/courses', courseId, 'subjects-chapters']" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-          <fa-icon [icon]="faBookOpen" class="mr-1"></fa-icon> {{ chapterName }}
-        </a>
-      </li>
-      <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <span class="text-gray-700">{{ topicName }}</span>
-      </li>
-    </ol>
-  </nav>
+<div class="min-h-screen bg-slate-50 dark:bg-[#0F172A]">
 
-  <!-- Page Title and Navigation -->
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">{{ topicName }}</h1>
-    <div class="flex space-x-3">
-      <button 
-        (click)="backToTopics()" 
-        class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded flex items-center text-sm transition duration-200">
-        <fa-icon [icon]="faList" class="mr-2"></fa-icon> All Topics
-      </button>
-      <button 
-        [disabled]="currentTopicIndex <= 0"
-        [ngClass]="{'opacity-50 cursor-not-allowed': currentTopicIndex <= 0}"
-        (click)="previousTopic()" 
-        class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded flex items-center text-sm transition duration-200">
-        <fa-icon [icon]="faChevronLeft" class="mr-2"></fa-icon> Previous
-      </button>
-      <button 
-        [disabled]="currentTopicIndex >= topics.length - 1"
-        [ngClass]="{'opacity-50 cursor-not-allowed': currentTopicIndex >= topics.length - 1}"
-        (click)="nextTopic()" 
-        class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded flex items-center text-sm transition duration-200">
-        Next <fa-icon [icon]="faChevronRight" class="ml-2"></fa-icon>
-      </button>
-    </div>
-  </div>
+  <!-- Page Header -->
+  <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+    <div class="container mx-auto px-6 py-6 max-w-7xl">
 
-  <!-- Topic Navigation Pills -->
-  <div class="mb-6 bg-gray-100 p-4 rounded-lg overflow-x-auto">
-    <div class="flex space-x-2">
-      <ng-container *ngFor="let topic of topics; let i = index">
-        <div 
-          [class.bg-blue-600]="topic.id === topicId"
-          [class.text-white]="topic.id === topicId"
-          [class.bg-white]="topic.id !== topicId"
-          [class.text-gray-700]="topic.id !== topicId"
-          class="px-3 py-2 rounded-full text-sm font-medium cursor-pointer hover:shadow-md transition duration-200 whitespace-nowrap"
-          [routerLink]="['/courses', courseId, 'subjects', subjectId, 'chapters', chapterId, 'topics', topic.id, 'content']">
-          {{ i + 1 }}. {{ topic.name }}
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-1.5 text-sm mb-3 flex-wrap">
+        <a routerLink="/home" class="text-[#0EA5E9] hover:underline font-medium flex items-center gap-1">
+          <fa-icon [icon]="faHome"></fa-icon> Home
+        </a>
+        <span class="text-slate-400">/</span>
+        <a routerLink="/courses" class="text-[#0EA5E9] hover:underline font-medium flex items-center gap-1">
+          <fa-icon [icon]="faBook"></fa-icon> Courses
+        </a>
+        <span class="text-slate-400">/</span>
+        <a [routerLink]="['/courses', courseId, 'subjects-chapters']" class="text-[#0EA5E9] hover:underline font-medium flex items-center gap-1">
+          <fa-icon [icon]="faLayerGroup"></fa-icon> {{ courseName }}
+        </a>
+        <span class="text-slate-400">/</span>
+        <a [routerLink]="['/courses', courseId, 'subjects-chapters']" class="text-[#0EA5E9] hover:underline font-medium flex items-center gap-1">
+          <fa-icon [icon]="faBookOpen"></fa-icon> {{ chapterName }}
+        </a>
+        <span class="text-slate-400">/</span>
+        <span class="text-slate-600 dark:text-slate-400">{{ topicName }}</span>
+      </nav>
+
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">{{ topicName }}</h1>
+          <p class="text-slate-500 text-sm mt-1">{{ chapterName }}</p>
         </div>
-      </ng-container>
+
+        <!-- Navigation buttons -->
+        <div class="flex items-center gap-2">
+          <button
+            (click)="backToTopics()"
+            class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all text-sm border border-slate-200 dark:border-slate-700">
+            <fa-icon [icon]="faList"></fa-icon> All Topics
+          </button>
+          <button
+            [disabled]="currentTopicIndex <= 0"
+            [ngClass]="{'opacity-40 cursor-not-allowed': currentTopicIndex <= 0}"
+            (click)="previousTopic()"
+            class="bg-[#0EA5E9]/10 hover:bg-[#0EA5E9]/20 text-[#0EA5E9] font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all text-sm border border-[#0EA5E9]/20">
+            <fa-icon [icon]="faChevronLeft"></fa-icon> Previous
+          </button>
+          <button
+            [disabled]="currentTopicIndex >= topics.length - 1"
+            [ngClass]="{'opacity-40 cursor-not-allowed': currentTopicIndex >= topics.length - 1}"
+            (click)="nextTopic()"
+            class="bg-[#0EA5E9]/10 hover:bg-[#0EA5E9]/20 text-[#0EA5E9] font-medium px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all text-sm border border-[#0EA5E9]/20">
+            Next <fa-icon [icon]="faChevronRight"></fa-icon>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-lg font-semibold text-gray-800 flex items-center">
-        <div class="h-6 w-1 bg-blue-600 rounded mr-2"></div>
-        Content
-      </h2>
-      <!-- Show appropriate button based on content existence -->
-      <button 
-        class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200"
-        [disabled]="isGenerating"
-        [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating}"
-        (click)="generateContent()">
-        <div *ngIf="isGenerating" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-        <fa-icon *ngIf="!isGenerating" [icon]="faMagic" class="mr-1.5"></fa-icon> 
-        {{ isGenerating ? 'Processing...' : (content || (currentTopic && currentTopic.has_content) ? 'Update Content' : 'Generate Content') }}
-      </button>
+  <div class="container mx-auto px-6 py-8 max-w-7xl">
+
+    <!-- Topic Navigation Pills -->
+    <div class="mb-6 bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-4 overflow-x-auto">
+      <div class="flex gap-2 flex-nowrap">
+        @for (topic of topics; track topic; let i = $index) {
+          <div
+            [class.bg-[#0EA5E9]]="topic.id === topicId"
+            [class.text-white]="topic.id === topicId"
+            [class.bg-slate-100]="topic.id !== topicId"
+            [class.dark:bg-slate-700]="topic.id !== topicId"
+            [class.text-slate-700]="topic.id !== topicId"
+            [class.dark:text-slate-300]="topic.id !== topicId"
+            [class.shadow-lg]="topic.id === topicId"
+            [class.shadow-[#0EA5E9]/30]="topic.id === topicId"
+            class="px-3.5 py-2 rounded-xl text-sm font-medium cursor-pointer hover:shadow-md transition-all duration-200 whitespace-nowrap border border-transparent"
+            [class.border-[#0EA5E9]/30]="topic.id === topicId"
+            [routerLink]="['/courses', courseId, 'subjects', subjectId, 'chapters', chapterId, 'topics', topic.id, 'content']">
+            {{ i + 1 }}. {{ topic.name }}
+          </div>
+        }
+      </div>
     </div>
 
-    <!-- Content Display -->
-    <div *ngIf="content" class="bg-gray-50 rounded-lg p-6 prose prose-blue max-w-none">
-      <div markdown [data]="content" mermaid katex class="markdown-content"></div>
-    </div>
+    <!-- Content Card -->
+    <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+      <div class="h-0.5 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB]"></div>
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-3">
+            <div class="w-1 h-6 bg-gradient-to-b from-[#0EA5E9] to-[#2563EB] rounded-full"></div>
+            Content
+          </h2>
+          <button
+            class="bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-[#0EA5E9]/20 flex items-center gap-2 transition-all text-sm"
+            [disabled]="isGenerating"
+            [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating}"
+            (click)="generateContent()">
+            @if (isGenerating) {
+              <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>
+            }
+            @if (!isGenerating) {
+              <fa-icon [icon]="faMagic"></fa-icon>
+            }
+            {{ isGenerating ? 'Processing...' : (content || (currentTopic && currentTopic.has_content) ? 'Update Content' : 'Generate with AI') }}
+          </button>
+        </div>
 
-    <!-- No Content Selected Message -->
-    <div *ngIf="!content" class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md flex items-center">
-      <fa-icon [icon]="faInfoCircle" class="text-blue-600 mr-3 text-lg"></fa-icon>
-      <div>
-        <p class="text-blue-700">No content available for this topic yet.</p>
-        <p class="text-sm text-blue-600 mt-1">Click "Generate Content" to create content for this topic.</p>
+        <!-- Content Display -->
+        @if (content) {
+          <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-6 prose prose-slate dark:prose-invert max-w-none">
+            <div markdown [data]="content" mermaid katex class="markdown-content"></div>
+          </div>
+        }
+
+        <!-- No Content Message -->
+        @if (!content) {
+          <div class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-4">
+              <fa-icon [icon]="faInfoCircle" class="text-[#0EA5E9] text-2xl"></fa-icon>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1">No content yet</h3>
+            <p class="text-slate-500 text-sm mb-5 max-w-xs">Click "Generate with AI" to create content for this topic.</p>
+            <button
+              class="bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white font-bold px-6 py-2.5 rounded-xl shadow-lg shadow-[#0EA5E9]/20 flex items-center gap-2 transition-all text-sm"
+              [disabled]="isGenerating"
+              (click)="generateContent()">
+              <fa-icon [icon]="faMagic"></fa-icon> Generate with AI
+            </button>
+          </div>
+        }
       </div>
     </div>
   </div>

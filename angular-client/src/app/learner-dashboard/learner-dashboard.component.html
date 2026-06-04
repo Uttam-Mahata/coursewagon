@@ -1,328 +1,392 @@
-<div class="container mx-auto px-4 py-8 max-w-7xl">
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-    <div>
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center">
-        <fa-icon [icon]="faGraduationCap" class="mr-3 text-blue-600 dark:text-blue-400"></fa-icon>
-        My Learning Dashboard
+<!-- Hero Stats Header -->
+<div class="bg-gradient-to-br from-[#0F172A] to-slate-900 text-white py-12 px-6">
+  <div class="container mx-auto max-w-7xl">
+    <p class="text-[#0EA5E9] text-sm font-semibold mb-1 uppercase tracking-wider">Learner Dashboard</p>
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+      <h1 class="text-3xl font-extrabold">
+        Welcome back!
       </h1>
-      <p class="text-gray-600 dark:text-gray-400 mt-2">Track your learning progress and continue your courses</p>
+      <button
+        (click)="browseCourses()"
+        class="self-start md:self-auto flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#2563EB] text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow-lg transition-colors duration-200">
+        <fa-icon [icon]="faSearch"></fa-icon>
+        Browse Courses
+      </button>
     </div>
-    <button
-      (click)="browseCourses()"
-      class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center transition duration-200 shadow-md w-full md:w-auto">
-      <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
-      Browse Courses
-    </button>
-  </div>
 
-  <!-- Loading State -->
-  <div *ngIf="loading" class="flex justify-center items-center py-20">
-    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 dark:border-blue-400"></div>
-  </div>
+    <!-- Stat Cards Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-  <!-- Error State -->
-  <div *ngIf="error && !loading" class="bg-red-100 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-300 p-4 rounded-md mb-6">
-    <p>{{ error }}</p>
-    <button
-      (click)="loadEnrollments()"
-      class="mt-2 text-sm underline hover:text-red-900 dark:hover:text-red-200">
-      Retry
-    </button>
-  </div>
-
-  <!-- Dashboard Content -->
-  <div *ngIf="!loading && !error">
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <!-- Total Enrollments -->
-      <div class="bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-xl shadow-lg p-6 text-white">
+      <!-- Total Courses -->
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm hover:bg-white/10 transition-colors">
         <div class="flex items-center justify-between mb-3">
-          <fa-icon [icon]="faBook" size="2x" class="opacity-80"></fa-icon>
-          <span class="text-3xl font-bold">{{ totalEnrollments }}</span>
+          <div class="h-10 w-10 rounded-xl bg-[#0EA5E9]/20 flex items-center justify-center">
+            <fa-icon [icon]="faBook" class="text-[#0EA5E9] text-lg"></fa-icon>
+          </div>
+          <span class="text-3xl font-extrabold text-white">{{ totalEnrollments }}</span>
         </div>
-        <div class="text-sm opacity-90">Total Courses</div>
+        <p class="text-slate-400 text-sm">Total Courses</p>
       </div>
 
       <!-- In Progress -->
-      <div class="bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700 rounded-xl shadow-lg p-6 text-white">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm hover:bg-white/10 transition-colors">
         <div class="flex items-center justify-between mb-3">
-          <fa-icon [icon]="faBookOpen" size="2x" class="opacity-80"></fa-icon>
-          <span class="text-3xl font-bold">{{ inProgressCourses }}</span>
+          <div class="h-10 w-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
+            <fa-icon [icon]="faBookOpen" class="text-[#FBBF24] text-lg"></fa-icon>
+          </div>
+          <span class="text-3xl font-extrabold text-white">{{ inProgressCourses }}</span>
         </div>
-        <div class="text-sm opacity-90">In Progress</div>
+        <p class="text-slate-400 text-sm">In Progress</p>
       </div>
 
       <!-- Completed -->
-      <div class="bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-xl shadow-lg p-6 text-white">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm hover:bg-white/10 transition-colors">
         <div class="flex items-center justify-between mb-3">
-          <fa-icon [icon]="faTrophy" size="2x" class="opacity-80"></fa-icon>
-          <span class="text-3xl font-bold">{{ completedCourses }}</span>
+          <div class="h-10 w-10 rounded-xl bg-[#10B981]/20 flex items-center justify-center">
+            <fa-icon [icon]="faTrophy" class="text-[#10B981] text-lg"></fa-icon>
+          </div>
+          <span class="text-3xl font-extrabold text-white">{{ completedCourses }}</span>
         </div>
-        <div class="text-sm opacity-90">Completed</div>
+        <p class="text-slate-400 text-sm">Completed</p>
       </div>
 
       <!-- Time Spent -->
-      <div class="bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 rounded-xl shadow-lg p-6 text-white">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm hover:bg-white/10 transition-colors">
         <div class="flex items-center justify-between mb-3">
-          <fa-icon [icon]="faClock" size="2x" class="opacity-80"></fa-icon>
-          <span class="text-3xl font-bold">{{ formatTimeSpent(totalTimeSpent) }}</span>
-        </div>
-        <div class="text-sm opacity-90">Time Spent</div>
-      </div>
-    </div>
-
-    <!-- Active Courses Section -->
-    <div *ngIf="activeEnrollments.length > 0" class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden mb-8">
-      <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
-        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Continue Learning</h2>
-      </div>
-
-      <div class="p-4 sm:p-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div *ngFor="let enrollment of activeEnrollments"
-               class="border border-gray-200 rounded-lg hover:shadow-lg transition duration-200 overflow-hidden flex flex-col">
-            <!-- Course Image -->
-            <div class="h-40 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden">
-              <img *ngIf="enrollment.course?.image_url"
-                   [src]="enrollment.course.image_url"
-                   [alt]="enrollment.course?.name"
-                   class="w-full h-full object-cover">
-              <fa-icon *ngIf="!enrollment.course?.image_url"
-                       [icon]="faBook"
-                       size="3x"
-                       class="text-white opacity-80"></fa-icon>
-            </div>
-
-            <!-- Course Info -->
-            <div class="p-4 flex flex-col flex-grow">
-              <h3 class="text-lg font-semibold text-gray-800 mb-2 line-clamp-2 flex-grow">
-                {{ enrollment.course?.name || 'Course' }}
-              </h3>
-
-              <!-- Progress Bar -->
-              <div class="mb-3">
-                <div class="flex justify-between items-center mb-1">
-                  <span class="text-xs font-medium text-gray-600">
-                    {{ getProgressLabel(enrollment.progress_percentage || 0) }}
-                  </span>
-                  <span class="text-xs font-bold text-gray-700">
-                    {{ enrollment.progress_percentage || 0 }}%
-                  </span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    [class]="getProgressColor(enrollment.progress_percentage || 0) + ' h-2 rounded-full transition-all duration-500'"
-                    [style.width.%]="enrollment.progress_percentage || 0">
-                  </div>
-                </div>
-              </div>
-
-              <!-- Metadata -->
-              <div class="flex justify-between items-center text-xs text-gray-500 mb-4">
-                <span>
-                  <fa-icon [icon]="faClock" class="mr-1"></fa-icon>
-                  {{ formatTimeSpent(enrollment.totalTimeSpent || 0) }}
-                </span>
-                <span>Last: {{ formatDate(enrollment.last_accessed_at) }}</span>
-              </div>
-
-              <!-- Review CTA Badge -->
-              <div *ngIf="enrollment.canReview && !enrollment.hasReviewed" class="mb-3">
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-center">
-                  <p class="text-xs text-yellow-800 font-medium mb-1">Ready to review!</p>
-                  <button
-                    (click)="writeReview(enrollment.course_id); $event.stopPropagation()"
-                    class="text-xs text-yellow-700 hover:text-yellow-900 underline flex items-center justify-center gap-1 mx-auto">
-                    <fa-icon [icon]="faStar"></fa-icon>
-                    Write a Review
-                  </button>
-                </div>
-              </div>
-
-              <!-- Already Reviewed Badge -->
-              <div *ngIf="enrollment.hasReviewed && enrollment.userReview" class="mb-3">
-                <div class="bg-green-50 border border-green-200 rounded-lg p-2 text-center">
-                  <p class="text-xs text-green-800 font-medium flex items-center justify-center gap-1">
-                    <fa-icon [icon]="faStar" class="text-yellow-500"></fa-icon>
-                    You rated this {{ enrollment.userReview.rating }}/5
-                  </p>
-                </div>
-              </div>
-
-              <!-- Action Button -->
-              <button
-                (click)="continueLearning(enrollment)"
-                class="w-full mt-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center transition duration-200">
-                <fa-icon [icon]="faPlay" class="mr-2"></fa-icon>
-                Continue Learning
-              </button>
-            </div>
+          <div class="h-10 w-10 rounded-xl bg-[#F59E0B]/20 flex items-center justify-center">
+            <fa-icon [icon]="faClock" class="text-[#F59E0B] text-lg"></fa-icon>
           </div>
+          <span class="text-3xl font-extrabold text-white">{{ formatTimeSpent(totalTimeSpent) }}</span>
         </div>
-      </div>
-    </div>
-
-    <!-- Completed Courses Section -->
-    <div *ngIf="completedEnrollments.length > 0" class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-800">Completed Courses</h2>
+        <p class="text-slate-400 text-sm">Time Spent</p>
       </div>
 
-      <!-- Desktop Table -->
-      <div class="hidden md:block overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Course
-              </th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Completed
-              </th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Time Spent
-              </th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Review Status
-              </th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let enrollment of completedEnrollments" class="hover:bg-gray-50 transition duration-150">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0 h-12 w-12 mr-4">
-                    <div *ngIf="enrollment.course?.image_url"
-                         class="h-12 w-12 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center overflow-hidden">
-                      <img [src]="enrollment.course.image_url"
-                           [alt]="enrollment.course.name"
-                           class="w-full h-full object-cover">
-                    </div>
-                    <div *ngIf="!enrollment.course?.image_url"
-                         class="h-12 w-12 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                      <fa-icon [icon]="faTrophy" class="text-white"></fa-icon>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">{{ enrollment.course?.name }}</div>
-                    <div class="text-sm text-gray-500">Enrolled: {{ formatDate(enrollment.enrolled_at) }}</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <span class="text-sm text-gray-600">{{ formatDate(enrollment.completed_at!) }}</span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <span class="inline-flex items-center justify-center px-3 py-1 text-sm font-semibold text-purple-800 bg-purple-100 rounded-full">
-                  {{ formatTimeSpent(enrollment.totalTimeSpent || 0) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <span *ngIf="enrollment.hasReviewed && enrollment.userReview"
-                      class="inline-flex items-center justify-center px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded-full gap-1">
-                  <fa-icon [icon]="faStar" class="text-yellow-500"></fa-icon>
-                  {{ enrollment.userReview.rating }}/5
-                </span>
-                <button *ngIf="enrollment.canReview && !enrollment.hasReviewed"
-                        (click)="writeReview(enrollment.course_id); $event.stopPropagation()"
-                        class="inline-flex items-center justify-center px-3 py-1 text-sm font-semibold text-yellow-700 bg-yellow-100 hover:bg-yellow-200 rounded-full gap-1 transition">
-                  <fa-icon [icon]="faPen"></fa-icon>
-                  Write Review
-                </button>
-                <span *ngIf="!enrollment.canReview && !enrollment.hasReviewed"
-                      class="text-sm text-gray-500">
-                  Not eligible
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <button
-                  (click)="viewCoursePreview(enrollment.course_id)"
-                  class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center transition duration-200">
-                  <fa-icon [icon]="faBookOpen" class="mr-2"></fa-icon>
-                  View
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Mobile Cards -->
-      <div class="md:hidden space-y-4 p-4">
-        <div *ngFor="let enrollment of completedEnrollments" class="bg-white border border-gray-200 rounded-lg shadow-md p-4">
-          <div class="flex items-center mb-4">
-            <div class="flex-shrink-0 h-12 w-12 mr-4">
-              <div *ngIf="enrollment.course?.image_url"
-                    class="h-12 w-12 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center overflow-hidden">
-                <img [src]="enrollment.course.image_url"
-                      [alt]="enrollment.course.name"
-                      class="w-full h-full object-cover">
-              </div>
-              <div *ngIf="!enrollment.course?.image_url"
-                    class="h-12 w-12 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                <fa-icon [icon]="faTrophy" class="text-white"></fa-icon>
-              </div>
-            </div>
-            <div>
-              <div class="text-sm font-medium text-gray-900">{{ enrollment.course?.name }}</div>
-              <div class="text-xs text-gray-500">Completed: {{ formatDate(enrollment.completed_at!) }}</div>
-            </div>
-          </div>
-          <div class="space-y-3">
-            <!-- Time Spent -->
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-gray-600">Time Spent:</span>
-              <span class="inline-flex items-center justify-center px-3 py-1 text-sm font-semibold text-purple-800 bg-purple-100 rounded-full">
-                {{ formatTimeSpent(enrollment.totalTimeSpent || 0) }}
-              </span>
-            </div>
-
-            <!-- Review Status -->
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-gray-600">Review:</span>
-              <span *ngIf="enrollment.hasReviewed && enrollment.userReview"
-                    class="inline-flex items-center justify-center px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded-full gap-1">
-                <fa-icon [icon]="faStar" class="text-yellow-500"></fa-icon>
-                {{ enrollment.userReview.rating }}/5
-              </span>
-              <button *ngIf="enrollment.canReview && !enrollment.hasReviewed"
-                      (click)="writeReview(enrollment.course_id); $event.stopPropagation()"
-                      class="inline-flex items-center justify-center px-3 py-1 text-sm font-semibold text-yellow-700 bg-yellow-100 hover:bg-yellow-200 rounded-full gap-1 transition">
-                <fa-icon [icon]="faPen"></fa-icon>
-                Write Review
-              </button>
-              <span *ngIf="!enrollment.canReview && !enrollment.hasReviewed"
-                    class="text-sm text-gray-500">
-                Not eligible
-              </span>
-            </div>
-
-            <!-- Action Button -->
-            <button
-              (click)="viewCoursePreview(enrollment.course_id)"
-              class="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
-              <fa-icon [icon]="faBookOpen" class="mr-2"></fa-icon>
-              View Course
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Empty State -->
-    <div *ngIf="enrollments.length === 0 && !loading" class="bg-white rounded-xl shadow-lg p-12 text-center">
-      <fa-icon [icon]="faGraduationCap" size="3x" class="text-gray-300 mb-4"></fa-icon>
-      <p class="text-gray-500 text-lg mb-4">You haven't enrolled in any courses yet</p>
-      <button
-        (click)="browseCourses()"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg inline-flex items-center transition duration-200">
-        <fa-icon [icon]="faSearch" class="mr-2"></fa-icon>
-        Browse Available Courses
-      </button>
     </div>
   </div>
+</div>
+
+<!-- Page Body -->
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="flex flex-col items-center justify-center py-24 gap-4">
+      <div class="animate-spin rounded-full h-14 w-14 border-t-4 border-b-4 border-[#0EA5E9]"></div>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">Loading your courses&hellip;</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error && !loading) {
+    <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-5 rounded-xl mb-6 shadow-sm">
+      <p class="font-medium">{{ error }}</p>
+      <button
+        (click)="loadEnrollments()"
+        class="mt-2 text-sm underline underline-offset-2 hover:text-red-900 dark:hover:text-red-200 transition-colors">
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- Dashboard Content -->
+  @if (!loading && !error) {
+
+    <!-- Active Courses -->
+    @if (activeEnrollments.length > 0) {
+      <section class="mb-10">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span class="inline-block h-5 w-1 rounded-full bg-gradient-to-b from-[#0EA5E9] to-[#2563EB]"></span>
+            Continue Learning
+          </h2>
+          <span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full">
+            {{ activeEnrollments.length }} course{{ activeEnrollments.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          @for (enrollment of activeEnrollments; track enrollment) {
+            <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+
+              <!-- Accent Stripe -->
+              <div class="h-1 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB]"></div>
+
+              <!-- Course Image -->
+              <div class="h-40 bg-gradient-to-br from-[#0EA5E9] to-[#2563EB] flex items-center justify-center overflow-hidden">
+                @if (enrollment.course?.image_url) {
+                  <img
+                    [src]="enrollment.course.image_url"
+                    [alt]="enrollment.course?.name"
+                    class="w-full h-full object-cover">
+                }
+                @if (!enrollment.course?.image_url) {
+                  <fa-icon [icon]="faBook" size="3x" class="text-white opacity-60"></fa-icon>
+                }
+              </div>
+
+              <!-- Card Body -->
+              <div class="p-4 flex flex-col flex-grow">
+                <h3 class="text-base font-semibold text-slate-800 dark:text-white mb-3 line-clamp-2 leading-snug flex-grow">
+                  {{ enrollment.course?.name || 'Course' }}
+                </h3>
+
+                <!-- Progress Bar -->
+                <div class="mb-3">
+                  <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      {{ getProgressLabel(enrollment.progress_percentage || 0) }}
+                    </span>
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300 tabular-nums">
+                      {{ enrollment.progress_percentage || 0 }}%
+                    </span>
+                  </div>
+                  <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
+                    <div
+                      class="bg-[#10B981] h-2 rounded-full transition-all duration-500"
+                      [style.width.%]="enrollment.progress_percentage || 0">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Metadata Row -->
+                <div class="flex justify-between items-center text-xs text-slate-400 dark:text-slate-500 mb-4">
+                  <span class="flex items-center gap-1">
+                    <fa-icon [icon]="faClock"></fa-icon>
+                    {{ formatTimeSpent(enrollment.totalTimeSpent || 0) }}
+                  </span>
+                  <span>{{ formatDate(enrollment.last_accessed_at) }}</span>
+                </div>
+
+                <!-- Review CTA -->
+                @if (enrollment.canReview && !enrollment.hasReviewed) {
+                  <div class="mb-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl p-2.5 text-center">
+                    <p class="text-xs text-amber-800 dark:text-amber-300 font-semibold mb-1">Ready to review!</p>
+                    <button
+                      (click)="writeReview(enrollment.course_id); $event.stopPropagation()"
+                      class="text-xs text-amber-700 dark:text-amber-400 hover:text-amber-900 dark:hover:text-amber-200 underline underline-offset-2 flex items-center justify-center gap-1 mx-auto transition-colors">
+                      <fa-icon [icon]="faStar"></fa-icon>
+                      Write a Review
+                    </button>
+                  </div>
+                }
+
+                <!-- Already Reviewed -->
+                @if (enrollment.hasReviewed && enrollment.userReview) {
+                  <div class="mb-3 bg-[#10B981]/10 border border-[#10B981]/30 rounded-xl p-2.5 text-center">
+                    <p class="text-xs text-[#10B981] font-semibold flex items-center justify-center gap-1">
+                      <fa-icon [icon]="faStar" class="text-amber-400"></fa-icon>
+                      You rated this {{ enrollment.userReview.rating }}/5
+                    </p>
+                  </div>
+                }
+
+                <!-- Continue Button -->
+                <button
+                  (click)="continueLearning(enrollment)"
+                  class="w-full mt-auto flex items-center justify-center gap-2 bg-[#0EA5E9] hover:bg-[#2563EB] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors duration-200">
+                  <fa-icon [icon]="faPlay"></fa-icon>
+                  Continue Learning
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Completed Courses -->
+    @if (completedEnrollments.length > 0) {
+      <section class="mb-10">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span class="inline-block h-5 w-1 rounded-full bg-gradient-to-b from-[#10B981] to-[#059669]"></span>
+            Completed Courses
+          </h2>
+          <span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full">
+            {{ completedEnrollments.length }} course{{ completedEnrollments.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="hidden md:block bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden shadow-sm">
+          <table class="min-w-full">
+            <thead>
+              <tr class="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700/50">
+                <th scope="col" class="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Course
+                </th>
+                <th scope="col" class="px-6 py-3.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Completed
+                </th>
+                <th scope="col" class="px-6 py-3.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Time Spent
+                </th>
+                <th scope="col" class="px-6 py-3.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Review
+                </th>
+                <th scope="col" class="px-6 py-3.5 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
+              @for (enrollment of completedEnrollments; track enrollment) {
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 dark:odd:bg-slate-800/30 transition-colors duration-150">
+
+                  <!-- Course Info -->
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-4">
+                      <div class="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center overflow-hidden">
+                        @if (enrollment.course?.image_url) {
+                          <img
+                            [src]="enrollment.course.image_url"
+                            [alt]="enrollment.course.name"
+                            class="w-full h-full object-cover">
+                        }
+                        @if (!enrollment.course?.image_url) {
+                          <fa-icon [icon]="faTrophy" class="text-white text-sm"></fa-icon>
+                        }
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-sm font-semibold text-slate-900 dark:text-white truncate">{{ enrollment.course?.name }}</p>
+                        <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Enrolled: {{ formatDate(enrollment.enrolled_at) }}</p>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Completed Date -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="text-sm text-slate-600 dark:text-slate-400">{{ formatDate(enrollment.completed_at!) }}</span>
+                  </td>
+
+                  <!-- Time Spent -->
+                  <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center px-3 py-1 text-xs font-semibold text-violet-700 dark:text-violet-300 bg-violet-100 dark:bg-violet-900/30 rounded-full tabular-nums">
+                      {{ formatTimeSpent(enrollment.totalTimeSpent || 0) }}
+                    </span>
+                  </td>
+
+                  <!-- Review Status -->
+                  <td class="px-6 py-4 text-center">
+                    @if (enrollment.hasReviewed && enrollment.userReview) {
+                      <span class="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold text-[#10B981] bg-[#10B981]/10 rounded-full">
+                        <fa-icon [icon]="faStar" class="text-[#FBBF24]"></fa-icon>
+                        {{ enrollment.userReview.rating }}/5
+                      </span>
+                    }
+                    @if (enrollment.canReview && !enrollment.hasReviewed) {
+                      <button
+                        (click)="writeReview(enrollment.course_id); $event.stopPropagation()"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold border border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#0EA5E9] hover:text-white rounded-lg transition-colors duration-150">
+                        <fa-icon [icon]="faPen"></fa-icon>
+                        Write Review
+                      </button>
+                    }
+                    @if (!enrollment.canReview && !enrollment.hasReviewed) {
+                      <span class="text-xs text-slate-400 dark:text-slate-500">Not eligible</span>
+                    }
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="px-6 py-4 text-center">
+                    <button
+                      (click)="viewCoursePreview(enrollment.course_id)"
+                      class="inline-flex items-center gap-2 border border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#0EA5E9] hover:text-white px-4 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150">
+                      <fa-icon [icon]="faBookOpen"></fa-icon>
+                      View
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="md:hidden space-y-4">
+          @for (enrollment of completedEnrollments; track enrollment) {
+            <div class="bg-white dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/50 rounded-2xl p-4 shadow-sm">
+
+              <div class="flex items-center gap-3 mb-4">
+                <div class="h-11 w-11 shrink-0 rounded-xl bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center overflow-hidden">
+                  @if (enrollment.course?.image_url) {
+                    <img
+                      [src]="enrollment.course.image_url"
+                      [alt]="enrollment.course.name"
+                      class="w-full h-full object-cover">
+                  }
+                  @if (!enrollment.course?.image_url) {
+                    <fa-icon [icon]="faTrophy" class="text-white text-sm"></fa-icon>
+                  }
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-slate-900 dark:text-white truncate">{{ enrollment.course?.name }}</p>
+                  <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Completed: {{ formatDate(enrollment.completed_at!) }}</p>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <!-- Time Spent -->
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-slate-500 dark:text-slate-400">Time Spent</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-violet-700 dark:text-violet-300 bg-violet-100 dark:bg-violet-900/30 rounded-full tabular-nums">
+                    {{ formatTimeSpent(enrollment.totalTimeSpent || 0) }}
+                  </span>
+                </div>
+
+                <!-- Review Status -->
+                <div class="flex justify-between items-center">
+                  <span class="text-xs text-slate-500 dark:text-slate-400">Review</span>
+                  @if (enrollment.hasReviewed && enrollment.userReview) {
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 text-xs font-semibold text-[#10B981] bg-[#10B981]/10 rounded-full">
+                      <fa-icon [icon]="faStar" class="text-[#FBBF24]"></fa-icon>
+                      {{ enrollment.userReview.rating }}/5
+                    </span>
+                  }
+                  @if (enrollment.canReview && !enrollment.hasReviewed) {
+                    <button
+                      (click)="writeReview(enrollment.course_id); $event.stopPropagation()"
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold border border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#0EA5E9] hover:text-white rounded-lg transition-colors duration-150">
+                      <fa-icon [icon]="faPen"></fa-icon>
+                      Write Review
+                    </button>
+                  }
+                  @if (!enrollment.canReview && !enrollment.hasReviewed) {
+                    <span class="text-xs text-slate-400 dark:text-slate-500">Not eligible</span>
+                  }
+                </div>
+
+                <!-- View Button -->
+                <button
+                  (click)="viewCoursePreview(enrollment.course_id)"
+                  class="w-full flex items-center justify-center gap-2 border border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#0EA5E9] hover:text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors duration-150">
+                  <fa-icon [icon]="faBookOpen"></fa-icon>
+                  View Course
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Empty State -->
+    @if (enrollments.length === 0 && !loading) {
+      <div class="flex flex-col items-center justify-center py-20 text-center bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
+        <div class="h-20 w-20 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-5">
+          <fa-icon [icon]="faGraduationCap" size="2x" class="text-slate-400 dark:text-slate-500"></fa-icon>
+        </div>
+        <p class="text-slate-500 dark:text-slate-400 text-lg font-medium mb-2">No courses yet</p>
+        <p class="text-slate-400 dark:text-slate-500 text-sm mb-6 max-w-xs">
+          You haven't enrolled in any courses yet. Start learning something new today!
+        </p>
+        <button
+          (click)="browseCourses()"
+          class="flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#2563EB] text-white px-6 py-2.5 rounded-xl font-semibold text-sm shadow-md transition-colors duration-200">
+          <fa-icon [icon]="faSearch"></fa-icon>
+          Browse Available Courses
+        </button>
+      </div>
+    }
+  }
 </div>

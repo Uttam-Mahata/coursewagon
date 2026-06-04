@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -22,7 +22,7 @@ interface EnrollmentWithProgress extends Enrollment {
 @Component({
   selector: 'app-learner-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FontAwesomeModule],
+  imports: [RouterModule, FontAwesomeModule],
   templateUrl: './learner-dashboard.component.html',
   styleUrl: './learner-dashboard.component.css'
 })

@@ -18,32 +18,34 @@ def add_user_role_fields():
     try:
         # Check if role column exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'user'
+            WHERE TABLE_NAME = 'user'
             AND COLUMN_NAME = 'role'
         """))
 
-        if result.fetchone().count == 0:
+        row = result.fetchone()
+        count = row[0] if row else 0
+
+        if count == 0:
             logger.info("Adding role, bio, and profile_image_url columns to user table...")
 
             # Add role column
             session.execute(text("""
-                ALTER TABLE user
-                ADD COLUMN role VARCHAR(50) DEFAULT 'both' NOT NULL
+                ALTER TABLE [user]
+                ADD role NVARCHAR(50) DEFAULT 'both' NOT NULL
             """))
 
             # Add bio column
             session.execute(text("""
-                ALTER TABLE user
-                ADD COLUMN bio TEXT NULL
+                ALTER TABLE [user]
+                ADD bio NVARCHAR(MAX) NULL
             """))
 
             # Add profile_image_url column
             session.execute(text("""
-                ALTER TABLE user
-                ADD COLUMN profile_image_url VARCHAR(512) NULL
+                ALTER TABLE [user]
+                ADD profile_image_url NVARCHAR(512) NULL
             """))
 
             session.commit()
@@ -64,24 +66,46 @@ def add_course_publishing_fields():
     try:
         # Check if is_published column exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'courses'
+            WHERE TABLE_NAME = 'courses'
             AND COLUMN_NAME = 'is_published'
         """))
 
-        if result.fetchone().count == 0:
+        row = result.fetchone()
+        count = row[0] if row else 0
+
+        if count == 0:
             logger.info("Adding publishing fields to courses table...")
 
             session.execute(text("""
                 ALTER TABLE courses
-                ADD COLUMN is_published BOOLEAN DEFAULT FALSE NOT NULL,
-                ADD COLUMN published_at DATETIME NULL,
-                ADD COLUMN category VARCHAR(100) NULL,
-                ADD COLUMN difficulty_level VARCHAR(50) NULL,
-                ADD COLUMN estimated_duration_hours INT NULL,
-                ADD COLUMN enrollment_count INT DEFAULT 0 NOT NULL
+                ADD is_published BIT DEFAULT 0 NOT NULL
+            """))
+
+            session.execute(text("""
+                ALTER TABLE courses
+                ADD published_at DATETIME NULL
+            """))
+
+            session.execute(text("""
+                ALTER TABLE courses
+                ADD category NVARCHAR(100) NULL
+            """))
+
+            session.execute(text("""
+                ALTER TABLE courses
+                ADD difficulty_level NVARCHAR(50) NULL
+            """))
+
+            session.execute(text("""
+                ALTER TABLE courses
+                ADD estimated_duration_hours INT NULL
+            """))
+
+            session.execute(text("""
+                ALTER TABLE courses
+                ADD enrollment_count INT DEFAULT 0 NOT NULL
             """))
 
             session.commit()
@@ -102,28 +126,31 @@ def create_enrollments_table():
     try:
         # Check if table exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'enrollments'
+            WHERE TABLE_NAME = 'enrollments'
         """))
 
-        if result.fetchone().count == 0:
+        row = result.fetchone()
+        count = row[0] if row else 0
+
+        if count == 0:
             logger.info("Creating enrollments table...")
 
             session.execute(text("""
+                IF OBJECT_ID('enrollments', 'U') IS NULL
                 CREATE TABLE enrollments (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    id INT IDENTITY(1,1) PRIMARY KEY,
                     user_id INT NOT NULL,
                     course_id INT NOT NULL,
-                    enrolled_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    status VARCHAR(50) DEFAULT 'active' NOT NULL,
+                    enrolled_at DATETIME NOT NULL DEFAULT GETDATE(),
+                    status NVARCHAR(50) DEFAULT 'active' NOT NULL,
                     progress_percentage FLOAT DEFAULT 0.0 NOT NULL,
-                    last_accessed_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    last_accessed_at DATETIME DEFAULT GETDATE(),
                     completed_at DATETIME NULL,
-                    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-                    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
-                    UNIQUE KEY unique_enrollment (user_id, course_id)
+                    FOREIGN KEY (user_id) REFERENCES [user](id) ON DELETE CASCADE,
+                    FOREIGN KEY (course_id) REFERENCES courses(id),
+                    CONSTRAINT unique_enrollment UNIQUE (user_id, course_id)
                 )
             """))
 
@@ -145,31 +172,34 @@ def create_learning_progress_table():
     try:
         # Check if table exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'learning_progress'
+            WHERE TABLE_NAME = 'learning_progress'
         """))
 
-        if result.fetchone().count == 0:
+        row = result.fetchone()
+        count = row[0] if row else 0
+
+        if count == 0:
             logger.info("Creating learning_progress table...")
 
             session.execute(text("""
+                IF OBJECT_ID('learning_progress', 'U') IS NULL
                 CREATE TABLE learning_progress (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    id INT IDENTITY(1,1) PRIMARY KEY,
                     enrollment_id INT NOT NULL,
                     topic_id INT NOT NULL,
                     content_id INT NULL,
-                    completed BOOLEAN DEFAULT FALSE NOT NULL,
+                    completed BIT DEFAULT 0 NOT NULL,
                     time_spent_seconds INT DEFAULT 0 NOT NULL,
-                    last_position TEXT NULL,
-                    started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    last_position NVARCHAR(MAX) NULL,
+                    started_at DATETIME NOT NULL DEFAULT GETDATE(),
                     completed_at DATETIME NULL,
-                    last_accessed_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    last_accessed_at DATETIME DEFAULT GETDATE(),
                     FOREIGN KEY (enrollment_id) REFERENCES enrollments(id) ON DELETE CASCADE,
-                    FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE,
-                    FOREIGN KEY (content_id) REFERENCES content(id) ON DELETE CASCADE,
-                    UNIQUE KEY unique_progress (enrollment_id, topic_id)
+                    FOREIGN KEY (topic_id) REFERENCES topics(id),
+                    FOREIGN KEY (content_id) REFERENCES content(id),
+                    CONSTRAINT unique_progress UNIQUE (enrollment_id, topic_id)
                 )
             """))
 

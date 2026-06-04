@@ -7,8 +7,8 @@ class LearningProgress(Base):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     enrollment_id = db.Column(db.Integer, db.ForeignKey('enrollments.id', ondelete='CASCADE'), nullable=False)
-    topic_id = db.Column(db.Integer, db.ForeignKey('topics.id', ondelete='CASCADE'), nullable=False)
-    content_id = db.Column(db.Integer, db.ForeignKey('content.id', ondelete='CASCADE'), nullable=True)
+    topic_id = db.Column(db.Integer, db.ForeignKey('topics.id', ondelete='NO ACTION'), nullable=False)
+    content_id = db.Column(db.Integer, db.ForeignKey('content.id', ondelete='NO ACTION'), nullable=True)
     completed = db.Column(db.Boolean, default=False, nullable=False)
     time_spent_seconds = db.Column(db.Integer, default=0, nullable=False)  # Time spent in seconds
     last_position = db.Column(db.Text, nullable=True)  # JSON string storing scroll position or other state

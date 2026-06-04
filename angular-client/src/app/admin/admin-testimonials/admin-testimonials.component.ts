@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import { CommonModule } from '@angular/common';
+
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-admin-testimonials',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule],
+  imports: [FontAwesomeModule],
   templateUrl: './admin-testimonials.component.html',
   styleUrls: ['./admin-testimonials.component.css']
 })

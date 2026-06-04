@@ -1,16 +1,27 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+  --color-brand-blue: #0EA5E9;
+  --color-brand-blue-dark: #2563EB;
+  --color-brand-emerald: #10B981;
+  --color-brand-emerald-dark: #059669;
+  --color-brand-amber: #FBBF24;
+  --color-brand-amber-dark: #F59E0B;
+  --color-brand-slate: #0F172A;
+}
+
 /* Tailwind v4 Dark Mode Configuration - Use class-based strategy */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Font Family Configuration */
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 /* Dark Mode Styles */
@@ -44,7 +55,7 @@ html.dark body {
   margin-top: 1.5rem;
   margin-bottom: 1rem;
   font-weight: 600;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .markdown-content h1 {

@@ -1,78 +1,200 @@
-<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-blue-100 dark:from-slate-900 dark:to-slate-800 py-8">
-  <div class="w-full max-w-md">
-    <div class="bg-white dark:bg-slate-800 shadow-xl rounded-2xl p-8">
-      <!-- Verifying State -->
-      <div *ngIf="isVerifying" class="text-center">
-        <div class="mb-4">
-          <svg class="animate-spin h-16 w-16 text-blue-500 dark:text-blue-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </div>
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Verifying Your Email</h2>
-        <p class="text-gray-600 dark:text-gray-400">Please wait while we verify your email address...</p>
-      </div>
+<div class="min-h-screen flex">
 
-      <!-- Success State -->
-      <div *ngIf="!isVerifying && verificationSuccess" class="text-center">
-        <div class="mb-4">
-          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30">
-            <svg class="h-10 w-10 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-          </div>
-        </div>
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Email Verified Successfully!</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
-          Your email address has been verified. You can now log in and access all features of Course Wagon.
-        </p>
-        <button
-          (click)="goToLogin()"
-          class="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-3 rounded-lg shadow transition">
-          Continue to Login
-        </button>
-      </div>
-
-      <!-- Error State -->
-      <div *ngIf="!isVerifying && !verificationSuccess" class="text-center">
-        <div class="mb-4">
-          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 dark:bg-red-900/30">
-            <svg class="h-10 w-10 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </div>
-        </div>
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Verification Failed</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-4">{{ errorMessage }}</p>
-
-        <!-- Resend Success Message -->
-        <div *ngIf="resendSuccess" class="mb-4 rounded-lg bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-4 py-3 text-sm">
-          A new verification email has been sent to your inbox. Please check your email and click the verification link.
-        </div>
-
-        <!-- Resend Button (if we have email) -->
-        <div *ngIf="userEmail && !resendSuccess" class="mb-4">
-          <button
-            (click)="resendVerification()"
-            [disabled]="resendingEmail"
-            class="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-3 rounded-lg shadow transition disabled:opacity-50 disabled:cursor-not-allowed">
-            <span *ngIf="!resendingEmail">Resend Verification Email</span>
-            <span *ngIf="resendingEmail">Sending...</span>
-          </button>
-        </div>
-
-        <!-- Back to Login Button -->
-        <button
-          (click)="goToLogin()"
-          class="w-full bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-800 dark:text-white font-semibold py-3 rounded-lg shadow transition">
-          Back to Login
-        </button>
-      </div>
+  <!-- LEFT PANEL – hidden on mobile -->
+  <div class="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center bg-gradient-to-br from-[#0F172A] via-slate-900 to-[#0F172A] overflow-hidden px-12">
+    <!-- Subtle grid overlay -->
+    <div class="absolute inset-0 opacity-10"
+         style="background-image: linear-gradient(rgba(14,165,233,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.3) 1px, transparent 1px); background-size: 40px 40px;">
     </div>
 
-    <!-- Help Text -->
-    <div class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-      <p>Need help? Contact us at <a href="mailto:coursewagon@gmail.com" class="text-blue-600 dark:text-blue-400 hover:underline">coursewagon&#64;gmail.com</a></p>
+    <!-- Ambient orbs -->
+    <div class="absolute top-1/4 left-1/4 w-72 h-72 rounded-full"
+         style="background: #0EA5E9; opacity: 0.12; filter: blur(80px); transform: translate(-50%, -50%);">
+    </div>
+    <div class="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full"
+         style="background: #10B981; opacity: 0.10; filter: blur(80px); transform: translate(50%, 50%);">
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 flex flex-col items-center text-center max-w-md">
+      <!-- Brand logo -->
+      <svg viewBox="0 0 160 120" class="w-20 h-16 mb-6" aria-hidden="true">
+        <defs>
+          <linearGradient id="apCGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/></linearGradient>
+          <linearGradient id="apWGrad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#10B981"/></linearGradient>
+          <linearGradient id="apSparkGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FBBF24"/><stop offset="100%" stop-color="#F59E0B"/></linearGradient>
+        </defs>
+        <g transform="translate(10,0)">
+          <path d="M 94.5 31.1 A 45 45 0 1 0 94.5 88.9" fill="none" stroke="url(#apCGrad)" stroke-width="14" stroke-linecap="round"/>
+          <path d="M 20 60 L 45 90 L 70 55 L 95 85 L 120 45" fill="none" stroke="url(#apWGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 120 2 Q 120 18 136 18 Q 120 18 120 34 Q 120 18 104 18 Q 120 18 120 2 Z" fill="url(#apSparkGrad)"/>
+        </g>
+      </svg>
+
+      <h2 class="text-4xl font-extrabold mb-3 bg-gradient-to-r from-[#0EA5E9] to-[#10B981] bg-clip-text text-transparent leading-tight">
+        One Step to<br>Get Started
+      </h2>
+      <p class="text-slate-400 text-base mb-10 leading-relaxed">
+        Verifying your email keeps your account secure and unlocks the full CourseWagon experience.
+      </p>
+
+      <!-- Feature bullets -->
+      <ul class="space-y-5 text-left w-full">
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#0EA5E9]/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="text-white font-semibold text-sm">Verified Accounts Only</p>
+            <p class="text-slate-400 text-xs mt-0.5">Protects the community from spam and abuse.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#10B981]/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#10B981]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="text-white font-semibold text-sm">Instant Access on Verify</p>
+            <p class="text-slate-400 text-xs mt-0.5">Click the link and you're in — no extra steps.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#FBBF24]/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#FBBF24]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </span>
+          <div>
+            <p class="text-white font-semibold text-sm">Resend at Any Time</p>
+            <p class="text-slate-400 text-xs mt-0.5">Didn't get it? Request a fresh link in one click.</p>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center bg-white dark:bg-[#0F172A] px-8 py-12 lg:px-16">
+    <div class="w-full max-w-md">
+
+      <!-- Mobile logo -->
+      <div class="flex items-center justify-center mb-8 lg:hidden">
+        <svg viewBox="0 0 160 120" class="w-12 h-10" aria-hidden="true">
+          <defs>
+            <linearGradient id="mCGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/></linearGradient>
+            <linearGradient id="mWGrad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#10B981"/></linearGradient>
+            <linearGradient id="mSparkGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FBBF24"/><stop offset="100%" stop-color="#F59E0B"/></linearGradient>
+          </defs>
+          <g transform="translate(10,0)">
+            <path d="M 94.5 31.1 A 45 45 0 1 0 94.5 88.9" fill="none" stroke="url(#mCGrad)" stroke-width="14" stroke-linecap="round"/>
+            <path d="M 20 60 L 45 90 L 70 55 L 95 85 L 120 45" fill="none" stroke="url(#mWGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 120 2 Q 120 18 136 18 Q 120 18 120 34 Q 120 18 104 18 Q 120 18 120 2 Z" fill="url(#mSparkGrad)"/>
+          </g>
+        </svg>
+        <span class="ml-2 text-xl font-extrabold text-slate-900 dark:text-white">CourseWagon</span>
+      </div>
+
+      <!-- ── VERIFYING STATE ── -->
+      @if (isVerifying) {
+        <div class="text-center">
+          <div class="flex justify-center mb-5">
+            <svg class="animate-spin w-14 h-14 text-[#0EA5E9]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+          <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Verifying Your Email</h1>
+          <p class="text-slate-500 dark:text-slate-400 text-sm">Please wait while we verify your email address...</p>
+        </div>
+      }
+
+      <!-- ── SUCCESS STATE ── -->
+      @if (!isVerifying && verificationSuccess) {
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center w-16 h-16 rounded-full bg-[#10B981]/10 mb-5">
+            <svg class="w-9 h-9 text-[#10B981]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Email Verified!</h1>
+          <p class="text-slate-500 dark:text-slate-400 text-sm mb-8">
+            Your email address has been verified. You can now log in and access all features of CourseWagon.
+          </p>
+          <button
+            (click)="goToLogin()"
+            class="w-full bg-[#0EA5E9] hover:bg-[#2563EB] text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-[#0EA5E9]/20 flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+            </svg>
+            Continue to Login
+          </button>
+        </div>
+      }
+
+      <!-- ── ERROR STATE ── -->
+      @if (!isVerifying && !verificationSuccess) {
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 mb-5">
+            <svg class="w-9 h-9 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </div>
+
+          <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Verification Failed</h1>
+          <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">{{ errorMessage }}</p>
+
+          <!-- Resend success notice -->
+          @if (resendSuccess) {
+            <div class="mb-5 bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] rounded-xl p-4 text-sm text-left">
+              A new verification email has been sent to your inbox. Please check your email and click the verification link.
+            </div>
+          }
+
+          <!-- Resend button (when we have email and haven't resent yet) -->
+          @if (userEmail && !resendSuccess) {
+            <button
+              (click)="resendVerification()"
+              [disabled]="resendingEmail"
+              class="w-full bg-[#0EA5E9] hover:bg-[#2563EB] text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-[#0EA5E9]/20 flex items-center justify-center gap-2 mb-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+              @if (resendingEmail) {
+                <span class="inline-block animate-spin">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </span>
+              }
+              @if (!resendingEmail) {
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              }
+              <span>{{ resendingEmail ? 'Sending...' : 'Resend Verification Email' }}</span>
+            </button>
+          }
+
+          <!-- Back to login -->
+          <button
+            (click)="goToLogin()"
+            class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-3.5 px-6 rounded-xl transition-all duration-200">
+            Back to Login
+          </button>
+        </div>
+      }
+
+      <!-- Help text -->
+      <p class="mt-8 text-center text-xs text-slate-400 dark:text-slate-500">
+        Need help? Contact us at
+        <a href="mailto:coursewagon@gmail.com" class="text-[#0EA5E9] hover:text-[#2563EB] font-semibold transition-colors">
+          coursewagon&#64;gmail.com
+        </a>
+      </p>
+
+    </div>
+  </div>
+
 </div>

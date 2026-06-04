@@ -7,9 +7,9 @@ class CourseReview(Base):
     __tablename__ = 'course_reviews'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete='CASCADE'), nullable=False)
-    enrollment_id = db.Column(db.Integer, db.ForeignKey('enrollments.id', ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='NO ACTION'), nullable=False)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id', ondelete='NO ACTION'), nullable=False)
+    enrollment_id = db.Column(db.Integer, db.ForeignKey('enrollments.id', ondelete='NO ACTION'), nullable=False)
     rating = db.Column(db.Integer, nullable=False)  # 1-5 stars
     review_text = db.Column(db.Text, nullable=True)  # Optional review text
     is_visible = db.Column(db.Boolean, default=True, nullable=False)  # For moderation/hiding

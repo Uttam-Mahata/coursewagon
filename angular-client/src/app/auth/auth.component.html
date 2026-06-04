@@ -1,258 +1,438 @@
-<div class="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-blue-100 dark:from-slate-900 dark:to-slate-800 py-8">
-  <div class="w-full max-w-md">
-    <div class="bg-white dark:bg-slate-800 shadow-xl rounded-2xl p-8">
-      <div class="mb-6 flex flex-col items-center">
-        <fa-icon 
-          [icon]="isLoginMode ? 'sign-in-alt' : 'user-plus'" 
-          class="text-blue-500 dark:text-blue-400 text-4xl mb-2">
-        </fa-icon>
-        <h3 class="text-2xl font-bold text-center text-gray-800 dark:text-white">
-          {{ isLoginMode ? 'Login' : 'Sign Up' }}
-        </h3>
-      </div>
-      <div *ngIf="errorMessage" class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-4 py-3 text-sm font-medium flex items-start gap-3 shadow-sm" role="alert">
-        <fa-icon [icon]="'exclamation-triangle'" class="text-red-600 dark:text-red-400 text-lg mt-0.5 flex-shrink-0"></fa-icon>
-        <span class="flex-1">{{ errorMessage }}</span>
-        <button 
-          type="button" 
-          (click)="clearMessages()" 
-          class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 flex-shrink-0 focus:outline-none ml-2"
-          aria-label="Close error message">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-          </svg>
-        </button>
-      </div>
-      <div *ngIf="successMessage" class="mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 text-sm font-medium flex items-start gap-3 shadow-sm" role="alert">
-        <fa-icon [icon]="'check-circle'" class="text-green-600 dark:text-green-400 text-lg mt-0.5 flex-shrink-0"></fa-icon>
-        <span class="flex-1">{{ successMessage }}</span>
-        <button 
-          type="button" 
-          (click)="clearMessages()" 
-          class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 flex-shrink-0 focus:outline-none ml-2"
-          aria-label="Close success message">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-          </svg>
-        </button>
-      </div>
+<div class="min-h-screen flex">
 
-      <!-- Email Verification Message -->
-      <div *ngIf="showVerificationMessage" class="text-center">
-        <div class="mb-4">
-          <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900/30">
-            <fa-icon [icon]="'envelope'" class="text-blue-600 dark:text-blue-400 text-2xl"></fa-icon>
-          </div>
-        </div>
-        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Check Your Email</h3>
-        <p class="text-gray-600 dark:text-gray-400 mb-4">
-          We've sent a verification email to <strong>{{ registeredEmail }}</strong>.
-          Please click the link in the email to verify your account.
-        </p>
-        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4 text-sm text-left">
-          <p class="font-medium text-blue-900 dark:text-blue-300 mb-2">📬 What to do next:</p>
-          <ul class="list-disc list-inside text-blue-800 dark:text-blue-400 space-y-1">
-            <li>Check your inbox (and spam folder)</li>
-            <li>Click the verification link</li>
-            <li>Return here to log in</li>
-          </ul>
-        </div>
-        <button
-          (click)="resendVerificationEmail()"
-          [disabled]="resendingVerification"
-          class="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-2 rounded-lg shadow transition-all duration-200 mb-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-          <span *ngIf="resendingVerification" class="inline-block animate-spin">
-            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  <!-- LEFT PANEL – hidden on mobile -->
+  <div class="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center bg-gradient-to-br from-[#0F172A] via-slate-900 to-[#0F172A] overflow-hidden px-12">
+    <!-- Subtle grid overlay -->
+    <div class="absolute inset-0 opacity-10"
+         style="background-image: linear-gradient(rgba(14,165,233,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(14,165,233,0.3) 1px, transparent 1px); background-size: 40px 40px;">
+    </div>
+
+    <!-- Ambient orbs -->
+    <div class="absolute top-1/4 left-1/4 w-72 h-72 rounded-full"
+         style="background: #0EA5E9; opacity: 0.12; filter: blur(80px); transform: translate(-50%, -50%);">
+    </div>
+    <div class="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full"
+         style="background: #10B981; opacity: 0.10; filter: blur(80px); transform: translate(50%, 50%);">
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 flex flex-col items-center text-center max-w-md">
+      <!-- Brand logo -->
+      <svg viewBox="0 0 160 120" class="w-20 h-16 mb-6" aria-hidden="true">
+        <defs>
+          <linearGradient id="apCGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/></linearGradient>
+          <linearGradient id="apWGrad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#10B981"/></linearGradient>
+          <linearGradient id="apSparkGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FBBF24"/><stop offset="100%" stop-color="#F59E0B"/></linearGradient>
+        </defs>
+        <g transform="translate(10,0)">
+          <path d="M 94.5 31.1 A 45 45 0 1 0 94.5 88.9" fill="none" stroke="url(#apCGrad)" stroke-width="14" stroke-linecap="round"/>
+          <path d="M 20 60 L 45 90 L 70 55 L 95 85 L 120 45" fill="none" stroke="url(#apWGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 120 2 Q 120 18 136 18 Q 120 18 120 34 Q 120 18 104 18 Q 120 18 120 2 Z" fill="url(#apSparkGrad)"/>
+        </g>
+      </svg>
+
+      <h2 class="text-4xl font-extrabold mb-3 bg-gradient-to-r from-[#0EA5E9] to-[#10B981] bg-clip-text text-transparent leading-tight">
+        Learn Smarter<br>with AI
+      </h2>
+      <p class="text-slate-400 text-base mb-10 leading-relaxed">
+        CourseWagon delivers AI-generated, structured courses tailored to how you learn best.
+      </p>
+
+      <!-- Feature bullets -->
+      <ul class="space-y-5 text-left w-full">
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#0EA5E9]/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
           </span>
-          <span>{{ resendingVerification ? 'Sending...' : 'Resend Verification Email' }}</span>
-        </button>
-        <button
-          (click)="backToLogin()"
-          class="w-full bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-800 dark:text-white font-semibold py-2 rounded-lg shadow transition-all duration-200 hover:shadow-md">
-          Back to Login
-        </button>
-      </div>
-
-      <!-- Login Form -->
-      <form *ngIf="isLoginMode && !showVerificationMessage" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
-          <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
-              <fa-icon [icon]="'envelope'"></fa-icon>
-            </span>
-            <input 
-              type="email" 
-              class="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 transition"
-              id="email" 
-              formControlName="email"
-              required>
+          <div>
+            <p class="text-white font-semibold text-sm">AI-Powered Course Generation</p>
+            <p class="text-slate-400 text-xs mt-0.5">Instantly create full courses from any topic with Gemini AI.</p>
           </div>
-        </div>
-        <div>
-          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-          <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
-              <fa-icon [icon]="'lock'"></fa-icon>
-            </span>
-            <input 
-              type="password" 
-              class="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 transition"
-              id="password" 
-              formControlName="password"
-              required>
-          </div>
-          <!-- Forgot password link -->
-          <div class="text-right mt-1">
-            <a routerLink="/forgot-password" class="text-sm text-blue-600 dark:text-blue-400 hover:underline transition-colors">
-              Forgot password?
-            </a>
-          </div>
-        </div>
-        
-        <!-- Remember Me Checkbox -->
-        <div class="flex items-center">
-          <input 
-            type="checkbox" 
-            id="rememberMe" 
-            formControlName="rememberMe"
-            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-slate-600 dark:bg-slate-700 rounded">
-          <label for="rememberMe" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-            Remember me
-          </label>
-        </div>
-        
-        <button
-          type="submit"
-          [disabled]="isLoginLoading"
-          class="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 hover:shadow-lg text-white font-semibold py-2 rounded-lg shadow transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-          <span *ngIf="isLoginLoading" class="inline-block animate-spin">
-            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </li>
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#10B981]/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#10B981]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
             </svg>
           </span>
-          <fa-icon *ngIf="!isLoginLoading" [icon]="'sign-in-alt'"></fa-icon>
-          {{ isLoginLoading ? 'Logging in...' : 'Login' }}
-        </button>
-      </form>
-
-      <!-- Register Form -->
-      <form *ngIf="!isLoginMode && !showVerificationMessage" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
-        <div>
-          <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
-          <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
-              <fa-icon [icon]="'user'"></fa-icon>
-            </span>
-            <input 
-              type="text" 
-              class="w-full rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 transition"
-              id="firstName" 
-              formControlName="first_name"
-              required>
+          <div>
+            <p class="text-white font-semibold text-sm">Structured Learning Paths</p>
+            <p class="text-slate-400 text-xs mt-0.5">Subjects, chapters, and topics — all organised for you.</p>
           </div>
-        </div>
-        <div>
-          <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-          <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <fa-icon [icon]="'user'"></fa-icon>
-            </span>
-            <input 
-              type="text" 
-              class="w-full rounded-lg border border-gray-300 px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              id="lastName" 
-              formControlName="last_name"
-              required>
-          </div>
-        </div>
-        <div>
-          <label for="registerEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <fa-icon [icon]="'envelope'"></fa-icon>
-            </span>
-            <input
-              type="email"
-              class="w-full rounded-lg border border-gray-300 px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              id="registerEmail"
-              formControlName="email"
-              required>
-          </div>
-        </div>
-        <div>
-          <label for="registerPassword" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <fa-icon [icon]="'lock'"></fa-icon>
-            </span>
-            <input 
-              type="password" 
-              class="w-full rounded-lg border border-gray-300 px-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              id="registerPassword" 
-              formControlName="password"
-              required>
-          </div>
-        </div>
-        <button
-          type="submit"
-          [disabled]="isRegisterLoading"
-          class="w-full bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 hover:shadow-lg text-white font-semibold py-2 rounded-lg shadow transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-          <span *ngIf="isRegisterLoading" class="inline-block animate-spin">
-            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </li>
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#FBBF24]/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-[#FBBF24]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
             </svg>
           </span>
-          <fa-icon *ngIf="!isRegisterLoading" [icon]="'user-plus'"></fa-icon>
-          {{ isRegisterLoading ? 'Signing up...' : 'Sign Up' }}
-        </button>
-      </form>
-
-      <!-- Divider -->
-      <div *ngIf="!showVerificationMessage" class="my-6 flex items-center">
-        <div class="flex-1 border-t border-gray-300"></div>
-        <span class="px-4 text-sm text-gray-500 bg-white">or</span>
-        <div class="flex-1 border-t border-gray-300"></div>
-      </div>
-
-      <!-- Google Sign-In Button -->
-      <button
-        *ngIf="!showVerificationMessage"
-        type="button"
-        class="w-full bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-600 hover:shadow-lg hover:border-blue-400 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 font-semibold py-2 rounded-lg shadow transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-        (click)="onGoogleSignIn()"
-        [disabled]="isGoogleLoading">
-        <span *ngIf="isGoogleLoading" class="inline-block animate-spin">
-          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </span>
-        <span *ngIf="!isGoogleLoading">
-          <svg class="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-        </span>
-        <span>{{ isGoogleLoading ? 'Connecting...' : (isLoginMode ? 'Sign in with Google' : 'Sign up with Google') }}</span>
-      </button>
-
-      <div *ngIf="!showVerificationMessage" class="mt-6 text-center">
-        <button
-          type="button"
-          class="text-blue-600 hover:underline font-medium transition flex items-center justify-center gap-2"
-          (click)="toggleMode()">
-          <fa-icon [icon]="isLoginMode ? 'user-plus' : 'sign-in-alt'"></fa-icon>
-          {{ isLoginMode ? 'Need an account? Sign up' : 'Already have an account? Login' }}
-        </button>
-      </div>
+          <div>
+            <p class="text-white font-semibold text-sm">Track Your Progress</p>
+            <p class="text-slate-400 text-xs mt-0.5">Enrol, learn, and see your achievements grow over time.</p>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center bg-white dark:bg-[#0F172A] px-8 py-12 lg:px-16">
+    <div class="w-full max-w-md">
+
+      <!-- Mobile logo -->
+      <div class="flex items-center justify-center mb-8 lg:hidden">
+        <svg viewBox="0 0 160 120" class="w-12 h-10" aria-hidden="true">
+          <defs>
+            <linearGradient id="mCGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/></linearGradient>
+            <linearGradient id="mWGrad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#10B981"/></linearGradient>
+            <linearGradient id="mSparkGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FBBF24"/><stop offset="100%" stop-color="#F59E0B"/></linearGradient>
+          </defs>
+          <g transform="translate(10,0)">
+            <path d="M 94.5 31.1 A 45 45 0 1 0 94.5 88.9" fill="none" stroke="url(#mCGrad)" stroke-width="14" stroke-linecap="round"/>
+            <path d="M 20 60 L 45 90 L 70 55 L 95 85 L 120 45" fill="none" stroke="url(#mWGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 120 2 Q 120 18 136 18 Q 120 18 120 34 Q 120 18 104 18 Q 120 18 120 2 Z" fill="url(#mSparkGrad)"/>
+          </g>
+        </svg>
+        <span class="ml-2 text-xl font-extrabold text-slate-900 dark:text-white">CourseWagon</span>
+      </div>
+
+      <!-- ============================================================
+           EMAIL VERIFICATION MESSAGE STATE
+           ============================================================ -->
+      @if (showVerificationMessage) {
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center w-16 h-16 rounded-full bg-[#0EA5E9]/10 mb-5">
+            <svg class="w-8 h-8 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+
+          <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Check Your Email</h1>
+          <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">
+            We've sent a verification link to <strong class="text-slate-700 dark:text-slate-300">{{ registeredEmail }}</strong>.
+          </p>
+
+          <div class="bg-[#0EA5E9]/10 border border-[#0EA5E9]/30 rounded-xl p-4 mb-6 text-left">
+            <p class="font-semibold text-[#2563EB] dark:text-[#0EA5E9] mb-2 text-sm">What to do next:</p>
+            <ul class="space-y-1 text-sm text-[#2563EB] dark:text-[#0EA5E9]/80">
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                Check your inbox (and spam folder)
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                Click the verification link
+              </li>
+              <li class="flex items-center gap-2">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                Return here to log in
+              </li>
+            </ul>
+          </div>
+
+          <button
+            (click)="resendVerificationEmail()"
+            [disabled]="resendingVerification"
+            class="w-full bg-[#0EA5E9] hover:bg-[#2563EB] text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-[#0EA5E9]/20 flex items-center justify-center gap-2 mb-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+            @if (resendingVerification) {
+              <span class="inline-block animate-spin">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+            }
+            <span>{{ resendingVerification ? 'Sending...' : 'Resend Verification Email' }}</span>
+          </button>
+
+          <button
+            (click)="backToLogin()"
+            class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold py-3.5 px-6 rounded-xl transition-all duration-200">
+            Back to Login
+          </button>
+        </div>
+      }
+
+      <!-- ============================================================
+           LOGIN FORM
+           ============================================================ -->
+      @if (isLoginMode && !showVerificationMessage) {
+        <div>
+          <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Sign In</h1>
+          <p class="text-slate-500 dark:text-slate-400 text-sm mb-8">Welcome back to CourseWagon</p>
+
+          <!-- Error banner -->
+          @if (errorMessage) {
+            <div class="mb-5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 text-sm flex items-start gap-3" role="alert">
+              <svg class="w-4 h-4 flex-shrink-0 mt-0.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="flex-1">{{ errorMessage }}</span>
+              <button type="button" (click)="clearMessages()" class="flex-shrink-0 text-red-400 hover:text-red-600 focus:outline-none" aria-label="Close">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </div>
+          }
+
+          <!-- Success banner -->
+          @if (successMessage) {
+            <div class="mb-5 bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] rounded-xl p-4 text-sm flex items-start gap-3" role="alert">
+              <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span class="flex-1">{{ successMessage }}</span>
+              <button type="button" (click)="clearMessages()" class="flex-shrink-0 text-[#10B981] hover:text-[#059669] focus:outline-none" aria-label="Close">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </div>
+          }
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+            <!-- Email -->
+            <div>
+              <label for="email" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder="you@example.com"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition-all"
+                required>
+            </div>
+
+            <!-- Password -->
+            <div>
+              <label for="password" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
+              <input
+                type="password"
+                id="password"
+                formControlName="password"
+                placeholder="••••••••"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition-all"
+                required>
+              <div class="text-right mt-1.5">
+                <a routerLink="/forgot-password" class="text-[#0EA5E9] hover:text-[#2563EB] font-semibold transition-colors text-sm">
+                  Forgot password?
+                </a>
+              </div>
+            </div>
+
+            <!-- Remember me -->
+            <div class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                formControlName="rememberMe"
+                class="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-[#0EA5E9] focus:ring-[#0EA5E9] dark:bg-slate-700">
+              <label for="rememberMe" class="text-sm text-slate-600 dark:text-slate-400">Remember me</label>
+            </div>
+
+            <!-- Submit -->
+            <button
+              type="submit"
+              [disabled]="isLoginLoading"
+              class="w-full bg-[#0EA5E9] hover:bg-[#2563EB] text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-[#0EA5E9]/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+              @if (isLoginLoading) {
+                <span class="inline-block animate-spin">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </span>
+              }
+              @if (!isLoginLoading) {
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                </svg>
+              }
+              {{ isLoginLoading ? 'Signing in...' : 'Sign In' }}
+            </button>
+          </form>
+
+          <!-- Divider -->
+          <div class="my-6 flex items-center gap-3">
+            <div class="flex-1 border-t border-slate-200 dark:border-slate-700"></div>
+            <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">or</span>
+            <div class="flex-1 border-t border-slate-200 dark:border-slate-700"></div>
+          </div>
+
+          <!-- Google Sign-In -->
+          <button
+            type="button"
+            (click)="onGoogleSignIn()"
+            [disabled]="isGoogleLoading"
+            class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-[#0EA5E9] dark:hover:border-[#0EA5E9] hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300 font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed">
+            @if (isGoogleLoading) {
+              <span class="inline-block animate-spin">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+            }
+            @if (!isGoogleLoading) {
+              <svg class="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            }
+            <span>{{ isGoogleLoading ? 'Connecting...' : 'Sign in with Google' }}</span>
+          </button>
+
+          <!-- Toggle to register -->
+          <p class="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+            Don't have an account?
+            <button type="button" (click)="toggleMode()" class="text-[#0EA5E9] hover:text-[#2563EB] font-semibold transition-colors ml-1">
+              Sign up free
+            </button>
+          </p>
+        </div>
+      }
+
+      <!-- ============================================================
+           REGISTER FORM
+           ============================================================ -->
+      @if (!isLoginMode && !showVerificationMessage) {
+        <div>
+          <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Create Account</h1>
+          <p class="text-slate-500 dark:text-slate-400 text-sm mb-8">Join thousands of learners on CourseWagon</p>
+
+          <!-- Error banner -->
+          @if (errorMessage) {
+            <div class="mb-5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 text-sm flex items-start gap-3" role="alert">
+              <svg class="w-4 h-4 flex-shrink-0 mt-0.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span class="flex-1">{{ errorMessage }}</span>
+              <button type="button" (click)="clearMessages()" class="flex-shrink-0 text-red-400 hover:text-red-600 focus:outline-none" aria-label="Close">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </div>
+          }
+
+          <!-- Success banner -->
+          @if (successMessage) {
+            <div class="mb-5 bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] rounded-xl p-4 text-sm flex items-start gap-3" role="alert">
+              <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span class="flex-1">{{ successMessage }}</span>
+              <button type="button" (click)="clearMessages()" class="flex-shrink-0 text-[#10B981] hover:text-[#059669] focus:outline-none" aria-label="Close">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+              </button>
+            </div>
+          }
+
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-5">
+            <!-- Name row -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="firstName" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">First Name</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  formControlName="first_name"
+                  placeholder="John"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition-all"
+                  required>
+              </div>
+              <div>
+                <label for="lastName" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Last Name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  formControlName="last_name"
+                  placeholder="Doe"
+                  class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition-all"
+                  required>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label for="registerEmail" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
+              <input
+                type="email"
+                id="registerEmail"
+                formControlName="email"
+                placeholder="you@example.com"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition-all"
+                required>
+            </div>
+
+            <!-- Password -->
+            <div>
+              <label for="registerPassword" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
+              <input
+                type="password"
+                id="registerPassword"
+                formControlName="password"
+                placeholder="••••••••"
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition-all"
+                required>
+            </div>
+
+            <!-- Submit -->
+            <button
+              type="submit"
+              [disabled]="isRegisterLoading"
+              class="w-full bg-[#0EA5E9] hover:bg-[#2563EB] text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-[#0EA5E9]/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+              @if (isRegisterLoading) {
+                <span class="inline-block animate-spin">
+                  <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </span>
+              }
+              @if (!isRegisterLoading) {
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                </svg>
+              }
+              {{ isRegisterLoading ? 'Creating account...' : 'Create Account' }}
+            </button>
+          </form>
+
+          <!-- Divider -->
+          <div class="my-6 flex items-center gap-3">
+            <div class="flex-1 border-t border-slate-200 dark:border-slate-700"></div>
+            <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">or</span>
+            <div class="flex-1 border-t border-slate-200 dark:border-slate-700"></div>
+          </div>
+
+          <!-- Google Sign-Up -->
+          <button
+            type="button"
+            (click)="onGoogleSignIn()"
+            [disabled]="isGoogleLoading"
+            class="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-[#0EA5E9] dark:hover:border-[#0EA5E9] hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-700 dark:text-slate-300 font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed">
+            @if (isGoogleLoading) {
+              <span class="inline-block animate-spin">
+                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </span>
+            }
+            @if (!isGoogleLoading) {
+              <svg class="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            }
+            <span>{{ isGoogleLoading ? 'Connecting...' : 'Sign up with Google' }}</span>
+          </button>
+
+          <!-- Toggle to login -->
+          <p class="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
+            Already have an account?
+            <button type="button" (click)="toggleMode()" class="text-[#0EA5E9] hover:text-[#2563EB] font-semibold transition-colors ml-1">
+              Sign in
+            </button>
+          </p>
+        </div>
+      }
+
+    </div>
+  </div>
+
 </div>

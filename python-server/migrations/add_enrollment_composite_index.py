@@ -20,56 +20,57 @@ def add_enrollment_composite_index():
     """Add composite index for enrollment table"""
     try:
         from extensions import engine
-        
+
         logger.info("Starting enrollment composite index creation...")
-        
+
         with engine.connect() as connection:
             # Start transaction
             trans = connection.begin()
-            
+
             try:
                 index_name = "idx_enrollments_user_course"
                 table_name = "enrollments"
-                
-                # Check if index already exists
+
+                # Check if index already exists using sys.indexes (MSSQL)
                 check_query = text("""
-                    SELECT COUNT(*) as count 
-                    FROM information_schema.statistics 
-                    WHERE table_schema = DATABASE() 
-                    AND table_name = :table_name 
-                    AND index_name = :index_name
+                    SELECT COUNT(*)
+                    FROM sys.indexes
+                    WHERE name = :index_name
+                    AND object_id = OBJECT_ID(:table_name)
                 """)
-                
+
                 result = connection.execute(
                     check_query,
                     {"table_name": table_name, "index_name": index_name}
                 ).fetchone()
-                
-                if result[0] == 0:
+
+                row_count = result[0] if result else 0
+
+                if row_count == 0:
                     # Create composite index on (user_id, course_id)
                     create_index_query = text(f"""
-                        CREATE INDEX {index_name} 
+                        CREATE INDEX {index_name}
                         ON {table_name}(user_id, course_id)
                     """)
                     connection.execute(create_index_query)
-                    logger.info(f"✓ Created composite index: {index_name} on {table_name}(user_id, course_id)")
+                    logger.info(f"Created composite index: {index_name} on {table_name}(user_id, course_id)")
                 else:
                     logger.info(f"  Composite index already exists: {index_name}")
-                
+
                 # Commit transaction
                 trans.commit()
-                logger.info("✓ Enrollment composite index creation completed successfully")
-                
+                logger.info("Enrollment composite index creation completed successfully")
+
             except Exception as e:
                 trans.rollback()
                 logger.error(f"Error during index creation, rolled back: {str(e)}")
                 raise
-                
+
     except Exception as e:
         logger.error(f"Failed to add enrollment composite index: {str(e)}")
         # Don't raise - this is not critical for application startup
         return False
-    
+
     return True
 
 if __name__ == "__main__":

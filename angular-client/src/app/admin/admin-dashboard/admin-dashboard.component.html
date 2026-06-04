@@ -1,235 +1,270 @@
-<!-- Dashboard Stats - First Row -->
-<div *ngIf="!loading && !error" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-  <!-- Users Card -->
-  <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-slate-700">
-    <div class="flex items-center">
-      <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300">
-        <fa-icon [icon]="faUsers" size="2x"></fa-icon>
-      </div>
-      <div class="ml-5">
-        <div class="text-gray-500 dark:text-gray-400 text-sm">Total Users</div>
-        <div class="text-3xl font-bold text-gray-700 dark:text-white">{{dashboardStats.total_users || 0}}</div>
-      </div>
-    </div>
-    <div class="mt-4">
-      <div class="flex justify-between items-center">
-        <span class="text-sm text-gray-500 dark:text-gray-400">Active Users</span>
-        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{dashboardStats.active_users || 0}}</span>
-      </div>
-      <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2.5 mt-1">
-        <div class="bg-blue-600 h-2.5 rounded-full"
-          [style.width.%]="dashboardStats.total_users ? (dashboardStats.active_users / dashboardStats.total_users) * 100 : 0">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Courses Card -->
-  <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-slate-700">
-    <div class="flex items-center">
-      <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-300">
-        <fa-icon [icon]="faGraduationCap" size="2x"></fa-icon>
-      </div>
-      <div class="ml-5">
-        <div class="text-gray-500 dark:text-gray-400 text-sm">Total Courses</div>
-        <div class="text-3xl font-bold text-gray-700 dark:text-white">{{dashboardStats.total_courses || 0}}</div>
-      </div>
-    </div>
-    <div class="mt-4" *ngIf="dashboardStats.recent_courses?.length">
-      <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Recent Courses</div>
-      <div class="text-sm text-gray-700 dark:text-gray-300 truncate" *ngFor="let course of dashboardStats.recent_courses?.slice(0,3)">
-        {{course.name}}
-      </div>
-    </div>
-  </div>
-
-  <!-- Testimonials Card -->
-  <div class="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 border border-gray-100 dark:border-slate-700">
-    <div class="flex items-center">
-      <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-300">
-        <fa-icon [icon]="faStar" size="2x"></fa-icon>
-      </div>
-      <div class="ml-5">
-        <div class="text-gray-500 dark:text-gray-400 text-sm">Total Testimonials</div>
-        <div class="text-3xl font-bold text-gray-700 dark:text-white">{{dashboardStats.total_testimonials || 0}}</div>
-      </div>
-    </div>
-    <div class="mt-4">
-      <div class="flex justify-between items-center">
-        <span class="text-sm text-gray-500 dark:text-gray-400">Pending Approval</span>
-        <span
-          [class.text-red-600]="dashboardStats.pending_testimonials > 0"
-          [class.dark:text-red-400]="dashboardStats.pending_testimonials > 0"
-          class="text-sm font-semibold">
-          {{dashboardStats.pending_testimonials || 0}}
-        </span>
-      </div>
-      <button
-        *ngIf="dashboardStats.pending_testimonials > 0"
-        class="mt-2 text-sm bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded"
-        (click)="reviewTestimonials()">
-        Review Testimonials
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Content Statistics - Second Row -->
-<div *ngIf="!loading && !error" class="mb-8">
-  <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Content Overview</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <!-- Subjects Card -->
-    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-md p-6 text-white">
-      <div class="flex justify-between items-start mb-2">
-        <div class="text-sm opacity-90">Subjects</div>
-        <div class="p-2 bg-white bg-opacity-20 rounded-lg">
-          <fa-icon [icon]="faGraduationCap" size="lg"></fa-icon>
-        </div>
-      </div>
-      <div class="text-3xl font-bold">{{dashboardStats.total_subjects || 0}}</div>
-    </div>
-
-    <!-- Chapters Card -->
-    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-md p-6 text-white">
-      <div class="flex justify-between items-start mb-2">
-        <div class="text-sm opacity-90">Chapters</div>
-        <div class="p-2 bg-white bg-opacity-20 rounded-lg">
-          <fa-icon [icon]="faGraduationCap" size="lg"></fa-icon>
-        </div>
-      </div>
-      <div class="text-3xl font-bold">{{dashboardStats.total_chapters || 0}}</div>
-    </div>
-
-    <!-- Topics Card -->
-    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-md p-6 text-white">
-      <div class="flex justify-between items-start mb-2">
-        <div class="text-sm opacity-90">Topics</div>
-        <div class="p-2 bg-white bg-opacity-20 rounded-lg">
-          <fa-icon [icon]="faGraduationCap" size="lg"></fa-icon>
-        </div>
-      </div>
-      <div class="text-3xl font-bold">{{dashboardStats.total_topics || 0}}</div>
-    </div>
-
-    <!-- Content Card -->
-    <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg shadow-md p-6 text-white">
-      <div class="flex justify-between items-start mb-2">
-        <div class="text-sm opacity-90">Content Items</div>
-        <div class="p-2 bg-white bg-opacity-20 rounded-lg">
-          <fa-icon [icon]="faGraduationCap" size="lg"></fa-icon>
-        </div>
-      </div>
-      <div class="text-3xl font-bold">{{dashboardStats.total_content || 0}}</div>
-    </div>
-  </div>
-</div>
-
-<!-- Course Breakdown Table -->
-<div *ngIf="!loading && !error && dashboardStats.course_breakdown?.length" class="mb-8">
-  <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Course Breakdown</h2>
-  <div class="bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-        <thead class="bg-gray-50 dark:bg-slate-700">
-          <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Course</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Subjects</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Chapters</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Topics</th>
-            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Content</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-          <tr *ngFor="let course of dashboardStats.course_breakdown" class="hover:bg-gray-50 dark:hover:bg-slate-700">
-            <td class="px-6 py-4">
-              <div class="text-sm font-medium text-gray-900 dark:text-white">{{course.course_name}}</div>
-              <div class="text-sm text-gray-500 dark:text-gray-400">{{course.created_at | date:'short'}}</div>
-            </td>
-            <td class="px-6 py-4 text-center">
-              <span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded-full">
-                {{course.subjects_count}}
-              </span>
-            </td>
-            <td class="px-6 py-4 text-center">
-              <span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-purple-800 bg-purple-100 rounded-full">
-                {{course.chapters_count}}
-              </span>
-            </td>
-            <td class="px-6 py-4 text-center">
-              <span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-orange-800 bg-orange-100 rounded-full">
-                {{course.topics_count}}
-              </span>
-            </td>
-            <td class="px-6 py-4 text-center">
-              <span class="inline-flex items-center px-3 py-1 text-sm font-semibold text-pink-800 bg-pink-100 rounded-full">
-                {{course.content_count}}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- Recent Users -->
-<div *ngIf="!loading && !error && dashboardStats.recent_users?.length" class="mb-8">
-  <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Recent Users</h2>
-  <div class="bg-white dark:bg-slate-800 shadow-md rounded-lg overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-      <thead class="bg-gray-50 dark:bg-slate-700">
-        <tr>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Joined</th>
-          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-        </tr>
-      </thead>
-      <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-        <tr *ngFor="let user of dashboardStats.recent_users">
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-medium text-gray-900 dark:text-white">{{user.first_name}} {{user.last_name}}</div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-500 dark:text-gray-400">{{user.email}}</div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-500 dark:text-gray-400">{{user.created_at | date}}</div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <span 
-              [class.bg-green-100]="user.is_active" 
-              [class.text-green-800]="user.is_active"
-              [class.bg-red-100]="!user.is_active" 
-              [class.text-red-800]="!user.is_active"
-              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-              {{user.is_active ? 'Active' : 'Inactive'}}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="mt-4">
-    <button 
-      class="text-blue-600 hover:text-blue-800 text-sm font-medium"
-      (click)="viewAllUsers()">
-      View All Users
-    </button>
-  </div>
-</div>
-
 <!-- Loading Indicator -->
-<div *ngIf="loading" class="flex justify-center items-center py-12">
-  <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-</div>
+@if (loading) {
+  <div class="flex justify-center items-center py-24">
+    <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#0EA5E9]"></div>
+  </div>
+}
 
 <!-- Error Message -->
-<div *ngIf="error" class="bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-4 rounded-md mb-6">
-  <p>{{error}}</p>
-  <button
-    class="mt-2 text-sm underline hover:text-red-900 dark:hover:text-red-200"
-    (click)="retryLoading()">
-    Retry
-  </button>
-</div>
+@if (error) {
+  <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-red-700 dark:text-red-300 px-5 py-4 rounded-2xl mb-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/40 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <p class="text-sm font-medium">{{error}}</p>
+    </div>
+    <button
+      class="text-sm font-semibold text-red-600 dark:text-red-400 hover:underline"
+      (click)="retryLoading()">
+      Retry
+    </button>
+  </div>
+}
+
+@if (!loading && !error) {
+  <!-- Primary Stats Row -->
+  <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+
+    <!-- Total Users -->
+    <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 rounded-xl bg-[#0EA5E9]/10 text-[#0EA5E9] flex items-center justify-center">
+          <fa-icon [icon]="faUsers"></fa-icon>
+        </div>
+        <span class="text-xs text-[#10B981] bg-[#10B981]/10 px-2 py-1 rounded-full font-semibold">Active</span>
+      </div>
+      <div class="text-3xl font-extrabold text-slate-900 dark:text-white">{{dashboardStats.total_users || 0}}</div>
+      <div class="text-sm text-slate-500 mt-1">Total Users</div>
+      <div class="mt-4">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs text-slate-500 dark:text-slate-400">Active</span>
+          <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">{{dashboardStats.active_users || 0}}</span>
+        </div>
+        <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
+          <div class="bg-[#0EA5E9] h-1.5 rounded-full transition-all"
+            [style.width.%]="dashboardStats.total_users ? (dashboardStats.active_users / dashboardStats.total_users) * 100 : 0">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Courses -->
+    <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 rounded-xl bg-[#10B981]/10 text-[#10B981] flex items-center justify-center">
+          <fa-icon [icon]="faGraduationCap"></fa-icon>
+        </div>
+        <span class="text-xs text-slate-500 bg-slate-100 dark:bg-slate-700 dark:text-slate-400 px-2 py-1 rounded-full font-semibold">Courses</span>
+      </div>
+      <div class="text-3xl font-extrabold text-slate-900 dark:text-white">{{dashboardStats.total_courses || 0}}</div>
+      <div class="text-sm text-slate-500 mt-1">Total Courses</div>
+      @if (dashboardStats.recent_courses?.length) {
+        <div class="mt-4 space-y-1">
+          @for (course of dashboardStats.recent_courses?.slice(0,2); track course) {
+            <div class="text-xs text-slate-500 dark:text-slate-400 truncate flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] shrink-0"></span>
+              {{course.name}}
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Testimonials -->
+    <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6 col-span-2 lg:col-span-1">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 rounded-xl bg-[#FBBF24]/10 text-[#FBBF24] flex items-center justify-center">
+          <fa-icon [icon]="faStar"></fa-icon>
+        </div>
+        @if (dashboardStats.pending_testimonials > 0) {
+          <span class="text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-full font-semibold">
+            {{dashboardStats.pending_testimonials}} pending
+          </span>
+        }
+        @if (!dashboardStats.pending_testimonials) {
+          <span class="text-xs text-[#10B981] bg-[#10B981]/10 px-2 py-1 rounded-full font-semibold">All clear</span>
+        }
+      </div>
+      <div class="text-3xl font-extrabold text-slate-900 dark:text-white">{{dashboardStats.total_testimonials || 0}}</div>
+      <div class="text-sm text-slate-500 mt-1">Total Testimonials</div>
+      @if (dashboardStats.pending_testimonials > 0) {
+        <button
+          class="mt-4 text-xs font-semibold bg-[#0EA5E9] hover:bg-[#2563EB] text-white px-3 py-1.5 rounded-lg transition-colors"
+          (click)="reviewTestimonials()">
+          Review Now
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Content Overview -->
+  <div class="mb-6">
+    <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Content Overview</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <!-- Subjects -->
+      <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-5 flex flex-col gap-3">
+        <div class="w-9 h-9 rounded-xl bg-[#10B981]/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-[#10B981]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white">{{dashboardStats.total_subjects || 0}}</div>
+          <div class="text-xs text-slate-500 mt-0.5">Subjects</div>
+        </div>
+      </div>
+
+      <!-- Chapters -->
+      <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-5 flex flex-col gap-3">
+        <div class="w-9 h-9 rounded-xl bg-purple-500/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white">{{dashboardStats.total_chapters || 0}}</div>
+          <div class="text-xs text-slate-500 mt-0.5">Chapters</div>
+        </div>
+      </div>
+
+      <!-- Topics -->
+      <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-5 flex flex-col gap-3">
+        <div class="w-9 h-9 rounded-xl bg-[#FBBF24]/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-[#FBBF24]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white">{{dashboardStats.total_topics || 0}}</div>
+          <div class="text-xs text-slate-500 mt-0.5">Topics</div>
+        </div>
+      </div>
+
+      <!-- Content Items -->
+      <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-5 flex flex-col gap-3">
+        <div class="w-9 h-9 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-[#0EA5E9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+        </div>
+        <div>
+          <div class="text-2xl font-extrabold text-slate-900 dark:text-white">{{dashboardStats.total_content || 0}}</div>
+          <div class="text-xs text-slate-500 mt-0.5">Content Items</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course Breakdown Table -->
+  @if (dashboardStats.course_breakdown?.length) {
+    <div class="mb-6">
+      <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Course Breakdown</h2>
+      <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-slate-50 dark:bg-slate-900/50">
+              <tr>
+                <th scope="col" class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-left px-6 py-3">Course</th>
+                <th scope="col" class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-center px-6 py-3">Subjects</th>
+                <th scope="col" class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-center px-6 py-3">Chapters</th>
+                <th scope="col" class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-center px-6 py-3">Topics</th>
+                <th scope="col" class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-center px-6 py-3">Content</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
+              @for (course of dashboardStats.course_breakdown; track course) {
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                  <td class="px-6 py-4">
+                    <div class="text-sm font-semibold text-slate-900 dark:text-white">{{course.course_name}}</div>
+                    <div class="text-xs text-slate-400 mt-0.5">{{course.created_at | date:'mediumDate'}}</div>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-[#059669] bg-[#10B981]/10 rounded-full">
+                      {{course.subjects_count}}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/20 rounded-full">
+                      {{course.chapters_count}}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-[#F59E0B] bg-[#FBBF24]/10 rounded-full">
+                      {{course.topics_count}}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-[#0EA5E9] bg-[#0EA5E9]/10 rounded-full">
+                      {{course.content_count}}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Recent Users -->
+  @if (dashboardStats.recent_users?.length) {
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Recent Users</h2>
+        <button
+          class="text-xs font-semibold text-[#0EA5E9] hover:text-[#2563EB] transition-colors"
+          (click)="viewAllUsers()">
+          View all
+        </button>
+      </div>
+      <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-slate-50 dark:bg-slate-900/50">
+            <tr>
+              <th scope="col" class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-left px-6 py-3">User</th>
+              <th scope="col" class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-left px-6 py-3">Email</th>
+              <th scope="col" class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-left px-6 py-3">Joined</th>
+              <th scope="col" class="text-xs font-semibold text-slate-500 uppercase tracking-wider text-left px-6 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
+            @for (user of dashboardStats.recent_users; track user) {
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#2563EB] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      {{user.first_name?.charAt(0) || ''}}{{user.last_name?.charAt(0) || ''}}
+                    </div>
+                    <span class="text-sm font-medium text-slate-900 dark:text-white">{{user.first_name}} {{user.last_name}}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-slate-500 dark:text-slate-400">{{user.email}}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-slate-500 dark:text-slate-400">{{user.created_at | date:'mediumDate'}}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold rounded-full"
+                    [class.text-[#059669]]="user.is_active"
+                    [class.bg-[#10B981]/10]="user.is_active"
+                    [class.text-red-600]="!user.is_active"
+                    [class.bg-red-50]="!user.is_active"
+                    [class.dark:bg-red-900/20]="!user.is_active">
+                    {{user.is_active ? 'Active' : 'Inactive'}}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+}

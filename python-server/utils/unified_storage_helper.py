@@ -8,73 +8,31 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 class UnifiedStorageHelper:
-    """
-    Unified storage helper that prioritizes Google Cloud Storage,
-    with fallback to Azure Storage and Firebase Storage
-    """
-    
+    """Storage helper backed by OCI Object Storage."""
+
     _instance = None
-    
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(UnifiedStorageHelper, cls).__new__(cls)
             cls._instance._initialized = False
         return cls._instance
-    
+
     def __init__(self):
         if self._initialized:
             return
-            
+
         self.storage_providers = []
         self.primary_provider = None
-        
-        # Try to initialize storage providers in order of priority
         self._initialize_storage_providers()
         self._initialized = True
-    
+
     def _initialize_storage_providers(self):
-        """Initialize storage providers in order of priority"""
-        
-        # 1st Priority: Google Cloud Storage
-        try:
-            from utils.gcs_storage_helper import GCSStorageHelper
-            gcs_helper = GCSStorageHelper()
-            self.storage_providers.append(('gcs', gcs_helper))
-            if not self.primary_provider:
-                self.primary_provider = ('gcs', gcs_helper)
-            logger.info("Google Cloud Storage initialized successfully (Primary)")
-        except Exception as e:
-            logger.warning(f"Failed to initialize Google Cloud Storage: {str(e)}")
-        
-        # 2nd Priority: Azure Storage
-        try:
-            from utils.azure_storage_helper import AzureStorageHelper
-            azure_helper = AzureStorageHelper()
-            self.storage_providers.append(('azure', azure_helper))
-            if not self.primary_provider:
-                self.primary_provider = ('azure', azure_helper)
-            logger.info("Azure Storage initialized successfully" + 
-                       (" (Primary)" if not self.primary_provider else " (Fallback)"))
-        except Exception as e:
-            logger.warning(f"Failed to initialize Azure Storage: {str(e)}")
-        
-        # 3rd Priority: Firebase Storage
-        try:
-            from utils.firebase_helper import FirebaseHelper
-            firebase_helper = FirebaseHelper()
-            self.storage_providers.append(('firebase', firebase_helper))
-            if not self.primary_provider:
-                self.primary_provider = ('firebase', firebase_helper)
-            logger.info("Firebase Storage initialized successfully" + 
-                       (" (Primary)" if not self.primary_provider else " (Fallback)"))
-        except Exception as e:
-            logger.warning(f"Failed to initialize Firebase Storage: {str(e)}")
-        
-        if not self.storage_providers:
-            raise RuntimeError("No storage providers could be initialized")
-        
-        logger.info(f"Initialized {len(self.storage_providers)} storage provider(s). "
-                   f"Primary: {self.primary_provider[0] if self.primary_provider else 'None'}")
+        from utils.oci_storage_helper import OCIStorageHelper
+        oci_helper = OCIStorageHelper()
+        self.storage_providers.append(('oci', oci_helper))
+        self.primary_provider = ('oci', oci_helper)
+        logger.info("OCI Object Storage initialized (Primary)")
     
     def upload_image(self, image_bytes, path):
         """
@@ -128,15 +86,7 @@ class UnifiedStorageHelper:
         if not image_url:
             return False
         
-        # Determine which provider to use based on URL
-        provider_to_use = None
-        
-        if 'storage.googleapis.com' in image_url:
-            provider_to_use = self._get_provider('gcs')
-        elif 'blob.core.windows.net' in image_url:
-            provider_to_use = self._get_provider('azure')
-        elif 'firebasestorage.app' in image_url or 'googleapis.com' in image_url:
-            provider_to_use = self._get_provider('firebase')
+        provider_to_use = self._get_provider('oci')
         
         if provider_to_use:
             provider_name, provider = provider_to_use

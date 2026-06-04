@@ -96,7 +96,12 @@ class AdminRepository:
             .outerjoin(Chapter, Subject.id == Chapter.subject_id)\
             .outerjoin(Topic, Chapter.id == Topic.chapter_id)\
             .outerjoin(Content, Topic.id == Content.topic_id)\
-            .group_by(Course.id)\
+            .group_by(
+                Course.id, Course.name, Course.description, Course.created_at,
+                Course.image_url, Course.is_published, Course.published_at,
+                Course.category, Course.difficulty_level,
+                Course.estimated_duration_hours, Course.enrollment_count
+            )\
             .order_by(Course.created_at.desc())
 
             results = query.all()
@@ -129,10 +134,6 @@ class AdminRepository:
     def get_user_course_breakdown(self, user_id: int):
         """Get detailed breakdown of courses for a specific user"""
         try:
-            # Use a single optimized query with LEFT JOINs and GROUP BY
-            # This replaces the N+1 query problem (1 query per course)
-            from sqlalchemy.orm import aliased
-
             query = self.db.query(
                 Course.id,
                 Course.name,
@@ -155,7 +156,12 @@ class AdminRepository:
             .outerjoin(Chapter, Subject.id == Chapter.subject_id)\
             .outerjoin(Topic, Chapter.id == Topic.chapter_id)\
             .outerjoin(Content, Topic.id == Content.topic_id)\
-            .group_by(Course.id)\
+            .group_by(
+                Course.id, Course.name, Course.description, Course.created_at,
+                Course.image_url, Course.is_published, Course.published_at,
+                Course.category, Course.difficulty_level,
+                Course.estimated_duration_hours, Course.enrollment_count
+            )\
             .order_by(Course.created_at.desc())
 
             results = query.all()

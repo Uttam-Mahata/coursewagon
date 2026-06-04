@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -31,7 +31,7 @@ interface CourseWithEnrollment {
 @Component({
   selector: 'app-course-catalog',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, FontAwesomeModule, StarRatingComponent],
+  imports: [RouterModule, FormsModule, FontAwesomeModule, StarRatingComponent],
   templateUrl: './course-catalog.component.html',
   styleUrl: './course-catalog.component.css'
 })

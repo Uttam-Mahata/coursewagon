@@ -1,59 +1,103 @@
-<section class="py-16 md:py-20 bg-gradient-to-b from-white via-indigo-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-  <div class="container mx-auto px-4">
-    <h2 class="text-3xl font-bold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">What Our Users Say</h2>
-    
+<section class="py-20 md:py-28 bg-white dark:bg-slate-900">
+  <div class="max-w-7xl mx-auto px-4">
 
-    
+    <!-- Section header -->
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-2 bg-[#0EA5E9]/10 dark:bg-[#0EA5E9]/15 border border-[#0EA5E9]/20 text-[#0EA5E9] text-sm font-medium px-4 py-2 rounded-full mb-6">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FBBF24] opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-[#FBBF24]"></span>
+        </span>
+        Real Stories, Real Impact
+      </div>
+      <h2 class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#0EA5E9] via-[#2563EB] to-[#10B981] mb-4">
+        What Our Users Say
+      </h2>
+      <p class="text-slate-500 dark:text-slate-400 text-lg max-w-xl mx-auto">
+        Thousands of educators have transformed their course creation workflow with CourseWagon.
+      </p>
+    </div>
+
     <!-- Loading state -->
-    <div *ngIf="isLoading" class="flex justify-center mb-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 dark:border-blue-400"></div>
-    </div>
-    
-    <!-- Error state -->
-    <div *ngIf="error" class="max-w-3xl mx-auto bg-red-100 dark:bg-red-900/20 p-4 rounded-lg text-red-700 dark:text-red-300 mb-8 text-center">
-      {{error}}
-    </div>
-    
-    <!-- No testimonials -->
-    <div *ngIf="!isLoading && !error && testimonials.length === 0" class="text-center mb-8 text-gray-600 dark:text-gray-400">
-      No testimonials yet. Be the first to share your experience!
-    </div>
-    
-    <!-- Public testimonials -->
-    <div *ngIf="!isLoading && testimonials.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div *ngFor="let testimonial of testimonials" class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-8 transition-all duration-300 hover:shadow-xl testimonial-card border border-transparent dark:border-slate-700">
-        <div class="flex justify-center mb-4">
-          <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-500 dark:text-blue-400">
-            <fa-icon [icon]="faUser" class="text-2xl"></fa-icon>
-          </div>
-        </div>
-        
-        <div class="flex justify-center mb-3">
-          <ng-container *ngFor="let star of generateRatingStars(testimonial.rating)">
-            <fa-icon [icon]="star.icon" class="text-yellow-500 dark:text-yellow-400"></fa-icon>
-          </ng-container>
-        </div>
-        
-        <p class="text-gray-700 dark:text-gray-300 text-center italic mb-4">"{{testimonial.quote}}"</p>
-        <h6 class="text-center font-semibold text-blue-600 dark:text-blue-400">- {{testimonial.author}}</h6>
+    <div *ngIf="isLoading" class="flex justify-center py-16">
+      <div class="relative">
+        <div class="animate-spin rounded-full h-14 w-14 border-4 border-slate-200 dark:border-slate-700 border-t-[#0EA5E9]"></div>
+        <div class="absolute inset-0 flex items-center justify-center text-[#0EA5E9] text-sm font-medium"></div>
       </div>
     </div>
 
-    <!-- Write  Review Route if Authenticated -->
-    <div *ngIf="isAuthenticated" class="mt-12 text-center">
-      <p class="text-gray-600 dark:text-gray-400 mb-3">Share your experience with CourseWagon!</p>
-      <a routerLink="/write-review" class="inline-block bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition">
-        Write a Review
-      </a>
+    <!-- Error state -->
+    <div *ngIf="error"
+         class="max-w-lg mx-auto bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-2xl p-6 text-red-600 dark:text-red-400 text-center mb-10">
+      <p class="font-medium">{{ error }}</p>
     </div>
-    
 
-    <!-- Login prompt -->
-    <div *ngIf="!isAuthenticated" class="mt-12 text-center">
-      <p class="text-gray-600 dark:text-gray-400 mb-3">Would you like to share your experience?</p>
-      <a routerLink="/auth" class="inline-block bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition">
-        Log in to add your testimonial
-      </a>
+    <!-- No testimonials -->
+    <div *ngIf="!isLoading && !error && testimonials.length === 0"
+         class="text-center py-16 text-slate-500 dark:text-slate-400">
+      <div class="text-5xl mb-4">💬</div>
+      <p class="text-lg font-medium">No testimonials yet.</p>
+      <p class="text-sm mt-1">Be the first to share your experience!</p>
     </div>
+
+    <!-- Masonry testimonial grid -->
+    <div *ngIf="!isLoading && testimonials.length > 0"
+         class="columns-1 md:columns-2 lg:columns-3 gap-5">
+      <div *ngFor="let testimonial of testimonials"
+           class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6 mb-5 break-inside-avoid hover:shadow-md transition-shadow duration-300">
+
+        <!-- Giant quote mark -->
+        <div class="text-5xl text-[#0EA5E9]/20 font-serif leading-none mb-2 select-none">"</div>
+
+        <!-- Stars -->
+        <div class="flex gap-0.5 mb-4">
+          <ng-container *ngFor="let star of generateRatingStars(testimonial.rating)">
+            <fa-icon [icon]="star.icon" class="text-[#FBBF24] text-base"></fa-icon>
+          </ng-container>
+        </div>
+
+        <!-- Quote text -->
+        <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6 italic">
+          "{{ testimonial.quote }}"
+        </p>
+
+        <!-- Author row -->
+        <div class="flex items-center gap-3">
+          <!-- Avatar: initials in gradient circle -->
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#2563EB] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+            {{ testimonial.author ? testimonial.author.charAt(0).toUpperCase() : 'U' }}
+          </div>
+          <div>
+            <p class="font-semibold text-slate-800 dark:text-white text-sm">{{ testimonial.author }}</p>
+            <p class="text-xs text-slate-400 dark:text-slate-500">CourseWagon User</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA row -->
+    <div class="mt-16 text-center">
+
+      <!-- Authenticated: write review -->
+      <div *ngIf="isAuthenticated">
+        <p class="text-slate-500 dark:text-slate-400 mb-4 text-sm">Enjoying CourseWagon? Share your experience!</p>
+        <a routerLink="/write-review"
+           class="inline-flex items-center gap-2 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#0284c7] hover:to-[#1d4ed8] text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-[#0EA5E9]/20 hover:shadow-[#0EA5E9]/30">
+          Write a Review
+        </a>
+      </div>
+
+      <!-- Not authenticated: login prompt -->
+      <div *ngIf="!isAuthenticated">
+        <p class="text-slate-500 dark:text-slate-400 mb-4 text-sm">Would you like to share your experience?</p>
+        <a routerLink="/auth"
+           class="inline-flex items-center gap-2 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#0284c7] hover:to-[#1d4ed8] text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-[#0EA5E9]/20 hover:shadow-[#0EA5E9]/30">
+          Log in to add your testimonial
+        </a>
+      </div>
+
+    </div>
+
   </div>
 </section>

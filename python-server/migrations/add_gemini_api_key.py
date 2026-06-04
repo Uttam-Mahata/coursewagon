@@ -1,4 +1,5 @@
 from extensions import db
+from sqlalchemy import text
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,13 +10,14 @@ def add_gemini_api_key_column():
         engine = db.engine
         with engine.connect() as connection:
             try:
-                connection.execute(db.text(
-                    'ALTER TABLE `user` ADD COLUMN encrypted_gemini_api_key TEXT NULL'
+                connection.execute(text(
+                    'ALTER TABLE [user] ADD encrypted_gemini_api_key NVARCHAR(MAX) NULL'
                 ))
                 connection.commit()
                 logger.info("Added encrypted_gemini_api_key column to user table")
             except Exception as e:
-                if 'Duplicate column' in str(e) or '1060' in str(e):
+                # MSSQL error 2705: column already exists in the table
+                if '2705' in str(e) or 'already exists' in str(e).lower():
                     logger.info("encrypted_gemini_api_key column already exists, skipping")
                 else:
                     logger.warning(f"Could not add encrypted_gemini_api_key column: {str(e)}")

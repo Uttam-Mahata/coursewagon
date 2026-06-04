@@ -2,16 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { 
-  faMagic, 
-  faBrain, 
-  faLaptopCode, 
-  faChartLine, 
-  faBookOpen, 
-  faShoppingCart, 
-  faLayerGroup, 
-  faSitemap, 
-  faUserPlus 
+import {
+  faMagic,
+  faBrain,
+  faLaptopCode,
+  faChartLine,
+  faBookOpen,
+  faShoppingCart,
+  faLayerGroup,
+  faSitemap,
+  faUserPlus,
+  faArrowRight,
+  faWandMagicSparkles
 } from '@fortawesome/free-solid-svg-icons';
 import { NavigationService } from '../services/navigation.service';
 import { AuthService } from '../services/auth/auth.service';
@@ -21,7 +23,7 @@ import { AuthService } from '../services/auth/auth.service';
     templateUrl: './home.component.html',
     styleUrl: './home.component.css',
     standalone: true,
-    imports: [CommonModule, RouterModule, FontAwesomeModule]
+    imports: [RouterModule, FontAwesomeModule, CommonModule]
 })
 export class HomeComponent implements OnInit { 
   // FontAwesome icons
@@ -34,6 +36,8 @@ export class HomeComponent implements OnInit {
   faLayerGroup = faLayerGroup;
   faSitemap = faSitemap;
   faUserPlus = faUserPlus;
+  faArrowRight = faArrowRight;
+  faWandMagicSparkles = faWandMagicSparkles;
   
   isLoggedIn = false;
   

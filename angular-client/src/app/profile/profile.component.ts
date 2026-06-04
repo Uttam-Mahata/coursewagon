@@ -8,7 +8,7 @@ import {
   faEye, faEyeSlash, faLock, faSave, faUser,
   faCalendar, faShieldAlt, faEdit, faCamera, faUserTag, faKey, faTrash
 } from '@fortawesome/free-solid-svg-icons';
-import { CommonModule } from '@angular/common';
+
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
@@ -17,7 +17,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     templateUrl: './profile.component.html',
     styleUrls: ['./profile.component.scss'],
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule, FontAwesomeModule, RouterModule]
+    imports: [ReactiveFormsModule, FormsModule, FontAwesomeModule, RouterModule]
 })
 export class ProfileComponent implements OnInit {
   // FontAwesome icons

@@ -7,22 +7,17 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Database configuration
-DATABASE_URL = os.environ.get('DATABASE_URL', 'mysql+pymysql://username:password@localhost/dbname')
+# Database configuration — Azure SQL (mssql+pymssql)
+DATABASE_URL = os.environ.get('DATABASE_URL', 'mssql+pymssql://user:pass@localhost/dbname')
 
-# Create SQLAlchemy engine with better connection pooling for concurrent handling
 engine = create_engine(
     DATABASE_URL,
-    pool_size=20,           # Increased pool size
-    max_overflow=30,        # Allow more overflow connections
-    pool_pre_ping=True,     # Enable pessimistic disconnect handling
-    pool_recycle=3600,      # Recycle connections every hour
-    pool_timeout=30,        # Timeout for getting connection from pool
-    echo=False,             # Set to True for SQL debugging
-    connect_args={
-        "charset": "utf8mb4",
-        "autocommit": False
-    }
+    pool_size=20,
+    max_overflow=30,
+    pool_pre_ping=True,
+    pool_recycle=3600,
+    pool_timeout=30,
+    echo=False,
 )
 
 # Create base class for models

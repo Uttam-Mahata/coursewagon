@@ -1,650 +1,703 @@
-<div class="flex h-screen overflow-hidden bg-gray-100 dark:bg-slate-900">
-  <!-- Sidebar / Course Outline - Always visible on large screens -->
+<div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-[#0F172A]">
+
+  <!-- ===== LEFT SIDEBAR / COURSE OUTLINE ===== -->
   <div
-    class="bg-gray-900 dark:bg-slate-950 text-white w-72 flex-shrink-0 overflow-y-auto transition-all duration-300"
-    [ngClass]="{'translate-x-0': isSidebarOpen, '-translate-x-full md:translate-x-0': !isSidebarOpen, 'fixed md:relative': true, 'h-full z-40': true, 'pt-16 md:pt-0': true}">
-    
-    <!-- Course Title with Toggle/Back buttons -->
-    <div class="p-4 border-b border-gray-700 dark:border-slate-800">
+    class="w-72 flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden transition-all duration-300"
+    [ngClass]="{
+      'translate-x-0': isSidebarOpen,
+      '-translate-x-full md:translate-x-0': !isSidebarOpen,
+      'fixed md:relative': true,
+      'h-full z-40': true,
+      'pt-16 md:pt-0': true
+    }">
+
+    <!-- Sidebar Header -->
+    <div class="px-4 py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
       <div class="flex items-center justify-between">
-        <h1 class="text-xl font-bold text-white">Course Outline</h1>
-        <!-- Back to Subjects link (hidden on mobile) -->
-        <a [routerLink]="['/courses', courseId, 'subjects']" class="text-blue-400 dark:text-blue-300 hover:text-blue-300 dark:hover:text-blue-200 text-sm hidden md:block">
-          Back to Subjects
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Course Outline</span>
+        <a
+          [routerLink]="['/courses', courseId, 'subjects']"
+          class="hidden md:flex items-center gap-1 text-xs text-[#0EA5E9] hover:underline font-medium">
+          <fa-icon [icon]="faChevronLeft" class="text-[10px]"></fa-icon> Back
         </a>
-        <!-- Toggle sidebar button (visible only on mobile) -->
-        <button 
-          class="md:hidden text-blue-400 hover:text-blue-300"
-          (click)="toggleSidebar()">
-          <fa-icon [icon]="faChevronLeft" class="text-sm"></fa-icon>
+        <button class="md:hidden text-slate-400 hover:text-[#0EA5E9] transition-colors" (click)="toggleSidebar()">
+          <fa-icon [icon]="faChevronLeft"></fa-icon>
         </button>
       </div>
-      <div class="mt-2 text-sm text-gray-400 dark:text-gray-500">{{ courseName }}</div>
+      <p class="mt-1.5 text-sm font-semibold text-slate-800 dark:text-white truncate">{{ courseName }}</p>
     </div>
 
-    <!-- Chapters and Topics List -->
-    <div class="overflow-y-auto h-full pb-20">
-      <!-- Loading Indicator for Chapters -->
-      <div *ngIf="isLoadingChapters" class="flex justify-center items-center py-8">
-        <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+    <!-- Outline Content -->
+    <div class="overflow-y-auto flex-1 pb-10">
 
-      <!-- Chapters List -->
-      <div *ngIf="!isLoadingChapters && chapters.length === 0" class="p-4 text-center text-gray-400 dark:text-gray-500">
-        <p>No chapters found.</p>
-        <button 
-          (click)="generateChapters()"
-          [disabled]="isGeneratingChapters"
-          class="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200">
-          <div *ngIf="isGeneratingChapters" class="inline-flex items-center">
-            <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-            <span>Generating...</span>
-          </div>
-          <span *ngIf="!isGeneratingChapters">Generate Chapters</span>
-        </button>
-      </div>
-
-      <!-- Generate Chapters Button -->
-      <div *ngIf="!isLoadingChapters && chapters.length > 0" class="p-4 flex justify-between">
-        <button 
-          (click)="generateChapters()"
-          [disabled]="isGeneratingChapters"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200 flex items-center">
-          <div *ngIf="isGeneratingChapters" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-          <fa-icon *ngIf="!isGeneratingChapters" [icon]="faMagic" class="mr-1.5"></fa-icon>
-          <span>{{ isGeneratingChapters ? 'Generating...' : 'Update Chapters' }}</span>
-        </button>
-        &nbsp;
-        <!-- Add new chapter button -->
-        <button 
-          (click)="openNewChapterModal()"
-          class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200 flex items-center">
-          <fa-icon [icon]="faPlus" class="mr-1.5"></fa-icon>
-          <span>Add Chapter</span>
-        </button>
-      </div>
-
-      <!-- Chapter Items -->
-      <div *ngFor="let chapter of chapters" class="border-b border-gray-800 dark:border-slate-900">
-        <!-- Chapter Header -->
-        <div
-          class="flex items-center justify-between py-3 px-4 cursor-pointer hover:bg-gray-800 dark:hover:bg-slate-900 transition-all"
-          [ngClass]="{'bg-gray-800 dark:bg-slate-900': expandedChapterId === chapter.id}"
-          (click)="toggleChapter(chapter.id)">
-          <span class="font-medium text-white">{{ chapter.name }}</span>
-          <div class="flex items-center space-x-2">
-            <!-- Edit/Delete buttons for chapters -->
-            <button 
-              class="text-blue-400 hover:text-blue-300 text-xs p-1"
-              (click)="openEditChapterModal(chapter, $event)">
-              <fa-icon [icon]="faEdit"></fa-icon>
-            </button>
-            <button 
-              class="text-red-400 hover:text-red-300 text-xs p-1"
-              (click)="openDeleteChapterModal(chapter, $event)">
-              <fa-icon [icon]="faTrash"></fa-icon>
-            </button>
-            <fa-icon 
-              [icon]="expandedChapterId === chapter.id ? faChevronDown : faChevronRight" 
-              class="text-gray-500">
-            </fa-icon>
-          </div>
+      <!-- Loading -->
+      @if (isLoadingChapters) {
+        <div class="flex justify-center items-center py-10">
+          <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[#0EA5E9]"></div>
         </div>
-        
-        <!-- Topics List (Expanded when chapter is selected) -->
-        <div *ngIf="expandedChapterId === chapter.id" class="pl-6 pb-2 bg-gray-800 dark:bg-slate-900 border-l-2 border-blue-500 dark:border-blue-400">
-          <!-- Generate Topics Button -->
-          <div *ngIf="!topics[chapter.id] || topics[chapter.id].length === 0" class="py-2 px-4">
-            <button 
-              (click)="generateTopics(chapter.id)"
-              [disabled]="isGeneratingTopics && generatingChapterId === chapter.id"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md text-xs transition duration-200 flex items-center justify-center">
-              <div *ngIf="isGeneratingTopics && generatingChapterId === chapter.id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-              <fa-icon *ngIf="!(isGeneratingTopics && generatingChapterId === chapter.id)" [icon]="faMagic" class="mr-1"></fa-icon>
-              <span>{{ (isGeneratingTopics && generatingChapterId === chapter.id) ? 'Generating...' : 'Generate Topics' }}</span>
-            </button>
+      }
+
+      <!-- Empty chapters -->
+      @if (!isLoadingChapters && chapters.length === 0) {
+        <div class="p-5 text-center">
+          <div class="w-12 h-12 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center mx-auto mb-3">
+            <fa-icon [icon]="faBook" class="text-[#0EA5E9]"></fa-icon>
           </div>
-          
-          <!-- Update Topics Button and Add Topic Button (if topics exist) -->
-          <div *ngIf="topics[chapter.id] && topics[chapter.id].length > 0" class="py-2 px-4 flex space-x-2">
-            <button 
-              (click)="generateTopics(chapter.id)"
-              [disabled]="isGeneratingTopics && generatingChapterId === chapter.id"
-              class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md text-xs transition duration-200 flex items-center justify-center">
-              <div *ngIf="isGeneratingTopics && generatingChapterId === chapter.id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-              <fa-icon *ngIf="!(isGeneratingTopics && generatingChapterId === chapter.id)" [icon]="faMagic" class="mr-1"></fa-icon>
-              <span>{{ (isGeneratingTopics && generatingChapterId === chapter.id) ? 'Updating...' : 'Update Topics' }}</span>
-            </button>
-            
-            <!-- Add topic button -->
-            <button 
-              (click)="openNewTopicModal()"
-              class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded-md text-xs transition duration-200 flex items-center justify-center">
-              <fa-icon [icon]="faPlus" class="mr-1"></fa-icon>
-              <span>Add Topic</span>
-            </button>
-          </div>
-          
-          <!-- Topic Items -->
-          <div *ngFor="let topic of topics[chapter.id]"
-               class="py-2 px-4 text-sm cursor-pointer hover:bg-gray-700 dark:hover:bg-slate-800 transition-all flex items-center justify-between"
-               [ngClass]="{'bg-gray-700 dark:bg-slate-800': selectedTopicId === topic.id}">
-            <div class="flex items-center" (click)="selectTopic(topic)">
-              <div class="h-2 w-2 rounded-full mr-2"
-                   [ngClass]="{'bg-green-500': topic.has_content, 'bg-gray-400': !topic.has_content}"></div>
-              <span>{{ topic.name }}</span>
-            </div>
-            
-            <!-- Edit/Delete buttons for topics -->
-            <div class="flex items-center space-x-2">
-              <button 
-                class="text-blue-400 hover:text-blue-300 text-xs p-1"
-                (click)="openEditTopicModal(topic, $event)">
-                <fa-icon [icon]="faEdit"></fa-icon>
+          <p class="text-slate-500 text-sm mb-3">No chapters yet</p>
+          <button
+            (click)="generateChapters()"
+            [disabled]="isGeneratingChapters"
+            class="w-full bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-[#0EA5E9]/20">
+            @if (isGeneratingChapters) {
+              <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white"></div>
+            }
+            @if (!isGeneratingChapters) {
+              <fa-icon [icon]="faMagic"></fa-icon>
+            }
+            {{ isGeneratingChapters ? 'Generating...' : 'Generate Chapters' }}
+          </button>
+        </div>
+      }
+
+      <!-- Chapters exist: toolbar -->
+      @if (!isLoadingChapters && chapters.length > 0) {
+        <div class="px-3 py-3 flex gap-2 border-b border-slate-100 dark:border-slate-800">
+          <button
+            (click)="generateChapters()"
+            [disabled]="isGeneratingChapters"
+            class="flex-1 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white font-bold px-2 py-2 rounded-xl text-xs flex items-center justify-center gap-1 transition-all shadow-md shadow-[#0EA5E9]/20">
+            @if (isGeneratingChapters) {
+              <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white"></div>
+            }
+            @if (!isGeneratingChapters) {
+              <fa-icon [icon]="faMagic"></fa-icon>
+            }
+            {{ isGeneratingChapters ? 'Updating...' : 'Update' }}
+          </button>
+          <button
+            (click)="openNewChapterModal()"
+            class="flex-1 bg-[#10B981] hover:bg-[#059669] text-white font-bold px-2 py-2 rounded-xl text-xs flex items-center justify-center gap-1 transition-all shadow-md shadow-emerald-500/20">
+            <fa-icon [icon]="faPlus"></fa-icon> Add
+          </button>
+        </div>
+      }
+
+      <!-- Chapter List -->
+      @for (chapter of chapters; track chapter) {
+        <div class="border-b border-slate-100 dark:border-slate-800">
+          <!-- Chapter header row -->
+          <div
+            class="flex items-center justify-between py-3 px-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group/ch"
+            [ngClass]="{'bg-slate-50 dark:bg-slate-800/50': expandedChapterId === chapter.id}"
+            (click)="toggleChapter(chapter.id)">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-200 leading-snug flex-1 min-w-0 truncate pr-2">{{ chapter.name }}</span>
+            <div class="flex items-center gap-1 shrink-0">
+              <button
+                class="w-6 h-6 rounded-lg hover:bg-[#0EA5E9]/10 text-slate-400 hover:text-[#0EA5E9] flex items-center justify-center transition-all opacity-0 group-hover/ch:opacity-100"
+                (click)="openEditChapterModal(chapter, $event)">
+                <fa-icon [icon]="faEdit" class="text-[10px]"></fa-icon>
               </button>
-              <button 
-                class="text-red-400 hover:text-red-300 text-xs p-1"
-                (click)="openDeleteTopicModal(topic, $event)">
-                <fa-icon [icon]="faTrash"></fa-icon>
+              <button
+                class="w-6 h-6 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 flex items-center justify-center transition-all opacity-0 group-hover/ch:opacity-100"
+                (click)="openDeleteChapterModal(chapter, $event)">
+                <fa-icon [icon]="faTrash" class="text-[10px]"></fa-icon>
               </button>
+              <fa-icon
+                [icon]="expandedChapterId === chapter.id ? faChevronDown : faChevronRight"
+                class="text-slate-400 text-xs ml-0.5">
+              </fa-icon>
             </div>
           </div>
+
+          <!-- Topics under expanded chapter -->
+          @if (expandedChapterId === chapter.id) {
+            <div class="border-l-2 border-[#0EA5E9] ml-4 pb-2 bg-slate-50/50 dark:bg-slate-800/20">
+              <!-- Topic toolbar -->
+              <div class="px-3 py-2 flex gap-2">
+                @if (!topics[chapter.id] || topics[chapter.id].length === 0) {
+                  <button
+                    (click)="generateTopics(chapter.id)"
+                    [disabled]="isGeneratingTopics && generatingChapterId === chapter.id"
+                    class="w-full bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white font-bold px-2 py-1.5 rounded-xl text-xs flex items-center justify-center gap-1 transition-all shadow-sm">
+                    @if (isGeneratingTopics && generatingChapterId === chapter.id) {
+                      <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white"></div>
+                    }
+                    @if (!(isGeneratingTopics && generatingChapterId === chapter.id)) {
+                      <fa-icon [icon]="faMagic"></fa-icon>
+                    }
+                    {{ (isGeneratingTopics && generatingChapterId === chapter.id) ? 'Generating...' : 'Generate Topics' }}
+                  </button>
+                }
+                @if (topics[chapter.id] && topics[chapter.id].length > 0) {
+                  <button
+                    (click)="generateTopics(chapter.id)"
+                    [disabled]="isGeneratingTopics && generatingChapterId === chapter.id"
+                    class="flex-1 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white font-bold px-2 py-1.5 rounded-xl text-xs flex items-center justify-center gap-1 transition-all shadow-sm">
+                    @if (isGeneratingTopics && generatingChapterId === chapter.id) {
+                      <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white"></div>
+                    }
+                    @if (!(isGeneratingTopics && generatingChapterId === chapter.id)) {
+                      <fa-icon [icon]="faMagic"></fa-icon>
+                    }
+                    {{ (isGeneratingTopics && generatingChapterId === chapter.id) ? 'Updating...' : 'Update' }}
+                  </button>
+                  <button
+                    (click)="openNewTopicModal()"
+                    class="flex-1 bg-[#10B981] hover:bg-[#059669] text-white font-bold px-2 py-1.5 rounded-xl text-xs flex items-center justify-center gap-1 transition-all shadow-sm">
+                    <fa-icon [icon]="faPlus"></fa-icon> Add
+                  </button>
+                }
+              </div>
+
+              <!-- Topic list items -->
+              @for (topic of topics[chapter.id]; track topic) {
+                <div
+                  class="flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-white dark:hover:bg-slate-800 transition-all group/tp rounded-lg mx-1"
+                  [ngClass]="{'bg-[#0EA5E9]/10 border-r-2 border-[#0EA5E9]': selectedTopicId === topic.id}">
+                  <div class="flex items-center gap-2 flex-1 min-w-0" (click)="selectTopic(topic)">
+                    <div class="h-1.5 w-1.5 rounded-full shrink-0"
+                      [ngClass]="{'bg-[#10B981]': topic.has_content, 'bg-slate-300 dark:bg-slate-600': !topic.has_content}">
+                    </div>
+                    <span class="text-xs text-slate-700 dark:text-slate-300 truncate"
+                      [ngClass]="{'text-[#0EA5E9] font-semibold': selectedTopicId === topic.id}">
+                      {{ topic.name }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-0.5 shrink-0 opacity-0 group-hover/tp:opacity-100 transition-all">
+                    <button
+                      class="w-5 h-5 rounded hover:bg-[#0EA5E9]/10 text-slate-400 hover:text-[#0EA5E9] flex items-center justify-center transition-all"
+                      (click)="openEditTopicModal(topic, $event)">
+                      <fa-icon [icon]="faEdit" class="text-[9px]"></fa-icon>
+                    </button>
+                    <button
+                      class="w-5 h-5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 flex items-center justify-center transition-all"
+                      (click)="openDeleteTopicModal(topic, $event)">
+                      <fa-icon [icon]="faTrash" class="text-[9px]"></fa-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
         </div>
-      </div>
+      }
     </div>
   </div>
 
-  <!-- Main Content Area -->
-  <div class="flex-1 overflow-y-auto w-full">
-    <!-- Mobile-friendly top navigation bar that contains topic toggle and breadcrumb -->
-    <div class="bg-white dark:bg-slate-800 shadow md:shadow-none sticky top-0 z-30 px-2 md:px-4 py-3 md:py-0 md:px-0 md:static w-full">
-      <!-- Mobile Topic Toggle Button -->
-      <div class="md:hidden flex items-center justify-between mb-2">
-        <button 
-          class="flex items-center bg-blue-600 text-white px-3 py-2 rounded-md shadow-sm"
-          (click)="toggleSidebar()">
-          <fa-icon [icon]="faList" class="mr-2"></fa-icon>
-          <span class="truncate max-w-[150px]">{{ expandedChapterId ? getChapterNameById(expandedChapterId) : 'Course Outline' }}</span>
-        </button>
-        
-        <!-- Topic Navigation on Mobile -->
-        <div class="flex space-x-2">
-          <button *ngIf="selectedTopic"
-            class="bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 p-2 rounded-md"
-            [disabled]="!getPreviousTopic()"
-            [ngClass]="{'opacity-50': !getPreviousTopic()}"
-            (click)="navigateToPreviousTopic()">
-            <fa-icon [icon]="faChevronLeft" class="text-xs"></fa-icon>
+  <!-- ===== MAIN CONTENT AREA ===== -->
+  <div class="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0F172A] flex flex-col">
+
+    <!-- Sticky top bar (mobile + breadcrumb) -->
+    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30">
+      <div class="px-4 md:px-6 py-3">
+
+        <!-- Mobile toggle + navigation row -->
+        <div class="md:hidden flex items-center justify-between mb-2">
+          <button
+            class="flex items-center gap-2 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] text-white px-3 py-2 rounded-xl text-sm font-medium"
+            (click)="toggleSidebar()">
+            <fa-icon [icon]="faList"></fa-icon>
+            <span class="truncate max-w-[140px]">{{ expandedChapterId ? getChapterNameById(expandedChapterId) : 'Course Outline' }}</span>
           </button>
-          <button *ngIf="selectedTopic"
-            class="bg-white dark:bg-slate-700 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 p-2 rounded-md"
-            [disabled]="!getNextTopic()"
-            [ngClass]="{'opacity-50': !getNextTopic()}"
-            (click)="navigateToNextTopic()">
-            <fa-icon [icon]="faChevronRight" class="text-xs"></fa-icon>
-          </button>
+          <div class="flex gap-1.5">
+            @if (selectedTopic) {
+              <button
+                class="w-9 h-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all"
+                [disabled]="!getPreviousTopic()"
+                [ngClass]="{'opacity-40': !getPreviousTopic()}"
+                (click)="navigateToPreviousTopic()">
+                <fa-icon [icon]="faChevronLeft" class="text-xs"></fa-icon>
+              </button>
+              <button
+                class="w-9 h-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all"
+                [disabled]="!getNextTopic()"
+                [ngClass]="{'opacity-40': !getNextTopic()}"
+                (click)="navigateToNextTopic()">
+                <fa-icon [icon]="faChevronRight" class="text-xs"></fa-icon>
+              </button>
+            }
+          </div>
         </div>
+
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-1.5 text-sm overflow-x-auto whitespace-nowrap">
+          <a routerLink="/home" class="text-[#0EA5E9] hover:underline font-medium flex items-center gap-1">
+            <fa-icon [icon]="faHome"></fa-icon>
+            <span class="hidden md:inline">Home</span>
+          </a>
+          <span class="text-slate-400">/</span>
+          <a routerLink="/courses" class="text-[#0EA5E9] hover:underline font-medium flex items-center gap-1">
+            <fa-icon [icon]="faBook"></fa-icon>
+            <span class="hidden md:inline">Courses</span>
+          </a>
+          <span class="text-slate-400">/</span>
+          <a [routerLink]="['/courses', courseId, 'subjects']" class="text-[#0EA5E9] hover:underline font-medium">
+            <span class="truncate max-w-[80px] md:max-w-none inline-block align-bottom">{{ courseName }}</span>
+          </a>
+          <span class="text-slate-400">/</span>
+          <a [routerLink]="['/courses', courseId, 'subjects']" class="text-[#0EA5E9] hover:underline font-medium">
+            <span class="truncate max-w-[80px] md:max-w-none inline-block align-bottom">{{ subjectName }}</span>
+          </a>
+          @if (selectedTopic) {
+            <span class="text-slate-400">/</span>
+            <span class="text-slate-600 dark:text-slate-400 truncate max-w-[120px] md:max-w-none">{{ selectedTopic.name }}</span>
+          }
+        </nav>
       </div>
-      
-      <!-- Enhanced Breadcrumb Navigation - Full width on mobile -->
-      <nav class="mb-2 md:mb-6 overflow-x-auto whitespace-nowrap w-full">
-        <ol class="flex items-center text-sm">
-          <li class="flex items-center">
-            <a routerLink="/home" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-              <fa-icon [icon]="faHome" class="mr-1"></fa-icon> <span class="hidden md:inline">Home</span>
-            </a>
-          </li>
-          <li class="flex items-center">
-            <span class="mx-1 md:mx-2 text-gray-500">/</span>
-            <a routerLink="/courses" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-              <fa-icon [icon]="faBook" class="mr-1"></fa-icon> <span class="hidden md:inline">Courses</span>
-            </a>
-          </li>
-          <li class="flex items-center">
-            <span class="mx-1 md:mx-2 text-gray-500">/</span>
-            <a [routerLink]="['/courses', courseId, 'subjects']" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-              <span class="truncate max-w-[60px] md:max-w-none">{{ courseName }}</span>
-            </a>
-          </li>
-          <li class="flex items-center">
-            <span class="mx-1 md:mx-2 text-gray-500">/</span>
-            <a [routerLink]="['/courses', courseId, 'subjects']" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-              <span class="truncate max-w-[60px] md:max-w-none">{{ subjectName }}</span>
-            </a>
-          </li>
-          <li *ngIf="selectedTopic" class="flex items-center">
-            <span class="mx-1 md:mx-2 text-gray-500">/</span>
-            <span class="text-gray-700 truncate max-w-[100px] md:max-w-none">{{ selectedTopic.name }}</span>
-          </li>
-        </ol>
-      </nav>
     </div>
-    
-    <!-- Content area with improved padding for mobile -->
-    <div class="w-full px-2 md:px-6">
-      <!-- Content Header -->
+
+    <!-- Content Scroll Area -->
+    <div class="flex-1 px-4 md:px-6 py-6">
+
+      <!-- Topic header -->
       <header class="mb-6">
-        <h1 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-2">{{ selectedTopic?.name || 'Select a Topic' }}</h1>
-        <p *ngIf="selectedTopic" class="text-gray-600 dark:text-gray-300 text-sm md:text-base">{{ expandedChapterId ? getChapterNameById(expandedChapterId) : '' }}</p>
+        <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white">{{ selectedTopic?.name || 'Select a Topic' }}</h1>
+        @if (selectedTopic) {
+          <p class="text-slate-500 text-sm mt-1">{{ expandedChapterId ? getChapterNameById(expandedChapterId) : '' }}</p>
+        }
       </header>
 
       <!-- Error Message -->
-      <div *ngIf="errorMessage" class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 mb-6 rounded-md flex items-center">
-        <fa-icon [icon]="faInfoCircle" class="text-red-500 dark:text-red-400 mr-3 text-lg"></fa-icon>
-        <p class="text-red-700 dark:text-red-300">{{ errorMessage }}</p>
-      </div>
-
-      <!-- Content Display -->
-      <div *ngIf="!selectedTopicId" class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 mb-6 rounded-md flex items-center">
-        <fa-icon [icon]="faInfoCircle" class="text-blue-600 dark:text-blue-400 mr-3 text-lg"></fa-icon>
-        <div>
-          <p class="text-blue-700 dark:text-blue-300">Please select a topic from the sidebar to view its content.</p>
-          <p *ngIf="chapters.length === 0" class="text-sm text-blue-600 dark:text-blue-400 mt-1">
-            First generate chapters, then topics, then select a topic to view/generate content.
-          </p>
-        </div>
-      </div>
-
-      <!-- Loading Content Indicator -->
-      <div *ngIf="selectedTopicId && isLoadingContent" class="flex justify-center my-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-
-      <!-- Generate/Edit/Delete Content Buttons -->
-      <div *ngIf="selectedTopicId && !isLoadingContent" class="mb-4 flex justify-end space-x-3">
-        <!-- Edit and Delete content buttons (only show if content exists) -->
-        <button 
-          *ngIf="content"
-          (click)="openEditContentModal()"
-          class="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm transition duration-200 shadow-sm">
-          <fa-icon [icon]="faEdit" class="mr-1.5"></fa-icon>
-          <span>Edit Content</span>
-        </button>
-        
-        <button 
-          *ngIf="content"
-          (click)="openDeleteContentConfirm()"
-          class="flex items-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm transition duration-200 shadow-sm">
-          <fa-icon [icon]="faTrash" class="mr-1.5"></fa-icon>
-          <span>Delete Content</span>
-        </button>
-        
-        <!-- Generate/Update content button (always show) -->
-        <button 
-          (click)="generateContent()"
-          [disabled]="isGeneratingContent"
-          class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm transition duration-200 shadow-sm">
-          <div *ngIf="isGeneratingContent" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-          <fa-icon *ngIf="!isGeneratingContent" [icon]="faMagic" class="mr-1.5"></fa-icon>
-          <span>{{ isGeneratingContent ? 'Generating...' : (content ? 'Update Content' : 'Generate Content') }}</span>
-        </button>
-      </div>
-
-      <!-- Content Display with improved mobile handling -->
-      <div *ngIf="selectedTopicId && !isLoadingContent && content" class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-3 md:p-6 mb-6 w-full overflow-hidden">
-        <!-- We're using a mixed approach: KaTeX for single-line equations and MathJax for multiline equations -->
-        <div class="prose max-w-none w-full markdown-content">
-          <!-- Use KaTeX for regular markdown and inline/simple equations -->
-          <div *ngIf="!processedContent" markdown [data]="content" mermaid katex class="markdown-content"></div>
-          
-          <!-- Use the processed content for mixed KaTeX/MathJax approach -->
-          <div *ngIf="processedContent">
-            <!-- First render with KaTeX for standard markdown and inline equations -->
-            <div markdown [data]="processedContent" mermaid katex class="markdown-content"></div>
-            
-            <!-- The mathjax-block divs will be processed by MathJax for multiline equations -->
-            <!-- Add a trigger for MathJax in case it wasn't automatically rendered -->
-            <button *ngIf="content && content.includes('\\begin{cases}')" 
-                    (click)="mathRendererService.renderMathJax()" 
-                    class="text-xs text-blue-600 hover:text-blue-800 mt-2 underline">
-              Equations not rendering correctly? Click here to refresh.
-            </button>
+      @if (errorMessage) {
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/40 flex items-center justify-center shrink-0">
+            <fa-icon [icon]="faInfoCircle" class="text-red-500 dark:text-red-400"></fa-icon>
           </div>
+          <p class="text-red-700 dark:text-red-300 text-sm">{{ errorMessage }}</p>
         </div>
-      </div>
+      }
 
-      <!-- Video Section -->
-      <div *ngIf="selectedTopicId && !isLoadingContent" class="bg-white dark:bg-slate-800 rounded-xl shadow-md p-3 md:p-6 mb-6 w-full">
-        <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 flex items-center">
-          <fa-icon [icon]="faVideo" class="mr-2 text-blue-600 dark:text-blue-400"></fa-icon>
-          Video Content
-        </h3>
+      <!-- No topic selected prompt -->
+      @if (!selectedTopicId) {
+        <div class="flex flex-col items-center justify-center py-20 text-center">
+          <div class="w-20 h-20 rounded-2xl bg-[#0EA5E9]/10 text-[#0EA5E9] flex items-center justify-center text-4xl mb-6">
+            <fa-icon [icon]="faBook" class="text-4xl"></fa-icon>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Select a topic</h3>
+          <p class="text-slate-500 mb-2 max-w-sm text-sm">Choose a topic from the outline panel on the left to view its content.</p>
+          @if (chapters.length === 0) {
+            <p class="text-slate-400 text-xs max-w-xs">Generate chapters first, then topics, then select a topic to view or generate content.</p>
+          }
+        </div>
+      }
 
-        <!-- Video Player (if video exists) -->
-        <div *ngIf="videoUrl" class="mb-4">
-          <video controls class="w-full rounded-lg shadow-lg max-h-96">
-            <source [src]="videoUrl" type="video/mp4">
-            <source [src]="videoUrl" type="video/webm">
-            <source [src]="videoUrl" type="video/ogg">
-            Your browser does not support the video tag.
-          </video>
+      <!-- Loading content -->
+      @if (selectedTopicId && isLoadingContent) {
+        <div class="flex flex-col items-center justify-center py-20">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0EA5E9] mb-4"></div>
+          <p class="text-slate-500 text-sm">Loading content...</p>
+        </div>
+      }
 
-          <!-- Delete Video Button -->
+      <!-- Content action buttons -->
+      @if (selectedTopicId && !isLoadingContent) {
+        <div class="mb-5 flex flex-wrap justify-end gap-2">
+          @if (content) {
+            <button
+              (click)="openEditContentModal()"
+              class="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-[#0EA5E9]/50 hover:text-[#0EA5E9] px-4 py-2.5 rounded-xl text-sm font-medium transition-all">
+              <fa-icon [icon]="faEdit"></fa-icon> Edit Content
+            </button>
+            <button
+              (click)="openDeleteContentConfirm()"
+              class="flex items-center gap-2 bg-white dark:bg-slate-800 border border-red-200 dark:border-red-900 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-4 py-2.5 rounded-xl text-sm font-medium transition-all">
+              <fa-icon [icon]="faTrash"></fa-icon> Delete
+            </button>
+          }
           <button
-            (click)="deleteVideo()"
-            [disabled]="isDeletingVideo"
-            class="mt-3 flex items-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm transition duration-200">
-            <div *ngIf="isDeletingVideo" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-            <fa-icon *ngIf="!isDeletingVideo" [icon]="faTrashAlt" class="mr-1.5"></fa-icon>
-            <span>{{ isDeletingVideo ? 'Deleting...' : 'Delete Video' }}</span>
+            (click)="generateContent()"
+            [disabled]="isGeneratingContent"
+            class="bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-[#0EA5E9]/20 flex items-center gap-2 transition-all text-sm">
+            @if (isGeneratingContent) {
+              <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>
+            }
+            @if (!isGeneratingContent) {
+              <fa-icon [icon]="faMagic"></fa-icon>
+            }
+            {{ isGeneratingContent ? 'Generating...' : (content ? 'Update Content' : 'Generate with AI') }}
           </button>
         </div>
+      }
 
-        <!-- Video Upload Section (if no video exists) -->
-        <div *ngIf="!videoUrl" class="border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg p-6">
-          <div class="text-center">
-            <fa-icon [icon]="faUpload" class="text-gray-400 dark:text-gray-500 text-4xl mb-3"></fa-icon>
-            <p class="text-gray-600 dark:text-gray-300 mb-4">Upload a video for this topic</p>
-
-            <!-- File Input -->
-            <input
-              type="file"
-              id="videoFileInput"
-              accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo"
-              (change)="onVideoFileSelected($event)"
-              class="hidden">
-
-            <label
-              for="videoFileInput"
-              class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md cursor-pointer transition duration-200">
-              Choose Video File
-            </label>
-
-            <!-- Selected File Info -->
-            <div *ngIf="selectedVideoFile" class="mt-4 p-3 bg-gray-50 dark:bg-slate-700 rounded-md">
-              <p class="text-sm text-gray-700 dark:text-gray-300">
-                <span class="font-semibold">Selected:</span> {{ selectedVideoFile.name }}
-              </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Size: {{ (selectedVideoFile.size / (1024 * 1024)).toFixed(2) }} MB
-              </p>
-
-              <!-- Upload Button -->
-              <button
-                (click)="uploadVideo()"
-                [disabled]="isUploadingVideo"
-                class="mt-3 flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm transition duration-200">
-                <div *ngIf="isUploadingVideo" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-                <fa-icon *ngIf="!isUploadingVideo" [icon]="faUpload" class="mr-1.5"></fa-icon>
-                <span>{{ isUploadingVideo ? 'Uploading...' : 'Upload Video' }}</span>
-              </button>
+      <!-- Markdown Content Card -->
+      @if (selectedTopicId && !isLoadingContent && content) {
+        <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 mb-6 overflow-hidden">
+          <div class="h-0.5 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB]"></div>
+          <div class="p-6 md:p-8">
+            <div class="prose prose-slate dark:prose-invert max-w-none w-full markdown-content">
+              @if (!processedContent) {
+                <div markdown [data]="content" mermaid katex class="markdown-content"></div>
+              }
+              @if (processedContent) {
+                <div>
+                  <div markdown [data]="processedContent" mermaid katex class="markdown-content"></div>
+                  @if (content && content.includes('\\begin{cases}')) {
+                    <button
+                      (click)="mathRendererService.renderMathJax()"
+                      class="text-xs text-[#0EA5E9] hover:underline mt-3 flex items-center gap-1 opacity-60 hover:opacity-100 transition-all">
+                      <fa-icon [icon]="faInfoCircle"></fa-icon>
+                      Equations not rendering? Click to refresh.
+                    </button>
+                  }
+                </div>
+              }
             </div>
-
-            <p class="text-xs text-gray-500 mt-4">
-              Supported formats: MP4, WebM, OGG, MOV, AVI (Max size: 100MB)
-            </p>
           </div>
         </div>
-      </div>
+      }
 
-      <!-- No Content Message -->
-      <div *ngIf="selectedTopicId && !isLoadingContent && !content" class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 rounded-md flex items-center">
-        <fa-icon [icon]="faInfoCircle" class="text-blue-600 dark:text-blue-400 mr-3 text-lg"></fa-icon>
-        <div>
-          <p class="text-blue-700 dark:text-blue-300">No content available for this topic yet.</p>
-          <p class="text-sm text-blue-600 dark:text-blue-400 mt-1">Click "Generate Content" to create content for this topic.</p>
+      <!-- No content yet message -->
+      @if (selectedTopicId && !isLoadingContent && !content) {
+        <div class="bg-[#0EA5E9]/5 dark:bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 rounded-2xl p-6 mb-6 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-[#0EA5E9]/10 flex items-center justify-center shrink-0">
+            <fa-icon [icon]="faInfoCircle" class="text-[#0EA5E9]"></fa-icon>
+          </div>
+          <div>
+            <p class="font-semibold text-slate-800 dark:text-white text-sm">No content available yet</p>
+            <p class="text-slate-500 text-sm mt-0.5">Click "Generate with AI" above to create content for this topic.</p>
+          </div>
         </div>
-      </div>
-      
-      <!-- Topic Navigation - Desktop version -->
-      <div *ngIf="selectedTopicId && !isLoadingContent" class="hidden md:flex justify-between mt-8 border-t pt-4 border-gray-200">
-        <button 
-          *ngIf="getPreviousTopic()"
-          (click)="navigateToPreviousTopic()"
-          class="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded transition duration-200">
-          <fa-icon [icon]="faChevronLeft" class="mr-2"></fa-icon>
-          Previous: {{ getPreviousTopic()?.name }}
-        </button>
-        <div *ngIf="!getPreviousTopic()" class="flex-1"></div>
-        
-        <button 
-          *ngIf="getNextTopic()"
-          (click)="navigateToNextTopic()"
-          class="flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded transition duration-200 ml-auto">
-          Next: {{ getNextTopic()?.name }}
-          <fa-icon [icon]="faChevronRight" class="ml-2"></fa-icon>
-        </button>
-      </div>
+      }
+
+      <!-- Video Section -->
+      @if (selectedTopicId && !isLoadingContent) {
+        <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 mb-6 overflow-hidden">
+          <div class="h-0.5 bg-gradient-to-r from-[#10B981] to-[#059669]"></div>
+          <div class="p-6">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-[#10B981]/10 text-[#10B981] flex items-center justify-center">
+                <fa-icon [icon]="faVideo"></fa-icon>
+              </div>
+              Video Content
+            </h3>
+
+            @if (videoUrl) {
+              <div>
+                <video controls class="w-full rounded-xl shadow-lg max-h-96 bg-black">
+                  <source [src]="videoUrl" type="video/mp4">
+                  <source [src]="videoUrl" type="video/webm">
+                  <source [src]="videoUrl" type="video/ogg">
+                  Your browser does not support the video tag.
+                </video>
+                <button
+                  (click)="deleteVideo()"
+                  [disabled]="isDeletingVideo"
+                  class="mt-4 flex items-center gap-2 bg-white dark:bg-slate-800 border border-red-200 dark:border-red-900 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 px-4 py-2.5 rounded-xl text-sm font-medium transition-all">
+                  @if (isDeletingVideo) {
+                    <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-red-500"></div>
+                  }
+                  @if (!isDeletingVideo) {
+                    <fa-icon [icon]="faTrashAlt"></fa-icon>
+                  }
+                  {{ isDeletingVideo ? 'Deleting...' : 'Delete Video' }}
+                </button>
+              </div>
+            }
+
+            @if (!videoUrl) {
+              <div class="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-8 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-4">
+                  <fa-icon [icon]="faUpload" class="text-slate-400 text-xl"></fa-icon>
+                </div>
+                <p class="text-slate-600 dark:text-slate-300 text-sm mb-4 font-medium">Upload a video for this topic</p>
+                <input
+                  type="file"
+                  id="videoFileInput"
+                  accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo"
+                  (change)="onVideoFileSelected($event)"
+                  class="hidden">
+                <label
+                  for="videoFileInput"
+                  class="inline-flex items-center gap-2 bg-[#0EA5E9] hover:bg-[#2563EB] text-white px-5 py-2.5 rounded-xl cursor-pointer transition-all text-sm font-semibold">
+                  <fa-icon [icon]="faUpload"></fa-icon> Choose Video File
+                </label>
+
+                @if (selectedVideoFile) {
+                  <div class="mt-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 text-left">
+                    <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">{{ selectedVideoFile.name }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ (selectedVideoFile.size / (1024 * 1024)).toFixed(2) }} MB</p>
+                    <button
+                      (click)="uploadVideo()"
+                      [disabled]="isUploadingVideo"
+                      class="mt-3 w-full flex items-center justify-center gap-2 bg-[#10B981] hover:bg-[#059669] text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-all">
+                      @if (isUploadingVideo) {
+                        <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>
+                      }
+                      @if (!isUploadingVideo) {
+                        <fa-icon [icon]="faUpload"></fa-icon>
+                      }
+                      {{ isUploadingVideo ? 'Uploading...' : 'Upload Video' }}
+                    </button>
+                  </div>
+                }
+
+                <p class="text-xs text-slate-400 mt-4">Supported: MP4, WebM, OGG, MOV, AVI &nbsp;·&nbsp; Max 100MB</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Desktop topic navigation -->
+      @if (selectedTopicId && !isLoadingContent) {
+        <div class="hidden md:flex justify-between mt-6 pt-5 border-t border-slate-200 dark:border-slate-800">
+          @if (getPreviousTopic()) {
+            <button
+              (click)="navigateToPreviousTopic()"
+              class="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9] px-5 py-2.5 rounded-xl text-sm font-medium transition-all">
+              <fa-icon [icon]="faChevronLeft"></fa-icon>
+              <span>{{ getPreviousTopic()?.name }}</span>
+            </button>
+          }
+          @if (!getPreviousTopic()) {
+            <div></div>
+          }
+          @if (getNextTopic()) {
+            <button
+              (click)="navigateToNextTopic()"
+              class="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-[#0EA5E9]/40 hover:text-[#0EA5E9] px-5 py-2.5 rounded-xl text-sm font-medium transition-all ml-auto">
+              <span>{{ getNextTopic()?.name }}</span>
+              <fa-icon [icon]="faChevronRight"></fa-icon>
+            </button>
+          }
+        </div>
+      }
     </div>
   </div>
 </div>
 
-<!-- MODAL COMPONENTS -->
+<!-- ===== MODALS ===== -->
 
 <!-- Edit Chapter Modal -->
-<div *ngIf="showEditChapterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" [formGroup]="editChapterForm">
-    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Edit Chapter</h2>
-    <div class="mb-4">
-      <label for="chapterName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-      <input
-        type="text"
-        id="chapterName"
-        formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-        placeholder="Enter chapter name">
-    </div>
-    <div class="flex justify-end space-x-3">
-      <button
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-        (click)="closeEditChapterModal()">
-        Cancel
-      </button>
-      <button
-        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
-        (click)="updateChapter()">
-        Save Changes
-      </button>
+@if (showEditChapterModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md relative z-10 border border-slate-200 dark:border-slate-700 shadow-2xl" [formGroup]="editChapterForm">
+      <h2 class="text-lg font-bold mb-5 text-slate-900 dark:text-white">Edit Chapter</h2>
+      <div class="mb-5">
+        <label for="chapterName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Name</label>
+        <input
+          type="text" id="chapterName" formControlName="name"
+          class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/50 focus:border-[#0EA5E9] transition-all text-sm"
+          placeholder="Enter chapter name">
+      </div>
+      <div class="flex justify-end gap-3">
+        <button class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700"
+          (click)="closeEditChapterModal()">Cancel</button>
+        <button class="px-5 py-2.5 bg-[#0EA5E9] hover:bg-[#2563EB] text-white rounded-xl transition-all text-sm font-bold"
+          (click)="updateChapter()">Save Changes</button>
+      </div>
     </div>
   </div>
-</div>
+}
 
-<!-- Delete Chapter Confirmation Modal -->
-<div *ngIf="showDeleteChapterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md">
-    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Delete Chapter</h2>
-    <p class="mb-6 text-gray-700 dark:text-gray-300">Are you sure you want to delete the chapter "<span class="font-semibold">{{ editChapterForm.value.name }}</span>"? This action cannot be undone.</p>
-    <div class="flex justify-end space-x-3">
-      <button
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-        (click)="closeDeleteChapterModal()">
-        Cancel
-      </button>
-      <button
-        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors flex items-center"
-        [disabled]="isDeletingChapter"
-        (click)="deleteChapter()">
-        <div *ngIf="isDeletingChapter" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-        {{ isDeletingChapter ? 'Deleting...' : 'Delete Chapter' }}
-      </button>
+<!-- Delete Chapter Modal -->
+@if (showDeleteChapterModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md relative z-10 border border-slate-200 dark:border-slate-700 shadow-2xl">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
+          <fa-icon [icon]="faTrash" class="text-red-500"></fa-icon>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Delete Chapter</h2>
+      </div>
+      <p class="mb-6 text-slate-600 dark:text-slate-400 text-sm">Are you sure you want to delete "<span class="font-semibold text-slate-900 dark:text-white">{{ editChapterForm.value.name }}</span>"? This action cannot be undone.</p>
+      <div class="flex justify-end gap-3">
+        <button class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700"
+          (click)="closeDeleteChapterModal()">Cancel</button>
+        <button class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all flex items-center gap-2 text-sm font-bold"
+          [disabled]="isDeletingChapter" (click)="deleteChapter()">
+          @if (isDeletingChapter) {
+            <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>
+          }
+          {{ isDeletingChapter ? 'Deleting...' : 'Delete Chapter' }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
+}
 
 <!-- Edit Topic Modal -->
-<div *ngIf="showEditTopicModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" [formGroup]="editTopicForm">
-    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Edit Topic</h2>
-    <div class="mb-4">
-      <label for="topicName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-      <input
-        type="text"
-        id="topicName"
-        formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-        placeholder="Enter topic name">
-    </div>
-    <div class="flex justify-end space-x-3">
-      <button
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-        (click)="closeEditTopicModal()">
-        Cancel
-      </button>
-      <button
-        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
-        (click)="updateTopic()">
-        Save Changes
-      </button>
+@if (showEditTopicModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md relative z-10 border border-slate-200 dark:border-slate-700 shadow-2xl" [formGroup]="editTopicForm">
+      <h2 class="text-lg font-bold mb-5 text-slate-900 dark:text-white">Edit Topic</h2>
+      <div class="mb-5">
+        <label for="topicName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Name</label>
+        <input
+          type="text" id="topicName" formControlName="name"
+          class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/50 focus:border-[#0EA5E9] transition-all text-sm"
+          placeholder="Enter topic name">
+      </div>
+      <div class="flex justify-end gap-3">
+        <button class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700"
+          (click)="closeEditTopicModal()">Cancel</button>
+        <button class="px-5 py-2.5 bg-[#0EA5E9] hover:bg-[#2563EB] text-white rounded-xl transition-all text-sm font-bold"
+          (click)="updateTopic()">Save Changes</button>
+      </div>
     </div>
   </div>
-</div>
+}
 
-<!-- Delete Topic Confirmation Modal -->
-<div *ngIf="showDeleteTopicModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md">
-    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Delete Topic</h2>
-    <p class="mb-6 text-gray-700 dark:text-gray-300">Are you sure you want to delete the topic "<span class="font-semibold">{{ editTopicForm.value.name }}</span>"? This action cannot be undone.</p>
-    <div class="flex justify-end space-x-3">
-      <button
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-        (click)="closeDeleteTopicModal()">
-        Cancel
-      </button>
-      <button
-        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors flex items-center"
-        [disabled]="isDeletingTopic"
-        (click)="deleteTopic()">
-        <div *ngIf="isDeletingTopic" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-        {{ isDeletingTopic ? 'Deleting...' : 'Delete Topic' }}
-      </button>
+<!-- Delete Topic Modal -->
+@if (showDeleteTopicModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md relative z-10 border border-slate-200 dark:border-slate-700 shadow-2xl">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
+          <fa-icon [icon]="faTrash" class="text-red-500"></fa-icon>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Delete Topic</h2>
+      </div>
+      <p class="mb-6 text-slate-600 dark:text-slate-400 text-sm">Are you sure you want to delete "<span class="font-semibold text-slate-900 dark:text-white">{{ editTopicForm.value.name }}</span>"? This action cannot be undone.</p>
+      <div class="flex justify-end gap-3">
+        <button class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700"
+          (click)="closeDeleteTopicModal()">Cancel</button>
+        <button class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all flex items-center gap-2 text-sm font-bold"
+          [disabled]="isDeletingTopic" (click)="deleteTopic()">
+          @if (isDeletingTopic) {
+            <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>
+          }
+          {{ isDeletingTopic ? 'Deleting...' : 'Delete Topic' }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
+}
 
 <!-- Edit Content Modal -->
-<div *ngIf="showEditContentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col" [formGroup]="editContentForm">
-    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Edit Content</h2>
-    <div class="mb-4 flex-grow overflow-y-auto">
-      <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Markdown Content</label>
-      <textarea
-        id="content"
-        formControlName="content"
-        class="w-full h-[60vh] px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 font-mono text-sm"
-        placeholder="Enter markdown content"></textarea>
-    </div>
-    <div class="flex justify-end space-x-3">
-      <button
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-        (click)="closeEditContentModal()">
-        Cancel
-      </button>
-      <button
-        class="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
-        (click)="updateContent()">
-        Save Changes
-      </button>
+@if (showEditContentModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] flex flex-col relative z-10 border border-slate-200 dark:border-slate-700 shadow-2xl" [formGroup]="editContentForm">
+      <h2 class="text-lg font-bold mb-4 text-slate-900 dark:text-white shrink-0">Edit Content</h2>
+      <div class="mb-4 flex-1 overflow-hidden flex flex-col">
+        <label for="content" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 shrink-0">Markdown Content</label>
+        <textarea
+          id="content" formControlName="content"
+          class="flex-1 min-h-[50vh] px-3.5 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/50 focus:border-[#0EA5E9] font-mono text-sm resize-none transition-all"
+          placeholder="Enter markdown content"></textarea>
+      </div>
+      <div class="flex justify-end gap-3 shrink-0">
+        <button class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700"
+          (click)="closeEditContentModal()">Cancel</button>
+        <button class="px-5 py-2.5 bg-[#0EA5E9] hover:bg-[#2563EB] text-white rounded-xl transition-all text-sm font-bold"
+          (click)="updateContent()">Save Changes</button>
+      </div>
     </div>
   </div>
-</div>
+}
 
-<!-- Delete Content Confirmation Modal -->
-<div *ngIf="showDeleteContentConfirm" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md">
-    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Delete Content</h2>
-    <p class="mb-6 text-gray-700 dark:text-gray-300">Are you sure you want to delete the content for "<span class="font-semibold">{{ selectedTopic?.name }}</span>"? This action cannot be undone.</p>
-    <div class="flex justify-end space-x-3">
-      <button
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-        (click)="closeDeleteContentConfirm()">
-        Cancel
-      </button>
-      <button
-        class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors flex items-center"
-        [disabled]="isDeletingContent"
-        (click)="deleteContent()">
-        <div *ngIf="isDeletingContent" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-        {{ isDeletingContent ? 'Deleting...' : 'Delete Content' }}
-      </button>
+<!-- Delete Content Modal -->
+@if (showDeleteContentConfirm) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md relative z-10 border border-slate-200 dark:border-slate-700 shadow-2xl">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
+          <fa-icon [icon]="faTrash" class="text-red-500"></fa-icon>
+        </div>
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Delete Content</h2>
+      </div>
+      <p class="mb-6 text-slate-600 dark:text-slate-400 text-sm">Are you sure you want to delete the content for "<span class="font-semibold text-slate-900 dark:text-white">{{ selectedTopic?.name }}</span>"? This cannot be undone.</p>
+      <div class="flex justify-end gap-3">
+        <button class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700"
+          (click)="closeDeleteContentConfirm()">Cancel</button>
+        <button class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-all flex items-center gap-2 text-sm font-bold"
+          [disabled]="isDeletingContent" (click)="deleteContent()">
+          @if (isDeletingContent) {
+            <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>
+          }
+          {{ isDeletingContent ? 'Deleting...' : 'Delete Content' }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
+}
 
 <!-- New Chapter Modal -->
-<div *ngIf="showNewChapterModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" [formGroup]="newChapterForm">
-    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Add New Chapter</h2>
-    <div class="mb-4">
-      <label for="newChapterName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-      <input
-        type="text"
-        id="newChapterName"
-        formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-        placeholder="Enter chapter name">
-    </div>
-    <div class="flex justify-end space-x-3">
-      <button
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-        (click)="closeNewChapterModal()">
-        Cancel
-      </button>
-      <button
-        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors flex items-center"
-        [disabled]="isAddingChapter"
-        (click)="createNewChapter()">
-        <div *ngIf="isAddingChapter" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-        {{ isAddingChapter ? 'Adding...' : 'Add Chapter' }}
-      </button>
+@if (showNewChapterModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md relative z-10 border border-slate-200 dark:border-slate-700 shadow-2xl" [formGroup]="newChapterForm">
+      <h2 class="text-lg font-bold mb-5 text-slate-900 dark:text-white">Add New Chapter</h2>
+      <div class="mb-5">
+        <label for="newChapterName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Name</label>
+        <input
+          type="text" id="newChapterName" formControlName="name"
+          class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/50 focus:border-[#0EA5E9] transition-all text-sm"
+          placeholder="Enter chapter name">
+      </div>
+      <div class="flex justify-end gap-3">
+        <button class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700"
+          (click)="closeNewChapterModal()">Cancel</button>
+        <button class="px-5 py-2.5 bg-[#10B981] hover:bg-[#059669] text-white rounded-xl transition-all flex items-center gap-2 text-sm font-bold"
+          [disabled]="isAddingChapter" (click)="createNewChapter()">
+          @if (isAddingChapter) {
+            <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>
+          }
+          {{ isAddingChapter ? 'Adding...' : 'Add Chapter' }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
+}
 
 <!-- New Topic Modal -->
-<div *ngIf="showNewTopicModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md" [formGroup]="newTopicForm">
-    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Add New Topic</h2>
-    <div class="mb-4">
-      <label for="newTopicName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-      <input
-        type="text"
-        id="newTopicName"
-        formControlName="name"
-        class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-        placeholder="Enter topic name">
-    </div>
-    <div class="flex justify-end space-x-3">
-      <button
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-        (click)="closeNewTopicModal()">
-        Cancel
-      </button>
-      <button
-        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors flex items-center"
-        [disabled]="isAddingTopic"
-        (click)="createNewTopic()">
-        <div *ngIf="isAddingTopic" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-        {{ isAddingTopic ? 'Adding...' : 'Add Topic' }}
-      </button>
+@if (showNewTopicModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md relative z-10 border border-slate-200 dark:border-slate-700 shadow-2xl" [formGroup]="newTopicForm">
+      <h2 class="text-lg font-bold mb-5 text-slate-900 dark:text-white">Add New Topic</h2>
+      <div class="mb-5">
+        <label for="newTopicName" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Name</label>
+        <input
+          type="text" id="newTopicName" formControlName="name"
+          class="w-full px-3.5 py-2.5 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/50 focus:border-[#0EA5E9] transition-all text-sm"
+          placeholder="Enter topic name">
+      </div>
+      <div class="flex justify-end gap-3">
+        <button class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700"
+          (click)="closeNewTopicModal()">Cancel</button>
+        <button class="px-5 py-2.5 bg-[#10B981] hover:bg-[#059669] text-white rounded-xl transition-all flex items-center gap-2 text-sm font-bold"
+          [disabled]="isAddingTopic" (click)="createNewTopic()">
+          @if (isAddingTopic) {
+            <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>
+          }
+          {{ isAddingTopic ? 'Adding...' : 'Add Topic' }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
+}
 
 <!-- New Content Modal -->
-<div *ngIf="showNewContentModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] flex flex-col" [formGroup]="newContentForm">
-    <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-white">Add New Content</h2>
-    <div class="mb-4 flex-grow overflow-y-auto">
-      <label for="newContent" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Markdown Content</label>
-      <textarea
-        id="newContent"
-        formControlName="content"
-        class="w-full h-[60vh] px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 font-mono text-sm"
-        placeholder="Enter markdown content"></textarea>
-    </div>
-    <div class="flex justify-end space-x-3">
-      <button
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
-        (click)="closeNewContentModal()">
-        Cancel
-      </button>
-      <button
-        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-800 transition-colors flex items-center"
-        [disabled]="isAddingContent"
-        (click)="createNewContent()">
-        <div *ngIf="isAddingContent" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-        {{ isAddingContent ? 'Adding...' : 'Add Content' }}
-      </button>
+@if (showNewContentModal) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] flex flex-col relative z-10 border border-slate-200 dark:border-slate-700 shadow-2xl" [formGroup]="newContentForm">
+      <h2 class="text-lg font-bold mb-4 text-slate-900 dark:text-white shrink-0">Add New Content</h2>
+      <div class="mb-4 flex-1 overflow-hidden flex flex-col">
+        <label for="newContent" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 shrink-0">Markdown Content</label>
+        <textarea
+          id="newContent" formControlName="content"
+          class="flex-1 min-h-[50vh] px-3.5 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0EA5E9]/50 focus:border-[#0EA5E9] font-mono text-sm resize-none transition-all"
+          placeholder="Enter markdown content"></textarea>
+      </div>
+      <div class="flex justify-end gap-3 shrink-0">
+        <button class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-sm font-medium border border-slate-200 dark:border-slate-700"
+          (click)="closeNewContentModal()">Cancel</button>
+        <button class="px-5 py-2.5 bg-[#10B981] hover:bg-[#059669] text-white rounded-xl transition-all flex items-center gap-2 text-sm font-bold"
+          [disabled]="isAddingContent" (click)="createNewContent()">
+          @if (isAddingContent) {
+            <div class="animate-spin rounded-full h-3.5 w-3.5 border-t-2 border-b-2 border-white"></div>
+          }
+          {{ isAddingContent ? 'Adding...' : 'Add Content' }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
+}

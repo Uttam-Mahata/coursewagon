@@ -16,20 +16,26 @@ def add_course_rating_fields():
     try:
         # Check if average_rating column exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'courses'
+            WHERE TABLE_NAME = 'courses'
             AND COLUMN_NAME = 'average_rating'
         """))
 
-        if result.fetchone().count == 0:
+        row = result.fetchone()
+        count = row[0] if row else 0
+
+        if count == 0:
             logger.info("Adding rating fields to courses table...")
 
             session.execute(text("""
                 ALTER TABLE courses
-                ADD COLUMN average_rating FLOAT DEFAULT 0.0 NOT NULL,
-                ADD COLUMN review_count INT DEFAULT 0 NOT NULL
+                ADD average_rating FLOAT DEFAULT 0.0 NOT NULL
+            """))
+
+            session.execute(text("""
+                ALTER TABLE courses
+                ADD review_count INT DEFAULT 0 NOT NULL
             """))
 
             session.commit()
@@ -50,35 +56,51 @@ def create_course_reviews_table():
     try:
         # Check if table exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'course_reviews'
+            WHERE TABLE_NAME = 'course_reviews'
         """))
 
-        if result.fetchone().count == 0:
+        row = result.fetchone()
+        count = row[0] if row else 0
+
+        if count == 0:
             logger.info("Creating course_reviews table...")
 
             session.execute(text("""
+                IF OBJECT_ID('course_reviews', 'U') IS NULL
                 CREATE TABLE course_reviews (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    id INT IDENTITY(1,1) PRIMARY KEY,
                     user_id INT NOT NULL,
                     course_id INT NOT NULL,
                     enrollment_id INT NOT NULL,
                     rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
-                    review_text TEXT NULL,
-                    is_visible BOOLEAN DEFAULT TRUE NOT NULL,
+                    review_text NVARCHAR(MAX) NULL,
+                    is_visible BIT DEFAULT 1 NOT NULL,
                     helpful_count INT DEFAULT 0 NOT NULL,
-                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-                    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
-                    FOREIGN KEY (enrollment_id) REFERENCES enrollments(id) ON DELETE CASCADE,
-                    UNIQUE KEY unique_user_course_review (user_id, course_id),
-                    INDEX idx_course_visible (course_id, is_visible),
-                    INDEX idx_user_course (user_id, course_id),
-                    INDEX idx_rating (course_id, rating)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+                    updated_at DATETIME NOT NULL DEFAULT GETDATE(),
+                    FOREIGN KEY (user_id) REFERENCES [user](id) ON DELETE CASCADE,
+                    FOREIGN KEY (course_id) REFERENCES courses(id),
+                    FOREIGN KEY (enrollment_id) REFERENCES enrollments(id),
+                    CONSTRAINT unique_user_course_review UNIQUE (user_id, course_id)
+                )
+            """))
+
+            # Create indexes separately (MSSQL does not support inline INDEX in CREATE TABLE)
+            session.execute(text("""
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'idx_course_visible' AND object_id = OBJECT_ID('course_reviews'))
+                    CREATE INDEX idx_course_visible ON course_reviews(course_id, is_visible)
+            """))
+
+            session.execute(text("""
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'idx_user_course' AND object_id = OBJECT_ID('course_reviews'))
+                    CREATE INDEX idx_user_course ON course_reviews(user_id, course_id)
+            """))
+
+            session.execute(text("""
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'idx_rating' AND object_id = OBJECT_ID('course_reviews'))
+                    CREATE INDEX idx_rating ON course_reviews(course_id, rating)
             """))
 
             session.commit()

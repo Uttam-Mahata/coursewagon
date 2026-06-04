@@ -15,45 +15,39 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     def __init__(self):
-        """Initialize email service with Gmail SMTP configuration"""
-        # Gmail SMTP configuration
-        self.smtp_server = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-        self.smtp_port = int(os.environ.get('MAIL_PORT', 587))
-        self.smtp_username = os.environ.get('MAIL_USERNAME')  # Gmail address
-        self.smtp_password = os.environ.get('MAIL_PASSWORD')  # App password
-        self.use_tls = os.environ.get('MAIL_USE_TLS', 'True').lower() == 'true'
-        self.use_ssl = os.environ.get('MAIL_USE_SSL', 'False').lower() == 'true'
-        
+        """Initialize email service with Resend SMTP configuration"""
+        self.smtp_server = os.environ.get('MAIL_SERVER', 'smtp.resend.com')
+        self.smtp_port = int(os.environ.get('MAIL_PORT', 465))
+        self.smtp_username = os.environ.get('MAIL_USERNAME', 'resend')
+        self.smtp_password = os.environ.get('MAIL_PASSWORD') or os.environ.get('RESEND_API_KEY')
+        self.use_tls = os.environ.get('MAIL_USE_TLS', 'False').lower() == 'true'
+        self.use_ssl = os.environ.get('MAIL_USE_SSL', 'True').lower() == 'true'
+
         # Email settings
-        self.sender_email = os.environ.get('MAIL_DEFAULT_SENDER', self.smtp_username)
-        self.contact_email = os.environ.get('MAIL_CONTACT_EMAIL', 'contact@coursewagon.live')
-        self.app_name = os.environ.get('APP_NAME', 'Course Wagon')
-        self.frontend_url = os.environ.get('FRONTEND_URL', 'https://www.coursewagon.live')
-        
-        logger.debug(f"Email service using Gmail SMTP: {self.smtp_server}:{self.smtp_port}")
-        
+        self.sender_email = os.environ.get('MAIL_DEFAULT_SENDER', 'coursewagon@gradientgeeks.tech')
+        self.contact_email = os.environ.get('MAIL_CONTACT_EMAIL', 'coursewagon@gradientgeeks.tech')
+        self.app_name = os.environ.get('APP_NAME', 'CourseWagon')
+        self.frontend_url = os.environ.get('FRONTEND_URL', 'https://coursewagon.gradientgeeks.tech')
+
         # Set up Jinja2 environment for email templates
         template_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'emails')
-        if not os.path.exists(template_dir):
-            # Create templates directory if it doesn't exist
-            os.makedirs(template_dir, exist_ok=True)
+        os.makedirs(template_dir, exist_ok=True)
         self.env = Environment(loader=FileSystemLoader(template_dir))
-        
+
         # Check if email service is properly configured
         self.is_configured = all([self.smtp_username, self.smtp_password, self.sender_email])
-        
+
         if not self.is_configured:
             missing_vars = []
             if not self.smtp_username:
                 missing_vars.append("MAIL_USERNAME")
             if not self.smtp_password:
-                missing_vars.append("MAIL_PASSWORD")
+                missing_vars.append("MAIL_PASSWORD / RESEND_API_KEY")
             if not self.sender_email:
                 missing_vars.append("MAIL_DEFAULT_SENDER")
-            
             logger.warning(f"Email service not configured properly. Missing: {', '.join(missing_vars)}")
         else:
-            logger.info(f"Email service configured successfully using Gmail SMTP: {self.smtp_server}")
+            logger.info(f"Email service configured — Resend SMTP ({self.sender_email} via {self.smtp_server}:{self.smtp_port})")
 
     def send_email(self, to_email, subject, html_content=None, text_content=None):
         """
@@ -96,7 +90,7 @@ class EmailService:
                 text_part = MIMEText(default_text, 'plain')
                 msg.attach(text_part)
 
-            logger.info(f"Attempting to send email to {to_email} via Gmail SMTP")
+            logger.info(f"Sending email to {to_email} via Resend SMTP")
             
             # Connect to Gmail SMTP server and send email
             if self.use_ssl:
@@ -343,69 +337,58 @@ class EmailService:
             logger.error(f"Failed to send verification email: {str(e)}")
             return False
 
-    def send_simple_test_message(self, to_email="uttambav@gmail.com"):
-        """Send a simple test message to verify Gmail SMTP configuration"""
+    def send_simple_test_message(self, to_email="coursewagon@gradientgeeks.tech"):
+        """Send a simple test message to verify Resend SMTP configuration"""
         try:
-            subject = "Hello from Course Wagon"
-            text_content = "Congratulations! You just sent an email with Gmail SMTP! Course Wagon email service is working!"
+            subject = "Hello from CourseWagon"
+            text_content = "Resend SMTP is working! CourseWagon email service is configured correctly."
             html_content = f"""
             <html>
             <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                 <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <h2 style="color: #2563eb;">🎉 Gmail SMTP Configuration Test Successful!</h2>
-                    <p>Congratulations! Your Gmail SMTP configuration is working correctly.</p>
-                    <div style="background-color: #eff6ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                        <h3 style="color: #1d4ed8; margin-top: 0;">✅ Configuration Details:</h3>
+                    <h2 style="color: #0EA5E9;">Resend SMTP Test Successful</h2>
+                    <p>Your Resend SMTP configuration is working correctly.</p>
+                    <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
                         <ul>
                             <li>SMTP Server: {self.smtp_server}</li>
                             <li>SMTP Port: {self.smtp_port}</li>
-                            <li>TLS Enabled: {self.use_tls}</li>
-                            <li>Sender Email: {self.sender_email}</li>
+                            <li>SSL: {self.use_ssl}</li>
+                            <li>Sender: {self.sender_email}</li>
                         </ul>
                     </div>
-                    <p>This email was sent using Gmail SMTP from CourseWagon.</p>
                     <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
-                        Best regards,<br>
-                        The Course Wagon Team
+                        The {self.app_name} Team
                     </p>
                 </div>
             </body>
             </html>
             """
-            
             return self.send_email(to_email, subject, html_content, text_content)
-            
         except Exception as e:
             logger.error(f"Failed to send test email: {str(e)}")
             return False
 
     def test_smtp_connection(self):
-        """Test SMTP connection to Gmail"""
+        """Test SMTP connection to Resend"""
         try:
-            logger.info("Testing Gmail SMTP connection...")
-            
+            logger.info("Testing Resend SMTP connection...")
             if self.use_ssl:
                 server = smtplib.SMTP_SSL(self.smtp_server, self.smtp_port)
             else:
                 server = smtplib.SMTP(self.smtp_server, self.smtp_port)
                 if self.use_tls:
                     server.starttls()
-
             server.login(self.smtp_username, self.smtp_password)
             server.quit()
-            
-            logger.info("✅ Gmail SMTP connection test successful!")
+            logger.info("Resend SMTP connection test successful")
             return True
-            
         except Exception as e:
-            logger.error(f"❌ Gmail SMTP connection test failed: {str(e)}")
+            logger.error(f"Resend SMTP connection test failed: {str(e)}")
             return False
 
-    def test_email_delivery_comprehensive(self, to_email="uttambav@gmail.com"):
-        """
-        Comprehensive email delivery test for Gmail SMTP
-        """
-        logger.info("Starting comprehensive Gmail SMTP email delivery test...")
+    def test_email_delivery_comprehensive(self, to_email="coursewagon@gradientgeeks.tech"):
+        """Comprehensive email delivery test for Resend SMTP"""
+        logger.info("Starting Resend SMTP email delivery test...")
         
         results = {}
         
@@ -427,15 +410,15 @@ class EmailService:
         results['password_reset'] = self.send_password_reset_email(test_user, 'test-token-123')
         
         # Summary
-        logger.info("\n=== Gmail SMTP Test Results ===")
+        logger.info("=== Resend SMTP Test Results ===")
         for test_name, result in results.items():
-            status = "✅ PASSED" if result else "❌ FAILED"
-            logger.info(f"{test_name}: {status}")
-        
+            status = "PASSED" if result else "FAILED"
+            logger.info(f"  {test_name}: {status}")
+
         all_passed = all(results.values())
         if all_passed:
-            logger.info("🎉 All Gmail SMTP tests passed!")
+            logger.info("All Resend SMTP tests passed!")
         else:
-            logger.warning("⚠️ Some Gmail SMTP tests failed!")
+            logger.warning("Some Resend SMTP tests failed!")
         
         return all_passed

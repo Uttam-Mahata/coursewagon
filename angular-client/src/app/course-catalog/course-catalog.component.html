@@ -1,217 +1,263 @@
-<div class="container mx-auto px-4 py-8 max-w-7xl">
-  <!-- Header -->
-  <div class="mb-8">
-    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center mb-4">
-      <fa-icon [icon]="faBook" class="mr-3 text-blue-600 dark:text-blue-400"></fa-icon>
-      Course Catalog
-    </h1>
-    <p class="text-gray-600 dark:text-gray-300">Discover and enroll in courses to start learning</p>
-  </div>
-
-  <!-- Search and Filter Bar -->
-  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-6 mb-8">
-    <!-- Search Input and Sort -->
-    <div class="flex flex-col md:flex-row gap-4 mb-4">
-      <div class="flex-1 relative">
+<!-- Sticky Search / Filter Bar -->
+<div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 shadow-sm">
+  <div class="container mx-auto px-6 py-4 max-w-7xl">
+    <div class="flex flex-wrap gap-3 items-center">
+      <!-- Search Input -->
+      <div class="flex-1 min-w-48 relative">
+        <fa-icon [icon]="faSearch" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></fa-icon>
         <input
           type="text"
           [(ngModel)]="searchQuery"
           (keyup.enter)="searchCourses()"
           placeholder="Search courses..."
-          class="w-full px-4 py-3 pl-12 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-        <fa-icon [icon]="faSearch" class="absolute left-4 top-4 text-gray-400 dark:text-gray-500"></fa-icon>
+          class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] dark:focus:ring-[#0EA5E9] transition">
       </div>
-      <div class="flex flex-col sm:flex-row gap-4">
-        <select
-          [(ngModel)]="selectedSort"
-          (change)="onSortChange()"
-          class="px-4 py-3 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-          <option *ngFor="let option of sortOptions" [value]="option.value">{{ option.label }}</option>
-        </select>
-        <button
-          (click)="searchCourses()"
-          class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white px-6 py-3 rounded-lg transition duration-200">
-          Search
-        </button>
-        <button
-          (click)="toggleFilters()"
-          class="bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-800 text-white px-6 py-3 rounded-lg flex items-center justify-center transition duration-200">
-          <fa-icon [icon]="faFilter" class="mr-2"></fa-icon>
-          Filters
-        </button>
-      </div>
+      <!-- Sort Select -->
+      <select
+        [(ngModel)]="selectedSort"
+        (change)="onSortChange()"
+        class="px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] transition text-sm">
+        @for (option of sortOptions; track option) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+      <!-- Search Button -->
+      <button
+        (click)="searchCourses()"
+        class="bg-[#0EA5E9] hover:bg-[#2563EB] text-white font-medium px-5 py-2.5 rounded-xl shadow-sm shadow-[#0EA5E9]/20 transition duration-200 text-sm">
+        Search
+      </button>
+      <!-- Filters Toggle -->
+      <button
+        (click)="toggleFilters()"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition text-sm font-medium">
+        <fa-icon [icon]="faFilter"></fa-icon>
+        Filters
+      </button>
     </div>
 
-    <!-- Filters Section -->
-    <div *ngIf="showFilters" class="border-t border-gray-200 dark:border-slate-700 pt-4 mt-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Category Filter -->
+    <!-- Expanded Filter Panel -->
+    @if (showFilters) {
+      <div class="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Category -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+          <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">Category</label>
           <select
             [(ngModel)]="selectedCategory"
             (change)="onCategoryChange()"
-            class="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] transition text-sm">
             <option value="">All Categories</option>
-            <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+            @for (category of categories; track category) {
+              <option [value]="category">{{ category }}</option>
+            }
           </select>
         </div>
-
-        <!-- Difficulty Filter -->
+        <!-- Difficulty -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Difficulty Level</label>
+          <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">Difficulty</label>
           <select
             [(ngModel)]="selectedDifficulty"
             (change)="onDifficultyChange()"
-            class="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] transition text-sm">
             <option value="">All Levels</option>
-            <option *ngFor="let level of difficultyLevels" [value]="level">{{ level }}</option>
+            @for (level of difficultyLevels; track level) {
+              <option [value]="level">{{ level }}</option>
+            }
           </select>
         </div>
-      </div>
-
-      <!-- Clear Filters -->
-      <div class="mt-4">
-        <button
-          (click)="clearFilters()"
-          class="text-sm text-blue-600 hover:text-blue-800 underline">
-          Clear all filters
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="loading" class="flex justify-center items-center py-20">
-    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
-  </div>
-
-  <!-- Error State -->
-  <div *ngIf="error && !loading" class="bg-red-100 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-300 p-4 rounded-md mb-6">
-    <p>{{ error }}</p>
-    <button
-      (click)="loadCourses()"
-      class="mt-2 text-sm underline hover:text-red-900 dark:hover:text-red-200">
-      Retry
-    </button>
-  </div>
-
-  <!-- Courses Grid -->
-  <div *ngIf="!loading && !error">
-    <!-- Results Count -->
-    <div class="mb-4 text-gray-600 dark:text-gray-300">
-      Found {{ displayedCourses.length }} course{{ displayedCourses.length !== 1 ? 's' : '' }}
-    </div>
-
-    <!-- Course Cards -->
-    <div *ngIf="displayedCourses.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      <div *ngFor="let course of displayedCourses"
-           class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:shadow-xl transition duration-200 overflow-hidden cursor-pointer flex flex-col"
-           (click)="viewCoursePreview(course.id)">
-        <!-- Course Image -->
-        <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden relative">
-          <img *ngIf="course.image_url"
-               [src]="course.image_url"
-               [alt]="course.name"
-               class="w-full h-full object-cover">
-          <fa-icon *ngIf="!course.image_url"
-                   [icon]="faBook"
-                   size="3x"
-                   class="text-white opacity-80"></fa-icon>
-
-          <!-- Enrolled Badge -->
-          <div *ngIf="course.is_enrolled"
-               class="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-            Enrolled
-          </div>
-        </div>
-
-        <!-- Course Content -->
-        <div class="p-5 flex flex-col flex-grow">
-          <!-- Category Badge -->
-          <div *ngIf="course.category" class="mb-2">
-            <span class="inline-block bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs px-2 py-1 rounded">
-              {{ course.category }}
-            </span>
-          </div>
-
-          <!-- Course Title -->
-          <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-2 line-clamp-2 flex-grow">
-            {{ course.name }}
-          </h3>
-
-          <!-- Rating Display -->
-          <div *ngIf="course.average_rating && course.review_count && course.review_count > 0" class="mb-3">
-            <app-star-rating
-              [rating]="course.average_rating"
-              [interactive]="false"
-              [size]="'sm'"
-              [showCount]="true"
-              [reviewCount]="course.review_count"
-            ></app-star-rating>
-          </div>
-
-          <!-- Course Description -->
-          <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-            {{ course.description }}
-          </p>
-
-          <!-- Course Meta -->
-          <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500 mb-4">
-            <!-- Difficulty -->
-            <span *ngIf="course.difficulty_level"
-                  [class]="'px-2 py-1 rounded font-semibold ' + getDifficultyColor(course.difficulty_level)">
-              <fa-icon [icon]="faSignal" class="mr-1"></fa-icon>
-              {{ course.difficulty_level }}
-            </span>
-
-            <!-- Duration -->
-            <span *ngIf="course.estimated_duration_hours">
-              <fa-icon [icon]="faClock" class="mr-1"></fa-icon>
-              {{ formatDuration(course.estimated_duration_hours) }}
-            </span>
-
-            <!-- Enrollment Count -->
-            <span>
-              <fa-icon [icon]="faUsers" class="mr-1"></fa-icon>
-              {{ course.enrollment_count }} enrolled
-            </span>
-          </div>
-
-          <!-- Creator Info -->
-          <div *ngIf="course.creator_name" class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-            By {{ course.creator_name }}
-          </div>
-
-          <!-- Action Button -->
+        <!-- Clear Filters -->
+        <div class="md:col-span-2 flex justify-end">
           <button
-            (click)="viewCoursePreview(course.id); $event.stopPropagation()"
-            class="w-full mt-auto bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200">
-            {{ course.is_enrolled ? 'View Course' : 'View Details' }}
+            (click)="clearFilters()"
+            class="text-xs text-[#0EA5E9] hover:text-[#2563EB] font-semibold underline underline-offset-2 transition">
+            Clear all filters
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- Empty State -->
-    <div *ngIf="displayedCourses.length === 0" class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-12 text-center">
-      <fa-icon [icon]="faSearch" size="3x" class="text-gray-300 dark:text-gray-600 mb-4"></fa-icon>
-      <p class="text-gray-500 dark:text-gray-400 text-lg mb-4">No courses found</p>
-      <p class="text-gray-400 dark:text-gray-500 mb-4">Try adjusting your search or filters</p>
-      <button
-        (click)="clearFilters()"
-        class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white px-6 py-3 rounded-lg inline-flex items-center transition duration-200">
-        Clear Filters
-      </button>
-    </div>
-
-    <!-- Load More Button -->
-    <div *ngIf="hasMore && displayedCourses.length > 0" class="text-center mt-8">
-      <button
-        (click)="loadMore()"
-        class="bg-gray-600 hover:bg-gray-700 text-white px-8 py-3 rounded-lg inline-flex items-center transition duration-200">
-        Load More Courses
-      </button>
-    </div>
+    }
   </div>
+</div>
+
+<!-- Page Body -->
+<div class="container mx-auto px-6 py-10 max-w-7xl">
+
+  <!-- Page Header -->
+  <div class="mb-10">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3 mb-2">
+      <fa-icon [icon]="faBook" class="text-[#0EA5E9]"></fa-icon>
+      <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#0EA5E9] to-[#10B981]">Course Catalog</span>
+    </h1>
+    <p class="text-slate-500 dark:text-slate-400 text-base">Discover AI-powered courses and start learning today.</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="flex justify-center items-center py-24">
+      <div class="relative">
+        <div class="animate-spin rounded-full h-16 w-16 border-4 border-slate-200 dark:border-slate-700 border-t-[#0EA5E9]"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="h-6 w-6 rounded-full bg-[#0EA5E9]/20 animate-pulse"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error && !loading) {
+    <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 text-red-700 dark:text-red-300 p-5 rounded-xl mb-8 flex items-start gap-3">
+      <span class="text-red-500 mt-0.5">&#9888;</span>
+      <div>
+        <p class="font-medium">{{ error }}</p>
+        <button
+          (click)="loadCourses()"
+          class="mt-2 text-sm underline hover:text-red-900 dark:hover:text-red-100 transition">
+          Retry
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Courses Grid -->
+  @if (!loading && !error) {
+    <div>
+      <!-- Results Count -->
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-5 font-medium">
+        {{ displayedCourses.length }} course{{ displayedCourses.length !== 1 ? 's' : '' }} found
+      </p>
+
+      <!-- Cards Grid -->
+      @if (displayedCourses.length > 0) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-10">
+          @for (course of displayedCourses; track course) {
+            <div
+              class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col"
+              (click)="viewCoursePreview(course.id)">
+
+              <!-- Top Accent -->
+              <div class="h-0.5 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB]"></div>
+
+              <!-- Image Area -->
+              <div class="h-40 bg-gradient-to-br from-[#0EA5E9]/10 to-[#2563EB]/20 dark:from-slate-700 dark:to-slate-800 relative overflow-hidden">
+                @if (course.image_url) {
+                  <img
+                    [src]="course.image_url"
+                    [alt]="course.name"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                }
+                @if (!course.image_url) {
+                  <div class="w-full h-full flex items-center justify-center">
+                    <fa-icon [icon]="faBook" class="text-[#0EA5E9]/30 dark:text-white/10 text-5xl"></fa-icon>
+                  </div>
+                }
+
+                <!-- Category Tag -->
+                @if (course.category) {
+                  <span class="absolute top-3 left-3 text-[10px] bg-[#0EA5E9]/90 text-white font-bold px-2 py-0.5 rounded-full tracking-wide uppercase">
+                    {{ course.category }}
+                  </span>
+                }
+
+                <!-- AI Badge -->
+                <span class="absolute top-3 right-3 inline-flex items-center text-[10px] px-2 py-0.5 rounded-full bg-[#FBBF24]/15 text-[#F59E0B] border border-[#FBBF24]/30 font-semibold">
+                  ✦ AI
+                </span>
+
+                <!-- Enrolled Badge -->
+                @if (course.is_enrolled) {
+                  <div class="absolute bottom-3 right-3 bg-[#10B981]/90 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide">
+                    Enrolled
+                  </div>
+                }
+              </div>
+
+              <!-- Card Body -->
+              <div class="p-4 flex flex-col flex-grow">
+
+                <!-- Title -->
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white mb-1.5 line-clamp-2 leading-snug group-hover:text-[#0EA5E9] transition-colors">
+                  {{ course.name }}
+                </h3>
+
+                <!-- Rating -->
+                @if (course.average_rating && course.review_count && course.review_count > 0) {
+                  <div class="mb-2">
+                    <app-star-rating
+                      [rating]="course.average_rating"
+                      [interactive]="false"
+                      [size]="'sm'"
+                      [showCount]="true"
+                      [reviewCount]="course.review_count"
+                    ></app-star-rating>
+                  </div>
+                }
+
+                <!-- Description -->
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 line-clamp-2 leading-relaxed">
+                  {{ course.description }}
+                </p>
+
+                <!-- Meta Row -->
+                <div class="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400 mb-3">
+                  @if (course.difficulty_level) {
+                    <span [class]="'px-2 py-0.5 rounded-full font-semibold ' + getDifficultyColor(course.difficulty_level)">
+                      {{ course.difficulty_level }}
+                    </span>
+                  }
+                  @if (course.estimated_duration_hours) {
+                    <span class="flex items-center gap-1">
+                      <fa-icon [icon]="faClock"></fa-icon>
+                      {{ formatDuration(course.estimated_duration_hours) }}
+                    </span>
+                  }
+                  <span class="flex items-center gap-1">
+                    <fa-icon [icon]="faUsers"></fa-icon>
+                    {{ course.enrollment_count }}
+                  </span>
+                </div>
+
+                <!-- Creator -->
+                @if (course.creator_name) {
+                  <p class="text-[10px] text-slate-400 dark:text-slate-500 mb-3">By {{ course.creator_name }}</p>
+                }
+
+                <!-- CTA Button -->
+                <button
+                  (click)="viewCoursePreview(course.id); $event.stopPropagation()"
+                  class="mt-auto w-full bg-[#10B981] hover:bg-[#059669] text-white text-xs font-semibold px-4 py-2 rounded-xl transition duration-200 shadow-sm shadow-[#10B981]/20">
+                  {{ course.is_enrolled ? 'View Course' : 'Enroll Now' }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (displayedCourses.length === 0) {
+        <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-16 text-center">
+          <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-5">
+            <fa-icon [icon]="faSearch" class="text-slate-400 text-2xl"></fa-icon>
+          </div>
+          <p class="text-slate-700 dark:text-slate-300 font-semibold text-lg mb-1">No courses found</p>
+          <p class="text-slate-400 dark:text-slate-500 text-sm mb-6">Try adjusting your search or filters</p>
+          <button
+            (click)="clearFilters()"
+            class="bg-[#0EA5E9] hover:bg-[#2563EB] text-white font-medium px-6 py-2.5 rounded-xl shadow-sm shadow-[#0EA5E9]/20 transition text-sm">
+            Clear Filters
+          </button>
+        </div>
+      }
+
+      <!-- Load More -->
+      @if (hasMore && displayedCourses.length > 0) {
+        <div class="text-center mt-8">
+          <button
+            (click)="loadMore()"
+            class="border-2 border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#0EA5E9]/10 font-semibold px-8 py-2.5 rounded-xl transition duration-200 text-sm">
+            Load More Courses
+          </button>
+        </div>
+      }
+    </div>
+  }
 </div>

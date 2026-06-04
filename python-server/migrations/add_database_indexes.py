@@ -20,13 +20,13 @@ def add_database_indexes():
     """Add performance indexes to database tables"""
     try:
         from extensions import engine
-        
+
         logger.info("Starting database index creation...")
-        
+
         with engine.connect() as connection:
             # Start transaction
             trans = connection.begin()
-            
+
             try:
                 # Indexes for course table
                 indexes_to_create = [
@@ -64,53 +64,54 @@ def add_database_indexes():
                     ("idx_learning_progress_topic_id", "learning_progress", "topic_id"),
                     ("idx_learning_progress_content_id", "learning_progress", "content_id"),
                 ]
-                
+
                 for index_name, table_name, column_name in indexes_to_create:
                     try:
-                        # Check if index already exists
-                        check_query = text(f"""
-                            SELECT COUNT(*) as count 
-                            FROM information_schema.statistics 
-                            WHERE table_schema = DATABASE() 
-                            AND table_name = :table_name 
-                            AND index_name = :index_name
+                        # Check if index already exists using sys.indexes (MSSQL)
+                        check_query = text("""
+                            SELECT COUNT(*)
+                            FROM sys.indexes
+                            WHERE name = :index_name
+                            AND object_id = OBJECT_ID(:table_name)
                         """)
-                        
+
                         result = connection.execute(
                             check_query,
                             {"table_name": table_name, "index_name": index_name}
                         ).fetchone()
-                        
-                        if result[0] == 0:
-                            # Create index
+
+                        row_count = result[0] if result else 0
+
+                        if row_count == 0:
+                            # Create index — bracket table name to handle reserved words (e.g. [user])
                             create_index_query = text(f"""
-                                CREATE INDEX {index_name} 
-                                ON {table_name}({column_name})
+                                CREATE INDEX {index_name}
+                                ON [{table_name}]({column_name})
                             """)
                             connection.execute(create_index_query)
-                            logger.info(f"✓ Created index: {index_name} on {table_name}({column_name})")
+                            logger.info(f"Created index: {index_name} on {table_name}({column_name})")
                         else:
                             logger.info(f"  Index already exists: {index_name}")
-                            
+
                     except SQLAlchemyError as e:
                         # Log error but continue with other indexes
                         logger.warning(f"  Could not create index {index_name}: {str(e)}")
                         continue
-                
+
                 # Commit transaction
                 trans.commit()
-                logger.info("✓ Database index creation completed successfully")
-                
+                logger.info("Database index creation completed successfully")
+
             except Exception as e:
                 trans.rollback()
                 logger.error(f"Error during index creation, rolled back: {str(e)}")
                 raise
-                
+
     except Exception as e:
         logger.error(f"Failed to add database indexes: {str(e)}")
         # Don't raise - this is not critical for application startup
         return False
-    
+
     return True
 
 if __name__ == "__main__":

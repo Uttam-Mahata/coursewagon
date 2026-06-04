@@ -5,13 +5,13 @@ import { FaIconLibrary, FontAwesomeModule } from '@fortawesome/angular-fontaweso
 import { faEnvelope, faLock, faUser, faUserPlus, faSignInAlt, faKey, faExclamationTriangle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
     selector: 'app-auth',
     templateUrl: './auth.component.html',
     standalone: true,
-    imports: [CommonModule, RouterModule, ReactiveFormsModule, FontAwesomeModule]
+    imports: [RouterModule, ReactiveFormsModule, FontAwesomeModule]
 })
 export class AuthComponent implements OnInit {
   loginForm!: FormGroup;

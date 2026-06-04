@@ -56,7 +56,6 @@ markupsafe
 msal
 msal-extensions
 msgpack
-mysql-connector-python
 numba
 numpy
 packaging
@@ -72,13 +71,15 @@ pycparser
 pydantic
 pydantic-core
 pyjwt
-pymysql
+pymssql
 pyparsing
 python-dateutil
 python-dotenv
 python-jose
 python-multipart
 redis
+upstash-redis
+oci
 requests
 rsa
 slowapi

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -19,13 +19,12 @@ import { CourseReviewsListComponent } from '../course-reviews-list/course-review
   selector: 'app-course-preview',
   standalone: true,
   imports: [
-    CommonModule,
     RouterModule,
     FontAwesomeModule,
     StarRatingComponent,
     CourseReviewComponent,
     CourseReviewsListComponent
-  ],
+],
   templateUrl: './course-preview.component.html',
   styleUrl: './course-preview.component.css'
 })

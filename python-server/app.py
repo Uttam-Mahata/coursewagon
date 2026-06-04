@@ -29,8 +29,18 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("FastAPI application starting up")
     
-    # Run database migrations
+    # Create all tables from models (safe on existing DBs — skips existing tables)
     try:
+        from extensions import db
+        db.create_all()
+        logger.info("Database tables verified/created")
+    except Exception as e:
+        logger.error(f"Table creation failed: {str(e)}")
+
+    # Run pending migrations (already-applied ones are skipped via schema_migrations table)
+    try:
+        from extensions import db
+        from migrations import migration_tracker as mt
         from migrations.add_welcome_email_sent_column import add_welcome_email_sent_column
         from migrations.add_email_verification import run_migration as run_email_verification_migration
         from migrations.add_learner_functionality import run_all_migrations
@@ -40,18 +50,22 @@ async def lifespan(app: FastAPI):
         from migrations.add_enrollment_composite_index import add_enrollment_composite_index
         from migrations.add_gemini_api_key import add_gemini_api_key_column
 
-        add_welcome_email_sent_column()
-        run_email_verification_migration()
-        run_all_migrations()  # New learner functionality migrations
-        add_video_url_to_content()  # Add video_url to content table
-        add_database_indexes()  # Add performance indexes
-        add_enrollment_composite_index()  # Add composite index for enrollment lookups
-        run_course_reviews_migration()  # Add course reviews and ratings
-        add_gemini_api_key_column()  # BYOK: add encrypted_gemini_api_key column
-        logger.info("Database migrations completed successfully")
+        # Single DB round-trip to load applied migrations
+        with db.engine.connect() as conn:
+            mt.load(conn)
+
+        mt.run("add_welcome_email_sent_column",  add_welcome_email_sent_column)
+        mt.run("add_email_verification",          run_email_verification_migration)
+        mt.run("add_learner_functionality",       run_all_migrations)
+        mt.run("add_video_url_to_content",        add_video_url_to_content)
+        mt.run("add_database_indexes",            add_database_indexes)
+        mt.run("add_enrollment_composite_index",  add_enrollment_composite_index)
+        mt.run("add_course_reviews",              run_course_reviews_migration)
+        mt.run("add_gemini_api_key",              add_gemini_api_key_column)
+        logger.info("Migrations complete")
     except Exception as e:
-        logger.error(f"Database migration failed: {str(e)}")
-        # Don't fail startup for migration errors in production
+        logger.error(f"Migration runner failed: {str(e)}")
+        # Non-fatal — server continues
     
     # Initialize background task service
     try:
@@ -129,7 +143,7 @@ if IS_PRODUCTION:
         "https://coursewagon.live",
         "https://www.coursewagon.live",
         "https://coursewagon.web.app",
-        "https://coursewagon.alphaaiservice.com"
+        "https://coursewagon.gradientgeeks.tech"
     ]
     logger.info("CORS configured for PRODUCTION - localhost access disabled")
 else:
@@ -140,7 +154,7 @@ else:
         "https://coursewagon.live",
         "https://www.coursewagon.live",
         "https://coursewagon.web.app",
-        "https://coursewagon.alphaaiservice.com"
+        "https://coursewagon.gradientgeeks.tech"
     ]
     logger.info("CORS configured for DEVELOPMENT - localhost access enabled")
 

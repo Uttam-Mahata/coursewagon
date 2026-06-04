@@ -1,158 +1,205 @@
-<div class="container mx-auto px-4 py-8 max-w-7xl">
-  <!-- Breadcrumb -->
-  <nav class="mb-6">
-    <ol class="flex items-center space-x-2 text-sm">
-      <li class="flex items-center">
-        <a routerLink="/home" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-          <fa-icon [icon]="faHome" class="mr-1"></fa-icon> Home
+<div class="min-h-screen bg-slate-50 dark:bg-[#0F172A]">
+
+  <!-- Page Header -->
+  <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+    <div class="container mx-auto px-6 py-6 max-w-7xl">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-1.5 text-sm mb-3 flex-wrap">
+        <a routerLink="/home" class="text-[#0EA5E9] hover:underline font-medium flex items-center gap-1">
+          <fa-icon [icon]="faHome"></fa-icon> Home
         </a>
-      </li>
-      <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <a routerLink="/courses" class="text-blue-600 hover:text-blue-800 flex items-center transition duration-200">
-          <fa-icon [icon]="faBook" class="mr-1"></fa-icon> Courses
+        <span class="text-slate-400">/</span>
+        <a routerLink="/courses" class="text-[#0EA5E9] hover:underline font-medium flex items-center gap-1">
+          <fa-icon [icon]="faBook"></fa-icon> Courses
         </a>
-      </li>
-      <li class="flex items-center">
-        <span class="mx-2 text-gray-500">/</span>
-        <span class="text-gray-700 flex items-center">
-          <fa-icon [icon]="faLayerGroup" class="mr-1"></fa-icon> {{ courseName }}
+        <span class="text-slate-400">/</span>
+        <span class="text-slate-600 dark:text-slate-400 flex items-center gap-1">
+          <fa-icon [icon]="faLayerGroup"></fa-icon> {{ courseName }}
         </span>
-      </li>
-    </ol>
-  </nav>
+      </nav>
 
-  <!-- Page Title -->
-  <h1 class="text-2xl font-bold text-gray-800 mb-8">{{ courseName }}</h1>
-
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <!-- Subjects Column -->
-    <div class="lg:col-span-4">
-      <div class="bg-white rounded-xl shadow-md p-4 mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-          <div class="h-6 w-1 bg-blue-600 rounded mr-2"></div>
-          Subjects
-        </h2>
-
-        <div *ngFor="let subject of subjects" class="mb-4">
-          <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-200">
-            <h3 class="text-lg font-medium text-gray-800 mb-2">{{ subject.name }}</h3>
-            <div class="flex justify-between">
-              <!-- If chapters exist, show both View and Update buttons -->
-              <ng-container *ngIf="subject.has_chapters; else generateSubjectOnly">
-                <button 
-                  class="flex items-center bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-md text-sm transition duration-200"
-                  (click)="viewChapters(subject.id)">
-                  <fa-icon [icon]="faEye" class="mr-1.5"></fa-icon> View Chapters
-                </button>
-                <button 
-                  class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200"
-                  [disabled]="isGenerating && generatingSubjectId === subject.id"
-                  [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating && generatingSubjectId === subject.id}"
-                  (click)="generateChapters(subject.id)">
-                  <div *ngIf="isGenerating && generatingSubjectId === subject.id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-                  <fa-icon *ngIf="!(isGenerating && generatingSubjectId === subject.id)" [icon]="faMagic" class="mr-1.5"></fa-icon>
-                  {{ (isGenerating && generatingSubjectId === subject.id) ? 'Processing...' : 'Update' }}
-                </button>
-              </ng-container>
-              
-              <!-- If no chapters exist, show only Generate button -->
-              <ng-template #generateSubjectOnly>
-                <button 
-                  class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200 mx-auto"
-                  [disabled]="isGenerating && generatingSubjectId === subject.id"
-                  [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating && generatingSubjectId === subject.id}"
-                  (click)="generateChapters(subject.id)">
-                  <div *ngIf="isGenerating && generatingSubjectId === subject.id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-                  <fa-icon *ngIf="!(isGenerating && generatingSubjectId === subject.id)" [icon]="faMagic" class="mr-1.5"></fa-icon>
-                  {{ (isGenerating && generatingSubjectId === subject.id) ? 'Processing...' : 'Generate Chapters' }}
-                </button>
-              </ng-template>
-            </div>
-          </div>
-        </div>
+      <div>
+        <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">{{ courseName }}</h1>
+        <p class="text-slate-500 text-sm mt-1">Subjects, chapters, and topics</p>
       </div>
     </div>
+  </div>
 
-    <!-- Chapters and Topics Column -->
-    <div class="lg:col-span-8">
-      <!-- Chapters Section -->
-      <div class="bg-white rounded-xl shadow-md p-4 mb-6" id="chaptersSection">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-          <div class="h-6 w-1 bg-blue-600 rounded mr-2"></div>
-          {{ selectedSubjectName ? selectedSubjectName + ' Chapters' : 'Chapters' }}
-        </h2>
-        
-        <!-- No selection info -->
-        <div *ngIf="chapters.length === 0 && !selectedSubjectId" class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md flex items-center">
-          <fa-icon [icon]="faInfoCircle" class="text-blue-600 mr-3 text-lg"></fa-icon>
-          <p class="text-blue-700">Please select a subject to view its chapters.</p>
-        </div>
+  <div class="container mx-auto px-6 py-8 max-w-7xl">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- Chapters Grid -->
-        <div *ngIf="chapters.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div *ngFor="let chapter of chapters" class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-lg overflow-hidden hover:shadow-md transition duration-200">
-            <div class="p-5">
-              <h3 class="text-lg font-medium text-gray-800 mb-2">{{ chapter.name }}</h3>
-              <div class="flex justify-between">
-                <!-- If topics exist, show both View and Update buttons -->
-                <ng-container *ngIf="chapter.has_topics; else generateChapterOnly">
-                  <button 
-                    class="flex items-center bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-md text-sm transition duration-200"
-                    (click)="viewTopics(chapter.id)">
-                    <fa-icon [icon]="faBookOpen" class="mr-1.5"></fa-icon> View Topics
-                  </button>
-                  <button 
-                    class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200"
-                    [disabled]="isGenerating && generatingChapterId === chapter.id"
-                    [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating && generatingChapterId === chapter.id}"
-                    (click)="generateTopics(chapter.id)">
-                    <div *ngIf="isGenerating && generatingChapterId === chapter.id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-                    <fa-icon *ngIf="!(isGenerating && generatingChapterId === chapter.id)" [icon]="faMagic" class="mr-1.5"></fa-icon> 
-                    {{ (isGenerating && generatingChapterId === chapter.id) ? 'Processing...' : 'Update Topics' }}
-                  </button>
-                </ng-container>
-                
-                <!-- If no topics exist, show only Generate button -->
-                <ng-template #generateChapterOnly>
-                  <button 
-                    class="flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-md text-sm transition duration-200 mx-auto"
-                    [disabled]="isGenerating && generatingChapterId === chapter.id"
-                    [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating && generatingChapterId === chapter.id}"
-                    (click)="generateTopics(chapter.id)">
-                    <div *ngIf="isGenerating && generatingChapterId === chapter.id" class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1.5"></div>
-                    <fa-icon *ngIf="!(isGenerating && generatingChapterId === chapter.id)" [icon]="faMagic" class="mr-1.5"></fa-icon> 
-                    {{ (isGenerating && generatingChapterId === chapter.id) ? 'Processing...' : 'Generate Topics' }}
-                  </button>
-                </ng-template>
-              </div>
+      <!-- Subjects Column -->
+      <div class="lg:col-span-4">
+        <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+          <div class="h-0.5 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB]"></div>
+          <div class="p-5">
+            <h2 class="text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <div class="w-1 h-5 bg-gradient-to-b from-[#0EA5E9] to-[#2563EB] rounded-full"></div>
+              Subjects
+            </h2>
+
+            <div class="space-y-3">
+              @for (subject of subjects; track subject; let i = $index) {
+                <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-700/50 p-4 hover:border-[#0EA5E9]/30 hover:shadow-md transition-all duration-200">
+                  <div class="flex items-start gap-3 mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-[#0EA5E9]/10 text-[#0EA5E9] flex items-center justify-center font-bold shrink-0 text-xs">
+                      {{ (i + 1).toString().padStart(2, '0') }}
+                    </div>
+                    <h3 class="font-semibold text-slate-800 dark:text-white text-sm leading-snug">{{ subject.name }}</h3>
+                  </div>
+                  <div class="flex gap-2">
+                    @if (subject.has_chapters) {
+                      <button
+                        class="flex-1 flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 border border-[#0EA5E9]/30 text-[#0EA5E9] hover:bg-[#0EA5E9]/5 px-3 py-2 rounded-xl text-xs font-semibold transition-all"
+                        (click)="viewChapters(subject.id)">
+                        <fa-icon [icon]="faEye"></fa-icon> View Chapters
+                      </button>
+                      <button
+                        class="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-md shadow-[#0EA5E9]/20"
+                        [disabled]="isGenerating && generatingSubjectId === subject.id"
+                        [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating && generatingSubjectId === subject.id}"
+                        (click)="generateChapters(subject.id)">
+                        @if (isGenerating && generatingSubjectId === subject.id) {
+                          <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white"></div>
+                        }
+                        @if (!(isGenerating && generatingSubjectId === subject.id)) {
+                          <fa-icon [icon]="faMagic"></fa-icon>
+                        }
+                        {{ (isGenerating && generatingSubjectId === subject.id) ? 'Updating...' : 'Update' }}
+                      </button>
+                    } @else {
+                      <button
+                        class="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-md shadow-[#0EA5E9]/20"
+                        [disabled]="isGenerating && generatingSubjectId === subject.id"
+                        [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating && generatingSubjectId === subject.id}"
+                        (click)="generateChapters(subject.id)">
+                        @if (isGenerating && generatingSubjectId === subject.id) {
+                          <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white"></div>
+                        }
+                        @if (!(isGenerating && generatingSubjectId === subject.id)) {
+                          <fa-icon [icon]="faMagic"></fa-icon>
+                        }
+                        {{ (isGenerating && generatingSubjectId === subject.id) ? 'Generating...' : 'Generate Chapters' }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
             </div>
           </div>
         </div>
       </div>
-      
-      <!-- Topics Section - Only visible when topics are available -->
-      <div *ngIf="showTopics && selectedChapterId && topics[selectedChapterId] && topics[selectedChapterId].length > 0" 
-           class="bg-white rounded-xl shadow-md p-4" id="topicsSection">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-          <div class="h-6 w-1 bg-green-600 rounded mr-2"></div>
-          {{ selectedChapterName }} Topics
-        </h2>
-        
-        <!-- Topics List -->
-        <div class="divide-y divide-gray-200">
-          <div *ngFor="let topic of topics[selectedChapterId]" 
-               class="py-3 hover:bg-gray-50 rounded px-3 transition-all cursor-pointer"
-               (click)="viewContent(topic.id)">
-            <div class="flex justify-between items-center">
-              <div class="flex items-center">
-                <div class="h-2 w-2 rounded-full bg-indigo-500 mr-3"></div>
-                <h3 class="font-medium text-gray-800">{{ topic.name }}</h3>
+
+      <!-- Chapters and Topics Column -->
+      <div class="lg:col-span-8 space-y-6">
+
+        <!-- Chapters Section -->
+        <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden" id="chaptersSection">
+          <div class="h-0.5 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB]"></div>
+          <div class="p-5">
+            <h2 class="text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <div class="w-1 h-5 bg-gradient-to-b from-[#0EA5E9] to-[#2563EB] rounded-full"></div>
+              {{ selectedSubjectName ? selectedSubjectName + ' — Chapters' : 'Chapters' }}
+            </h2>
+
+            <!-- Empty / no selection state -->
+            @if (chapters.length === 0 && !selectedSubjectId) {
+              <div class="flex flex-col items-center justify-center py-12 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-[#0EA5E9]/10 flex items-center justify-center mb-3">
+                  <fa-icon [icon]="faInfoCircle" class="text-[#0EA5E9] text-xl"></fa-icon>
+                </div>
+                <p class="text-slate-500 text-sm">Select a subject on the left to view its chapters.</p>
               </div>
-              <fa-icon [icon]="faChevronRight" class="text-gray-400"></fa-icon>
-            </div>
+            }
+
+            <!-- Chapters Grid -->
+            @if (chapters.length > 0) {
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @for (chapter of chapters; track chapter; let i = $index) {
+                  <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-700/50 overflow-hidden hover:border-[#0EA5E9]/30 hover:shadow-md transition-all duration-200 group">
+                    <div class="h-0.5 bg-gradient-to-r from-[#0EA5E9]/40 to-[#2563EB]/40 group-hover:from-[#0EA5E9] group-hover:to-[#2563EB] transition-all"></div>
+                    <div class="p-4">
+                      <div class="flex items-start gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center font-bold shrink-0 text-xs">
+                          {{ (i + 1).toString().padStart(2, '0') }}
+                        </div>
+                        <h3 class="font-semibold text-slate-800 dark:text-white text-sm leading-snug">{{ chapter.name }}</h3>
+                      </div>
+                      <div class="flex gap-2">
+                        @if (chapter.has_topics) {
+                          <button
+                            class="flex-1 flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 border border-[#0EA5E9]/30 text-[#0EA5E9] hover:bg-[#0EA5E9]/5 px-3 py-2 rounded-xl text-xs font-semibold transition-all"
+                            (click)="viewTopics(chapter.id)">
+                            <fa-icon [icon]="faBookOpen"></fa-icon> View Topics
+                          </button>
+                          <button
+                            class="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-md shadow-[#0EA5E9]/20"
+                            [disabled]="isGenerating && generatingChapterId === chapter.id"
+                            [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating && generatingChapterId === chapter.id}"
+                            (click)="generateTopics(chapter.id)">
+                            @if (isGenerating && generatingChapterId === chapter.id) {
+                              <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white"></div>
+                            }
+                            @if (!(isGenerating && generatingChapterId === chapter.id)) {
+                              <fa-icon [icon]="faMagic"></fa-icon>
+                            }
+                            {{ (isGenerating && generatingChapterId === chapter.id) ? 'Updating...' : 'Update Topics' }}
+                          </button>
+                        } @else {
+                          <button
+                            class="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] hover:from-[#2563EB] hover:to-[#0EA5E9] text-white px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-md shadow-[#0EA5E9]/20"
+                            [disabled]="isGenerating && generatingChapterId === chapter.id"
+                            [ngClass]="{'opacity-70 cursor-not-allowed': isGenerating && generatingChapterId === chapter.id}"
+                            (click)="generateTopics(chapter.id)">
+                            @if (isGenerating && generatingChapterId === chapter.id) {
+                              <div class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white"></div>
+                            }
+                            @if (!(isGenerating && generatingChapterId === chapter.id)) {
+                              <fa-icon [icon]="faMagic"></fa-icon>
+                            }
+                            {{ (isGenerating && generatingChapterId === chapter.id) ? 'Generating...' : 'Generate Topics' }}
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
           </div>
         </div>
+
+        <!-- Topics Section -->
+        @if (showTopics && selectedChapterId && topics[selectedChapterId] && topics[selectedChapterId].length > 0) {
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden" id="topicsSection">
+            <div class="h-0.5 bg-gradient-to-r from-[#10B981] to-[#059669]"></div>
+            <div class="p-5">
+              <h2 class="text-base font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                <div class="w-1 h-5 bg-gradient-to-b from-[#10B981] to-[#059669] rounded-full"></div>
+                {{ selectedChapterName }} — Topics
+              </h2>
+              <div class="divide-y divide-slate-100 dark:divide-slate-700/50">
+                @for (topic of topics[selectedChapterId]; track topic; let i = $index) {
+                  <div
+                    class="py-3 px-3 hover:bg-slate-50 dark:hover:bg-slate-700/30 rounded-xl transition-all cursor-pointer group/topic"
+                    (click)="viewContent(topic.id)">
+                    <div class="flex justify-between items-center gap-3">
+                      <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded-lg bg-[#10B981]/10 text-[#10B981] flex items-center justify-center text-xs font-bold shrink-0">
+                          {{ i + 1 }}
+                        </div>
+                        <h3 class="font-medium text-slate-800 dark:text-white text-sm">{{ topic.name }}</h3>
+                      </div>
+                      <fa-icon [icon]="faChevronRight" class="text-slate-300 dark:text-slate-600 group-hover/topic:text-[#0EA5E9] transition-colors text-xs shrink-0"></fa-icon>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
       </div>
     </div>
   </div>

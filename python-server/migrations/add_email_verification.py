@@ -17,28 +17,29 @@ def add_email_verification_to_user_table():
     try:
         # Check if email_verified column already exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'user'
+            WHERE TABLE_NAME = 'user'
             AND COLUMN_NAME = 'email_verified'
         """))
 
-        column_exists = result.fetchone().count > 0
+        row = result.fetchone()
+        count = row[0] if row else 0
+        column_exists = count > 0
 
         if not column_exists:
             logger.info("Adding email_verified column to user table...")
 
-            # Add the email_verified column with default value False
+            # Add the email_verified column with default value 0 (False)
             session.execute(text("""
-                ALTER TABLE user
-                ADD COLUMN email_verified BOOLEAN DEFAULT FALSE NOT NULL
+                ALTER TABLE [user]
+                ADD email_verified BIT DEFAULT 0 NOT NULL
             """))
 
             # Mark existing users as verified (they're already active)
             session.execute(text("""
-                UPDATE user
-                SET email_verified = TRUE
+                UPDATE [user]
+                SET email_verified = 1
             """))
 
             session.commit()
@@ -48,22 +49,23 @@ def add_email_verification_to_user_table():
 
         # Check if email_verification_sent_at column already exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'user'
+            WHERE TABLE_NAME = 'user'
             AND COLUMN_NAME = 'email_verification_sent_at'
         """))
 
-        column_exists = result.fetchone().count > 0
+        row = result.fetchone()
+        count = row[0] if row else 0
+        column_exists = count > 0
 
         if not column_exists:
             logger.info("Adding email_verification_sent_at column to user table...")
 
             # Add the email_verification_sent_at column
             session.execute(text("""
-                ALTER TABLE user
-                ADD COLUMN email_verification_sent_at DATETIME NULL
+                ALTER TABLE [user]
+                ADD email_verification_sent_at DATETIME NULL
             """))
 
             session.commit()
@@ -84,31 +86,46 @@ def create_email_verification_table():
     try:
         # Check if table already exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'email_verification'
+            WHERE TABLE_NAME = 'email_verification'
         """))
 
-        table_exists = result.fetchone().count > 0
+        row = result.fetchone()
+        count = row[0] if row else 0
+        table_exists = count > 0
 
         if not table_exists:
             logger.info("Creating email_verification table...")
 
             # Create the table
             session.execute(text("""
+                IF OBJECT_ID('email_verification', 'U') IS NULL
                 CREATE TABLE email_verification (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    id INT IDENTITY(1,1) PRIMARY KEY,
                     user_id INT NOT NULL,
-                    token VARCHAR(255) NOT NULL UNIQUE,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    token NVARCHAR(255) NOT NULL UNIQUE,
+                    created_at DATETIME DEFAULT GETDATE(),
                     expires_at DATETIME NOT NULL,
-                    used BOOLEAN DEFAULT FALSE,
-                    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-                    INDEX idx_token (token),
-                    INDEX idx_user_id (user_id),
-                    INDEX idx_expires_at (expires_at)
+                    used BIT DEFAULT 0,
+                    FOREIGN KEY (user_id) REFERENCES [user](id) ON DELETE CASCADE
                 )
+            """))
+
+            # Create indexes separately (MSSQL does not support inline INDEX in CREATE TABLE)
+            session.execute(text("""
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'idx_ev_token' AND object_id = OBJECT_ID('email_verification'))
+                    CREATE INDEX idx_ev_token ON email_verification(token)
+            """))
+
+            session.execute(text("""
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'idx_ev_user_id' AND object_id = OBJECT_ID('email_verification'))
+                    CREATE INDEX idx_ev_user_id ON email_verification(user_id)
+            """))
+
+            session.execute(text("""
+                IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'idx_ev_expires_at' AND object_id = OBJECT_ID('email_verification'))
+                    CREATE INDEX idx_ev_expires_at ON email_verification(expires_at)
             """))
 
             session.commit()

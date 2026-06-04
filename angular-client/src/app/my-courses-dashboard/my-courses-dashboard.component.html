@@ -1,351 +1,372 @@
-<div class="container mx-auto px-4 py-8 max-w-7xl">
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-    <div>
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white flex items-center">
-        <fa-icon [icon]="faChartLine" class="mr-3 text-blue-600 dark:text-blue-400"></fa-icon>
-        My Courses Dashboard
-      </h1>
-      <p class="text-gray-600 dark:text-gray-300 mt-2">Track your course creation progress</p>
-    </div>
-    <button
-      (click)="createNewCourse()"
-      class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white px-6 py-3 rounded-lg flex items-center transition duration-200 shadow-md w-full md:w-auto">
-      <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>
-      Create New Course
-    </button>
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="loading" class="flex justify-center items-center py-20">
-    <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 dark:border-blue-400"></div>
-  </div>
-
-  <!-- Error State -->
-  <div *ngIf="error && !loading" class="bg-red-100 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 text-red-700 dark:text-red-300 p-4 rounded-md mb-6">
-    <p>{{ error }}</p>
-    <button
-      (click)="loadStatistics()"
-      class="mt-2 text-sm underline hover:text-red-900 dark:hover:text-red-200">
-      Retry
-    </button>
-  </div>
-
-  <!-- Dashboard Content -->
-  <div *ngIf="!loading && !error && stats">
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-      <!-- Courses Card -->
-      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
-        <div class="flex items-center justify-between mb-3">
-          <fa-icon [icon]="faBook" size="2x" class="opacity-80"></fa-icon>
-          <span class="text-3xl font-bold">{{ stats.total_courses }}</span>
+<div class="min-h-screen bg-slate-50 dark:bg-[#0F172A]">
+  <!-- Page Header Banner -->
+  <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-[#0EA5E9] mb-1">Creator Studio</p>
+          <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Dashboard</h1>
+          <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm">Track your course creation progress</p>
         </div>
-        <div class="text-sm opacity-90">Total Courses</div>
-      </div>
-
-      <!-- Subjects Card -->
-      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
-        <div class="flex items-center justify-between mb-3">
-          <fa-icon [icon]="faBookOpen" size="2x" class="opacity-80"></fa-icon>
-          <span class="text-3xl font-bold">{{ stats.total_subjects }}</span>
-        </div>
-        <div class="text-sm opacity-90">Total Subjects</div>
-      </div>
-
-      <!-- Chapters Card -->
-      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
-        <div class="flex items-center justify-between mb-3">
-          <fa-icon [icon]="faBookmark" size="2x" class="opacity-80"></fa-icon>
-          <span class="text-3xl font-bold">{{ stats.total_chapters }}</span>
-        </div>
-        <div class="text-sm opacity-90">Total Chapters</div>
-      </div>
-
-      <!-- Topics Card -->
-      <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
-        <div class="flex items-center justify-between mb-3">
-          <fa-icon [icon]="faListUl" size="2x" class="opacity-80"></fa-icon>
-          <span class="text-3xl font-bold">{{ stats.total_topics }}</span>
-        </div>
-        <div class="text-sm opacity-90">Total Topics</div>
-      </div>
-
-      <!-- Content Card -->
-      <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg p-6 text-white sm:col-span-2 lg:col-span-1">
-        <div class="flex items-center justify-between mb-3">
-          <fa-icon [icon]="faFileAlt" size="2x" class="opacity-80"></fa-icon>
-          <span class="text-3xl font-bold">{{ stats.total_content }}</span>
-        </div>
-        <div class="text-sm opacity-90">Total Content</div>
-      </div>
-    </div>
-
-    <!-- Courses Breakdown Table -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
-      <div class="px-6 py-4 bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
-        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Course Details</h2>
-      </div>
-
-      <!-- Empty State -->
-      <div *ngIf="stats.courses_with_details.length === 0" class="p-12 text-center">
-        <fa-icon [icon]="faBook" size="3x" class="text-gray-300 dark:text-gray-600 mb-4"></fa-icon>
-        <p class="text-gray-500 dark:text-gray-400 text-lg mb-4">You haven't created any courses yet</p>
         <button
           (click)="createNewCourse()"
-          class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white px-6 py-3 rounded-lg inline-flex items-center transition duration-200">
-          <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>
-          Create Your First Course
+          class="bg-[#0EA5E9] hover:bg-[#2563EB] text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-[#0EA5E9]/20 flex items-center gap-2 transition-all hover:scale-[1.02]">
+          <fa-icon [icon]="faPlus"></fa-icon>
+          <span class="hidden sm:inline">Create New Course</span>
+          <span class="sm:hidden">New</span>
         </button>
       </div>
+    </div>
+  </div>
 
-      <!-- Courses Table - Desktop -->
-      <div *ngIf="stats.courses_with_details.length > 0" class="hidden md:block overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-          <thead class="bg-gray-50 dark:bg-slate-700">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Course
-              </th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Content Stats
-              </th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Progress
-              </th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Status
-              </th>
-              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
-            <tr *ngFor="let course of stats.courses_with_details" class="hover:bg-gray-50 dark:hover:bg-slate-700 transition duration-150">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0 h-12 w-12 mr-4">
-                    <div *ngIf="course.image_url" class="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden">
-                      <img [src]="course.image_url" [alt]="course.course_name" class="w-full h-full object-cover">
-                    </div>
-                    <div *ngIf="!course.image_url" class="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                      <fa-icon [icon]="faBook" class="text-white"></fa-icon>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ course.course_name }}</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">Created: {{ course.created_at | date:'short' }}</div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <div class="flex flex-col gap-1">
-                  <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
-                    {{ course.subjects_count }} Subjects
-                  </span>
-                  <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-semibold text-purple-800 bg-purple-100 rounded-full">
-                    {{ course.chapters_count }} Chapters
-                  </span>
-                  <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-semibold text-orange-800 bg-orange-100 rounded-full">
-                    {{ course.topics_count }} Topics
-                  </span>
-                  <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-semibold text-pink-800 bg-pink-100 rounded-full">
-                    {{ course.content_count }} Content
-                  </span>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex flex-col items-center">
-                  <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ getProgressPercentage(course) }}%</div>
-                  <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-                    <div
-                      [class]="getProgressColor(getProgressPercentage(course)) + ' h-2 rounded-full transition-all duration-500'"
-                      [style.width.%]="getProgressPercentage(course)">
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <span *ngIf="course.is_published"
-                      class="inline-flex items-center px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
-                  <fa-icon [icon]="faGlobe" class="mr-1"></fa-icon>
-                  Published
-                </span>
-                <span *ngIf="!course.is_published"
-                      class="inline-flex items-center px-3 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">
-                  <fa-icon [icon]="faLock" class="mr-1"></fa-icon>
-                  Draft
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <div class="flex flex-col sm:flex-row gap-2 justify-center">
-                  <button
-                    (click)="viewCourse(course.course_id)"
-                    class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
-                    <fa-icon [icon]="faEye" class="mr-2"></fa-icon>
-                    View
-                  </button>
-                  <button *ngIf="!course.is_published"
-                    (click)="openPublishModal(course)"
-                    class="bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
-                    <fa-icon [icon]="faGlobe" class="mr-2"></fa-icon>
-                    Publish
-                  </button>
-                  <button *ngIf="course.is_published"
-                    (click)="unpublishCourse(course.course_id)"
-                    [disabled]="isPublishing(course.course_id)"
-                    class="bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-800 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
-                    <fa-icon *ngIf="isPublishing(course.course_id)" [icon]="faSpinner" animation="spin" class="mr-2"></fa-icon>
-                    <fa-icon *ngIf="!isPublishing(course.course_id)" [icon]="faLock" class="mr-2"></fa-icon>
-                    Unpublish
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Courses Cards - Mobile -->
-      <div *ngIf="stats.courses_with_details.length > 0" class="md:hidden space-y-4 px-4">
-        <div *ngFor="let course of stats.courses_with_details" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-md p-4">
-          <!-- Course Header -->
-          <div class="flex items-center mb-4">
-            <div class="flex-shrink-0 h-12 w-12 mr-4">
-              <div *ngIf="course.image_url" class="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden">
-                <img [src]="course.image_url" [alt]="course.course_name" class="w-full h-full object-cover">
-              </div>
-              <div *ngIf="!course.image_url" class="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                <fa-icon [icon]="faBook" class="text-white"></fa-icon>
-              </div>
-            </div>
-            <div>
-              <div class="text-sm font-medium text-gray-900 dark:text-white">{{ course.course_name }}</div>
-              <div class="text-xs text-gray-500 dark:text-gray-400">Created: {{ course.created_at | date:'short' }}</div>
-            </div>
-          </div>
-
-          <!-- Progress -->
-          <div class="mb-4">
-            <div class="flex justify-between items-center mb-1">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
-              <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ getProgressPercentage(course) }}%</span>
-            </div>
-            <div class="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2">
-              <div
-                [class]="getProgressColor(getProgressPercentage(course)) + ' h-2 rounded-full transition-all duration-500'"
-                [style.width.%]="getProgressPercentage(course)">
-              </div>
-            </div>
-          </div>
-
-          <!-- Status -->
-          <div class="mb-4">
-            <span *ngIf="course.is_published"
-                  class="inline-flex items-center px-3 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
-              <fa-icon [icon]="faGlobe" class="mr-1"></fa-icon>
-              Published
-            </span>
-            <span *ngIf="!course.is_published"
-                  class="inline-flex items-center px-3 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">
-              <fa-icon [icon]="faLock" class="mr-1"></fa-icon>
-              Draft
-            </span>
-          </div>
-
-          <!-- Content Stats -->
-          <div class="grid grid-cols-2 gap-2 text-xs mb-4">
-            <span class="inline-flex items-center justify-center px-2 py-1 font-semibold text-green-800 bg-green-100 rounded-full">
-              {{ course.subjects_count }} Subjects
-            </span>
-            <span class="inline-flex items-center justify-center px-2 py-1 font-semibold text-purple-800 bg-purple-100 rounded-full">
-              {{ course.chapters_count }} Chapters
-            </span>
-            <span class="inline-flex items-center justify-center px-2 py-1 font-semibold text-orange-800 bg-orange-100 rounded-full">
-              {{ course.topics_count }} Topics
-            </span>
-            <span class="inline-flex items-center justify-center px-2 py-1 font-semibold text-pink-800 bg-pink-100 rounded-full">
-              {{ course.content_count }} Content
-            </span>
-          </div>
-
-          <!-- Actions -->
-          <div class="flex flex-col sm:flex-row gap-2 justify-center">
-            <button
-              (click)="viewCourse(course.course_id)"
-              class="bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
-              <fa-icon [icon]="faEye" class="mr-2"></fa-icon>
-              View
-            </button>
-            <button *ngIf="!course.is_published"
-              (click)="openPublishModal(course)"
-              class="bg-green-600 dark:bg-green-700 hover:bg-green-700 dark:hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
-              <fa-icon [icon]="faGlobe" class="mr-2"></fa-icon>
-              Publish
-            </button>
-            <button *ngIf="course.is_published"
-              (click)="unpublishCourse(course.course_id)"
-              [disabled]="isPublishing(course.course_id)"
-              class="bg-gray-600 dark:bg-gray-700 hover:bg-gray-700 dark:hover:bg-gray-800 disabled:bg-gray-400 dark:disabled:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center justify-center transition duration-200">
-              <fa-icon *ngIf="isPublishing(course.course_id)" [icon]="faSpinner" animation="spin" class="mr-2"></fa-icon>
-              <fa-icon *ngIf="!isPublishing(course.course_id)" [icon]="faLock" class="mr-2"></fa-icon>
-              Unpublish
-            </button>
-          </div>
+  <div class="container mx-auto px-6 py-8 max-w-7xl">
+    <!-- Loading State -->
+    @if (loading) {
+      <div class="flex justify-center items-center py-24">
+        <div class="flex flex-col items-center gap-4">
+          <div class="animate-spin rounded-full h-14 w-14 border-t-2 border-b-2 border-[#0EA5E9]"></div>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Loading your dashboard…</p>
         </div>
       </div>
-    </div>
+    }
+
+    <!-- Error State -->
+    @if (error && !loading) {
+      <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded-xl mb-8 flex items-center gap-3">
+        <p class="text-red-700 dark:text-red-300 text-sm flex-1">{{ error }}</p>
+        <button
+          (click)="loadStatistics()"
+          class="text-sm font-semibold text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200 underline shrink-0">
+          Retry
+        </button>
+      </div>
+    }
+
+    <!-- Dashboard Content -->
+    @if (!loading && !error && stats) {
+      <div>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
+          <!-- Courses -->
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-[#0EA5E9]/10 text-[#0EA5E9] flex items-center justify-center text-xl shrink-0">
+              <fa-icon [icon]="faBook"></fa-icon>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ stats.total_courses }}</div>
+              <div class="text-sm text-slate-500">Total Courses</div>
+            </div>
+          </div>
+          <!-- Subjects -->
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-[#10B981]/10 text-[#10B981] flex items-center justify-center text-xl shrink-0">
+              <fa-icon [icon]="faBookOpen"></fa-icon>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ stats.total_subjects }}</div>
+              <div class="text-sm text-slate-500">Total Subjects</div>
+            </div>
+          </div>
+          <!-- Chapters -->
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-[#10B981]/10 text-[#10B981] flex items-center justify-center text-xl shrink-0">
+              <fa-icon [icon]="faBookmark"></fa-icon>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ stats.total_chapters }}</div>
+              <div class="text-sm text-slate-500">Total Chapters</div>
+            </div>
+          </div>
+          <!-- Topics -->
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-[#10B981]/10 text-[#10B981] flex items-center justify-center text-xl shrink-0">
+              <fa-icon [icon]="faListUl"></fa-icon>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ stats.total_topics }}</div>
+              <div class="text-sm text-slate-500">Total Topics</div>
+            </div>
+          </div>
+          <!-- AI Content -->
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-6 flex items-center gap-4 sm:col-span-2 lg:col-span-1">
+            <div class="w-12 h-12 rounded-xl bg-[#FBBF24]/10 text-[#F59E0B] flex items-center justify-center text-xl shrink-0">
+              <fa-icon [icon]="faFileAlt"></fa-icon>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ stats.total_content }}</div>
+              <div class="text-sm text-slate-500">AI Content</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Course Details Table -->
+        <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+          <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-extrabold text-slate-900 dark:text-white">Course Details</h2>
+              <p class="text-xs text-slate-500 mt-0.5">All courses and their content breakdown</p>
+            </div>
+            <span class="text-xs font-bold text-[#0EA5E9] bg-[#0EA5E9]/10 px-3 py-1.5 rounded-full">{{ stats.courses_with_details.length }} courses</span>
+          </div>
+
+          <!-- Empty State -->
+          @if (stats.courses_with_details.length === 0) {
+            <div class="p-16 text-center">
+              <div class="w-16 h-16 rounded-2xl bg-[#0EA5E9]/10 text-[#0EA5E9] flex items-center justify-center text-3xl mx-auto mb-5">
+                <fa-icon [icon]="faBook"></fa-icon>
+              </div>
+              <p class="text-slate-900 dark:text-white font-bold text-lg mb-2">No courses yet</p>
+              <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Create your first course to see details here</p>
+              <button
+                (click)="createNewCourse()"
+                class="bg-[#0EA5E9] hover:bg-[#2563EB] text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-[#0EA5E9]/20 inline-flex items-center gap-2 transition-all hover:scale-[1.02]">
+                <fa-icon [icon]="faPlus"></fa-icon>
+                Create Your First Course
+              </button>
+            </div>
+          }
+
+          <!-- Desktop Table -->
+          @if (stats.courses_with_details.length > 0) {
+            <div class="hidden md:block overflow-x-auto">
+              <table class="min-w-full">
+                <thead>
+                  <tr class="bg-slate-50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-700/50">
+                    <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Course</th>
+                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Content</th>
+                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Progress</th>
+                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-700/50">
+                  @for (course of stats.courses_with_details; track course) {
+                    <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors duration-150">
+                      <!-- Course name & image -->
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-4">
+                          <div class="shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-[#0EA5E9] to-[#2563EB] flex items-center justify-center">
+                            @if (course.image_url) {
+                              <img [src]="course.image_url" [alt]="course.course_name" class="w-full h-full object-cover">
+                            }
+                            @if (!course.image_url) {
+                              <fa-icon [icon]="faBook" class="text-white text-sm"></fa-icon>
+                            }
+                          </div>
+                          <div>
+                            <div class="text-sm font-bold text-slate-900 dark:text-white">{{ course.course_name }}</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ course.created_at | date:'mediumDate' }}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <!-- Stats badges -->
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="flex flex-col gap-1.5 items-center">
+                          <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-[#10B981] bg-[#10B981]/10 rounded-full">{{ course.subjects_count }} Subjects</span>
+                          <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-[#10B981] bg-[#10B981]/10 rounded-full">{{ course.chapters_count }} Chapters</span>
+                          <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-[#10B981] bg-[#10B981]/10 rounded-full">{{ course.topics_count }} Topics</span>
+                          <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-semibold text-[#F59E0B] bg-[#FBBF24]/10 rounded-full">{{ course.content_count }} Content</span>
+                        </div>
+                      </td>
+                      <!-- Progress bar -->
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex flex-col items-center min-w-[100px]">
+                          <div class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1.5">{{ getProgressPercentage(course) }}%</div>
+                          <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+                            <div
+                              class="bg-[#10B981] h-1.5 rounded-full transition-all duration-500"
+                              [style.width.%]="getProgressPercentage(course)">
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <!-- Status badge -->
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        @if (course.is_published) {
+                          <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-[#10B981] bg-[#10B981]/10 rounded-full">
+                            <fa-icon [icon]="faGlobe"></fa-icon> Published
+                          </span>
+                        }
+                        @if (!course.is_published) {
+                          <span class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-700 dark:text-slate-400 rounded-full">
+                            <fa-icon [icon]="faLock"></fa-icon> Draft
+                          </span>
+                        }
+                      </td>
+                      <!-- Action buttons -->
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="flex items-center justify-center gap-2">
+                          <button
+                            (click)="viewCourse(course.course_id)"
+                            class="bg-[#0EA5E9] hover:bg-[#2563EB] text-white px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-sm shadow-[#0EA5E9]/20 transition-all hover:shadow-md">
+                            <fa-icon [icon]="faEye"></fa-icon> View
+                          </button>
+                          @if (!course.is_published) {
+                            <button
+                              (click)="openPublishModal(course)"
+                              class="bg-[#10B981] hover:bg-[#059669] text-white px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-sm shadow-[#10B981]/20 transition-all hover:shadow-md">
+                              <fa-icon [icon]="faGlobe"></fa-icon> Publish
+                            </button>
+                          }
+                          @if (course.is_published) {
+                            <button
+                              (click)="unpublishCourse(course.course_id)"
+                              [disabled]="isPublishing(course.course_id)"
+                              class="bg-slate-600 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-all">
+                              @if (isPublishing(course.course_id)) {
+                                <fa-icon [icon]="faSpinner" animation="spin"></fa-icon>
+                              }
+                              @if (!isPublishing(course.course_id)) {
+                                <fa-icon [icon]="faLock"></fa-icon>
+                              }
+                              Unpublish
+                            </button>
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+
+          <!-- Mobile Cards -->
+          @if (stats.courses_with_details.length > 0) {
+            <div class="md:hidden divide-y divide-slate-100 dark:divide-slate-700/50">
+              @for (course of stats.courses_with_details; track course) {
+                <div class="p-5">
+                  <!-- Course header -->
+                  <div class="flex items-center gap-3 mb-4">
+                    <div class="shrink-0 w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-[#0EA5E9] to-[#2563EB] flex items-center justify-center">
+                      @if (course.image_url) {
+                        <img [src]="course.image_url" [alt]="course.course_name" class="w-full h-full object-cover">
+                      }
+                      @if (!course.image_url) {
+                        <fa-icon [icon]="faBook" class="text-white text-sm"></fa-icon>
+                      }
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <div class="text-sm font-bold text-slate-900 dark:text-white truncate">{{ course.course_name }}</div>
+                      <div class="text-xs text-slate-500 mt-0.5">{{ course.created_at | date:'mediumDate' }}</div>
+                    </div>
+                    @if (course.is_published) {
+                      <span class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-[#10B981] bg-[#10B981]/10 rounded-full">
+                        <fa-icon [icon]="faGlobe"></fa-icon> Live
+                      </span>
+                    }
+                    @if (!course.is_published) {
+                      <span class="shrink-0 inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-700 dark:text-slate-400 rounded-full">
+                        <fa-icon [icon]="faLock"></fa-icon> Draft
+                      </span>
+                    }
+                  </div>
+                  <!-- Progress -->
+                  <div class="mb-4">
+                    <div class="flex justify-between items-center mb-1.5">
+                      <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Progress</span>
+                      <span class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ getProgressPercentage(course) }}%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+                      <div
+                        class="bg-[#10B981] h-1.5 rounded-full transition-all duration-500"
+                        [style.width.%]="getProgressPercentage(course)">
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Stats badges -->
+                  <div class="grid grid-cols-2 gap-2 mb-4">
+                    <span class="flex items-center justify-center px-2 py-1.5 text-xs font-semibold text-[#10B981] bg-[#10B981]/10 rounded-xl">{{ course.subjects_count }} Subjects</span>
+                    <span class="flex items-center justify-center px-2 py-1.5 text-xs font-semibold text-[#10B981] bg-[#10B981]/10 rounded-xl">{{ course.chapters_count }} Chapters</span>
+                    <span class="flex items-center justify-center px-2 py-1.5 text-xs font-semibold text-[#10B981] bg-[#10B981]/10 rounded-xl">{{ course.topics_count }} Topics</span>
+                    <span class="flex items-center justify-center px-2 py-1.5 text-xs font-semibold text-[#F59E0B] bg-[#FBBF24]/10 rounded-xl">{{ course.content_count }} Content</span>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex gap-2">
+                    <button
+                      (click)="viewCourse(course.course_id)"
+                      class="flex-1 bg-[#0EA5E9] hover:bg-[#2563EB] text-white py-2.5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-sm shadow-[#0EA5E9]/20 transition-all">
+                      <fa-icon [icon]="faEye"></fa-icon> View
+                    </button>
+                    @if (!course.is_published) {
+                      <button
+                        (click)="openPublishModal(course)"
+                        class="flex-1 bg-[#10B981] hover:bg-[#059669] text-white py-2.5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-sm shadow-[#10B981]/20 transition-all">
+                        <fa-icon [icon]="faGlobe"></fa-icon> Publish
+                      </button>
+                    }
+                    @if (course.is_published) {
+                      <button
+                        (click)="unpublishCourse(course.course_id)"
+                        [disabled]="isPublishing(course.course_id)"
+                        class="flex-1 bg-slate-600 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-xl text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-all">
+                        @if (isPublishing(course.course_id)) {
+                          <fa-icon [icon]="faSpinner" animation="spin"></fa-icon>
+                        }
+                        @if (!isPublishing(course.course_id)) {
+                          <fa-icon [icon]="faLock"></fa-icon>
+                        }
+                        Unpublish
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
   </div>
 </div>
 
 <!-- Publish Course Modal -->
-<div *ngIf="showPublishModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white dark:bg-slate-800 rounded-lg p-6 w-full max-w-md shadow-2xl">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold text-gray-800 dark:text-white">Publish Course</h2>
-      <button (click)="closePublishModal()" class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
-        <fa-icon [icon]="faTimes" size="lg"></fa-icon>
-      </button>
-    </div>
-
-    <div class="mb-4">
-      <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
-        Publishing "{{ selectedCourseForPublish?.course_name }}" will make it available for learners to discover and enroll.
+@if (showPublishModal) {
+  <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl w-full max-w-md p-6">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Publish Course</h3>
+        <button (click)="closePublishModal()" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors">
+          <fa-icon [icon]="faTimes"></fa-icon>
+        </button>
+      </div>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-5">
+        Publishing <span class="font-semibold text-slate-900 dark:text-white">"{{ selectedCourseForPublish?.course_name }}"</span> will make it available for learners to discover and enroll.
       </p>
-
       <!-- Category -->
       <div class="mb-4">
-        <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Category <span class="text-red-500 dark:text-red-400">*</span>
+        <label for="category" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+          Category <span class="text-red-500">*</span>
         </label>
         <select
           id="category"
           [(ngModel)]="publishForm.category"
-          class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+          class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition">
           <option value="">Select a category</option>
-          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
         </select>
       </div>
-
-      <!-- Difficulty Level -->
+      <!-- Difficulty -->
       <div class="mb-4">
-        <label for="difficulty" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Difficulty Level <span class="text-red-500 dark:text-red-400">*</span>
+        <label for="difficulty" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+          Difficulty Level <span class="text-red-500">*</span>
         </label>
         <select
           id="difficulty"
           [(ngModel)]="publishForm.difficulty_level"
-          class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+          class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition">
           <option value="">Select difficulty level</option>
-          <option *ngFor="let level of difficultyLevels" [value]="level">{{ level }}</option>
+          @for (level of difficultyLevels; track level) {
+            <option [value]="level">{{ level }}</option>
+          }
         </select>
       </div>
-
-      <!-- Estimated Duration -->
-      <div class="mb-4">
-        <label for="duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Estimated Duration (hours) <span class="text-red-500 dark:text-red-400">*</span>
+      <!-- Duration -->
+      <div class="mb-6">
+        <label for="duration" class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+          Estimated Duration (hours) <span class="text-red-500">*</span>
         </label>
         <input
           type="number"
@@ -354,26 +375,30 @@
           min="0"
           step="0.5"
           placeholder="e.g., 10"
-          class="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">How long it will take to complete this course</p>
+          class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent transition placeholder:text-slate-400">
+        <p class="text-xs text-slate-400 mt-1.5">How long it will take to complete this course</p>
+      </div>
+      <!-- Actions -->
+      <div class="flex justify-end gap-3">
+        <button
+          (click)="closePublishModal()"
+          class="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-semibold transition-colors">
+          Cancel
+        </button>
+        <button
+          (click)="publishCourse()"
+          [disabled]="isPublishing(selectedCourseForPublish?.course_id || 0)"
+          class="px-5 py-2.5 bg-[#10B981] hover:bg-[#059669] disabled:bg-slate-400 dark:disabled:bg-slate-600 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold shadow-sm shadow-[#10B981]/20 inline-flex items-center gap-2 transition-all hover:shadow-md">
+          @if (isPublishing(selectedCourseForPublish?.course_id || 0)) {
+            <fa-icon [icon]="faSpinner" animation="spin"></fa-icon>
+            Publishing…
+          }
+          @if (!isPublishing(selectedCourseForPublish?.course_id || 0)) {
+            <fa-icon [icon]="faGlobe"></fa-icon>
+            Publish Course
+          }
+        </button>
       </div>
     </div>
-
-    <!-- Actions -->
-    <div class="flex justify-end space-x-3">
-      <button
-        (click)="closePublishModal()"
-        class="px-4 py-2 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors">
-        Cancel
-      </button>
-      <button
-        (click)="publishCourse()"
-        [disabled]="isPublishing(selectedCourseForPublish?.course_id || 0)"
-        class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 disabled:bg-gray-400 dark:disabled:bg-gray-600 transition-colors flex items-center">
-        <fa-icon *ngIf="isPublishing(selectedCourseForPublish?.course_id || 0)" [icon]="faSpinner" animation="spin" class="mr-2"></fa-icon>
-        <fa-icon *ngIf="!isPublishing(selectedCourseForPublish?.course_id || 0)" [icon]="faGlobe" class="mr-2"></fa-icon>
-        {{ isPublishing(selectedCourseForPublish?.course_id || 0) ? 'Publishing...' : 'Publish Course' }}
-      </button>
-    </div>
   </div>
-</div>
+}

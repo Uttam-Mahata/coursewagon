@@ -13,14 +13,15 @@ def add_video_url_to_content():
     try:
         # Check if video_url column already exists
         result = session.execute(text("""
-            SELECT COUNT(*) as count
+            SELECT COUNT(*)
             FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = DATABASE()
-            AND TABLE_NAME = 'content'
+            WHERE TABLE_NAME = 'content'
             AND COLUMN_NAME = 'video_url'
         """))
 
-        column_exists = result.fetchone().count > 0
+        row = result.fetchone()
+        count = row[0] if row else 0
+        column_exists = count > 0
 
         if not column_exists:
             logger.info("Adding video_url column to content table...")
@@ -28,7 +29,7 @@ def add_video_url_to_content():
             # Add the video_url column
             session.execute(text("""
                 ALTER TABLE content
-                ADD COLUMN video_url TEXT NULL
+                ADD video_url NVARCHAR(MAX) NULL
             """))
 
             session.commit()

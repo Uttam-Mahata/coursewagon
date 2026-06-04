@@ -1,403 +1,444 @@
-<div class="container mx-auto px-4 py-8 max-w-5xl">
-  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 px-6 py-4">
-      <h1 class="text-2xl font-bold text-white">My Profile</h1>
-    </div>
-    
-    <!-- Alerts -->
-    <div class="px-6 pt-4">
-      <div *ngIf="successMessage" class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-400 p-4 mb-4 rounded-md flex items-center justify-between">
-        <div class="flex items-center">
-          <fa-icon [icon]="faCheckCircle" class="text-green-500 dark:text-green-400 mr-3 text-lg"></fa-icon>
-          <p class="text-green-700 dark:text-green-300">{{ successMessage }}</p>
-        </div>
-        <button type="button" class="text-green-500 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300" (click)="clearMessages()">
-          <fa-icon [icon]="faTimes" class="text-lg"></fa-icon>
-        </button>
-      </div>
+<div class="min-h-screen bg-slate-50 dark:bg-[#0F172A] py-8 px-4">
+  <div class="max-w-5xl mx-auto">
 
-      <div *ngIf="errorMessage" class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 mb-4 rounded-md flex items-center justify-between">
-        <div class="flex items-center">
-          <fa-icon [icon]="faExclamationCircle" class="text-red-500 dark:text-red-400 mr-3 text-lg"></fa-icon>
-          <p class="text-red-700 dark:text-red-300">{{ errorMessage }}</p>
+    <!-- Global Alerts -->
+    <div class="mb-6 space-y-3">
+      @if (successMessage) {
+        <div class="bg-[#10B981]/10 border border-[#10B981]/30 px-5 py-4 rounded-2xl flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <fa-icon [icon]="faCheckCircle" class="text-[#10B981] text-lg"></fa-icon>
+            <p class="text-[#059669] dark:text-[#10B981] text-sm font-medium">{{ successMessage }}</p>
+          </div>
+          <button type="button" class="text-[#10B981] hover:text-[#059669] transition-colors" (click)="clearMessages()">
+            <fa-icon [icon]="faTimes"></fa-icon>
+          </button>
         </div>
-        <button type="button" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300" (click)="clearMessages()">
-          <fa-icon [icon]="faTimes" class="text-lg"></fa-icon>
-        </button>
-      </div>
+      }
+      @if (errorMessage) {
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 px-5 py-4 rounded-2xl flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <fa-icon [icon]="faExclamationCircle" class="text-red-500 dark:text-red-400 text-lg"></fa-icon>
+            <p class="text-red-700 dark:text-red-300 text-sm font-medium">{{ errorMessage }}</p>
+          </div>
+          <button type="button" class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors" (click)="clearMessages()">
+            <fa-icon [icon]="faTimes"></fa-icon>
+          </button>
+        </div>
+      }
     </div>
 
-    <!-- Profile Content -->
-    <div *ngIf="user" class="px-6 py-4">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <!-- User Info Column -->
+    @if (user) {
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+        <!-- Left: Profile Identity Card -->
         <div class="md:col-span-1">
-          <div class="flex flex-col items-center">
-            <!-- Profile Image -->
-            <div class="relative mb-4">
-              <div *ngIf="!user?.profile_image_url"
-                   class="h-24 w-24 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-600 dark:to-blue-800 flex items-center justify-center text-white text-2xl font-bold">
-                {{ user?.first_name?.charAt(0) || '' }}{{ user?.last_name?.charAt(0) || '' }}
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+            <!-- Top accent bar -->
+            <div class="h-1 bg-gradient-to-r from-[#0EA5E9] to-[#10B981]"></div>
+            <div class="p-6 flex flex-col items-center text-center">
+              <!-- Avatar -->
+              <div class="relative mb-4">
+                @if (!user?.profile_image_url) {
+                  <div class="h-20 w-20 rounded-full bg-gradient-to-br from-[#0EA5E9] to-[#2563EB] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-[#0EA5E9]/20">
+                    {{ user?.first_name?.charAt(0) || '' }}{{ user?.last_name?.charAt(0) || '' }}
+                  </div>
+                }
+                @if (user?.profile_image_url) {
+                  <img
+                    [src]="user.profile_image_url"
+                    alt="Profile"
+                    class="h-20 w-20 rounded-full object-cover ring-4 ring-white dark:ring-slate-800">
+                }
               </div>
-              <img *ngIf="user?.profile_image_url"
-                   [src]="user.profile_image_url"
-                   alt="Profile"
-                   class="h-24 w-24 rounded-full object-cover">
-            </div>
 
-            <!-- Name -->
-            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1 text-center">
-              {{ user?.first_name }} {{ user?.last_name }}
-            </h2>
+              <!-- Name -->
+              <h2 class="text-base font-bold text-slate-900 dark:text-white mb-1">
+                {{ user?.first_name }} {{ user?.last_name }}
+              </h2>
 
-            <!-- Email with Verification Badge -->
-            <div class="flex items-center mb-2">
-              <fa-icon [icon]="faEnvelope" class="mr-2 text-gray-400 dark:text-gray-500 text-sm"></fa-icon>
-              <p class="text-gray-500 dark:text-gray-400 text-sm">{{ user?.email }}</p>
-            </div>
-            <div *ngIf="user?.email_verified"
-                 class="flex items-center text-green-600 dark:text-green-400 text-xs mb-3">
-              <fa-icon [icon]="faCheckCircle" class="mr-1"></fa-icon>
-              <span>Verified</span>
-            </div>
-            <div *ngIf="!user?.email_verified"
-                 class="flex items-center text-orange-600 dark:text-orange-400 text-xs mb-3">
-              <fa-icon [icon]="faExclamationCircle" class="mr-1"></fa-icon>
-              <span>Not Verified</span>
-            </div>
+              <!-- Email -->
+              <div class="flex items-center gap-1.5 mb-2">
+                <fa-icon [icon]="faEnvelope" class="text-slate-400 text-xs"></fa-icon>
+                <p class="text-slate-500 dark:text-slate-400 text-xs truncate max-w-[160px]">{{ user?.email }}</p>
+              </div>
 
-            <!-- Role Badge -->
-            <div class="mb-3">
-              <span [class]="getRoleBadgeClass(user?.role)"
-                    class="px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                <fa-icon [icon]="faUserTag" class="mr-1"></fa-icon>
-                {{ getRoleDisplayName(user?.role) }}
-              </span>
-            </div>
+              <!-- Verification badge -->
+              @if (user?.email_verified) {
+                <div class="inline-flex items-center gap-1 text-[#059669] dark:text-[#10B981] text-xs bg-[#10B981]/10 px-2.5 py-1 rounded-full mb-3">
+                  <fa-icon [icon]="faCheckCircle" class="text-xs"></fa-icon>
+                  <span class="font-medium">Verified</span>
+                </div>
+              }
+              @if (!user?.email_verified) {
+                <div class="inline-flex items-center gap-1 text-[#F59E0B] text-xs bg-[#FBBF24]/10 px-2.5 py-1 rounded-full mb-3">
+                  <fa-icon [icon]="faExclamationCircle" class="text-xs"></fa-icon>
+                  <span class="font-medium">Not Verified</span>
+                </div>
+              }
 
-            <!-- Admin Badge -->
-            <div *ngIf="user?.is_admin" class="mb-3">
-              <span class="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-3 py-1 rounded-full text-xs font-medium flex items-center">
-                <fa-icon [icon]="faShieldAlt" class="mr-1"></fa-icon>
-                Administrator
-              </span>
-            </div>
+              <!-- Role Badge -->
+              <div class="mb-2">
+                <span [class]="getRoleBadgeClass(user?.role)"
+                  class="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                  <fa-icon [icon]="faUserTag" class="text-xs"></fa-icon>
+                  {{ getRoleDisplayName(user?.role) }}
+                </span>
+              </div>
 
-            <!-- Account Created Date -->
-            <div class="text-gray-500 dark:text-gray-400 text-xs flex items-center">
-              <fa-icon [icon]="faCalendar" class="mr-1"></fa-icon>
-              <span>Joined {{ formatDate(user?.created_at) }}</span>
+              <!-- Admin Badge -->
+              @if (user?.is_admin) {
+                <div class="mb-3">
+                  <span class="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                    <fa-icon [icon]="faShieldAlt" class="text-xs"></fa-icon>
+                    Administrator
+                  </span>
+                </div>
+              }
+
+              <!-- Joined date -->
+              <div class="text-slate-400 dark:text-slate-500 text-xs flex items-center gap-1 mt-1">
+                <fa-icon [icon]="faCalendar" class="text-xs"></fa-icon>
+                <span>Joined {{ formatDate(user?.created_at) }}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Main Content Column -->
-        <div class="md:col-span-3 space-y-6">
+        <!-- Right: Main Sections -->
+        <div class="md:col-span-3 space-y-4">
+
           <!-- Profile Information Section -->
-          <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-6 border border-gray-200 dark:border-slate-600">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
-                <fa-icon [icon]="faUser" class="mr-2"></fa-icon>
-                Profile Information
-              </h3>
-              <button *ngIf="!isEditingProfile"
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+            <div class="h-px bg-gradient-to-r from-[#0EA5E9]/40 to-transparent"></div>
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-5">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span class="w-7 h-7 rounded-lg bg-[#0EA5E9]/10 text-[#0EA5E9] flex items-center justify-center">
+                    <fa-icon [icon]="faUser" class="text-xs"></fa-icon>
+                  </span>
+                  Profile Information
+                </h3>
+                @if (!isEditingProfile) {
+                  <button
+                    type="button"
+                    class="text-xs font-semibold text-[#0EA5E9] hover:text-[#2563EB] flex items-center gap-1 transition-colors"
+                    (click)="toggleEditProfile()">
+                    <fa-icon [icon]="faEdit" class="text-xs"></fa-icon>
+                    Edit Profile
+                  </button>
+                }
+              </div>
+
+              <!-- Display Mode -->
+              @if (!isEditingProfile) {
+                <div class="space-y-4">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">First Name</label>
+                      <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">{{ user?.first_name || 'Not set' }}</p>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Last Name</label>
+                      <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">{{ user?.last_name || 'Not set' }}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Role</label>
+                    <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">{{ getRoleDisplayName(user?.role) }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Bio</label>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">{{ user?.bio || 'No bio added yet' }}</p>
+                  </div>
+                </div>
+              }
+
+              <!-- Edit Mode -->
+              @if (isEditingProfile) {
+                <form [formGroup]="profileForm">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label for="firstName" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                        First Name <span class="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="firstName"
+                        formControlName="first_name"
+                        class="block w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-xl shadow-sm focus:ring-2 focus:ring-[#0EA5E9]/40 focus:border-[#0EA5E9] outline-none transition-colors"
+                        placeholder="Enter first name">
+                      @if (profileForm.get('first_name')?.touched && profileForm.get('first_name')?.errors?.['required']) {
+                        <p class="mt-1 text-xs text-red-600 dark:text-red-400">First name is required</p>
+                      }
+                    </div>
+                    <div>
+                      <label for="lastName" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                        Last Name <span class="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="lastName"
+                        formControlName="last_name"
+                        class="block w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-xl shadow-sm focus:ring-2 focus:ring-[#0EA5E9]/40 focus:border-[#0EA5E9] outline-none transition-colors"
+                        placeholder="Enter last name">
+                      @if (profileForm.get('last_name')?.touched && profileForm.get('last_name')?.errors?.['required']) {
+                        <p class="mt-1 text-xs text-red-600 dark:text-red-400">Last name is required</p>
+                      }
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <label for="role" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Role <span class="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="role"
+                      formControlName="role"
+                      class="block w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-xl shadow-sm focus:ring-2 focus:ring-[#0EA5E9]/40 focus:border-[#0EA5E9] outline-none transition-colors">
+                      <option value="creator">Creator</option>
+                      <option value="learner">Learner</option>
+                      <option value="both">Creator & Learner</option>
+                    </select>
+                  </div>
+                  <div class="mb-5">
+                    <label for="bio" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Bio</label>
+                    <textarea
+                      id="bio"
+                      formControlName="bio"
+                      rows="3"
+                      class="block w-full px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-xl shadow-sm focus:ring-2 focus:ring-[#0EA5E9]/40 focus:border-[#0EA5E9] outline-none transition-colors resize-none"
+                      placeholder="Tell us about yourself..."></textarea>
+                  </div>
+                  <div class="flex gap-3">
+                    <button
                       type="button"
-                      class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center text-sm"
+                      class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold bg-[#0EA5E9] hover:bg-[#2563EB] text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      [disabled]="profileForm.invalid || isLoading['profileUpdate']"
+                      (click)="updateProfile()">
+                      @if (isLoading['profileUpdate']) {
+                        <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                      }
+                      <fa-icon [icon]="faSave" class="text-xs"></fa-icon>
+                      {{ isLoading['profileUpdate'] ? 'Saving...' : 'Save Changes' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="px-4 py-2.5 text-sm font-semibold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl transition-colors"
                       (click)="toggleEditProfile()">
-                <fa-icon [icon]="faEdit" class="mr-1"></fa-icon>
-                Edit Profile
-              </button>
-            </div>
-
-            <!-- Display Mode -->
-            <div *ngIf="!isEditingProfile">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">First Name</label>
-                  <p class="text-gray-800 dark:text-gray-200">{{ user?.first_name || 'Not set' }}</p>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Last Name</label>
-                  <p class="text-gray-800 dark:text-gray-200">{{ user?.last_name || 'Not set' }}</p>
-                </div>
-              </div>
-              <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Role</label>
-                <p class="text-gray-800 dark:text-gray-200">{{ getRoleDisplayName(user?.role) }}</p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Bio</label>
-                <p class="text-gray-800 dark:text-gray-200">{{ user?.bio || 'No bio added yet' }}</p>
-              </div>
-            </div>
-
-            <!-- Edit Mode -->
-            <form *ngIf="isEditingProfile" [formGroup]="profileForm">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label for="firstName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    First Name <span class="text-red-500 dark:text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    formControlName="first_name"
-                    class="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter first name">
-                  <div *ngIf="profileForm.get('first_name')?.touched && profileForm.get('first_name')?.errors?.['required']"
-                       class="mt-1 text-sm text-red-600 dark:text-red-400">
-                    First name is required
+                      Cancel
+                    </button>
                   </div>
-                </div>
-                <div>
-                  <label for="lastName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Last Name <span class="text-red-500 dark:text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    formControlName="last_name"
-                    class="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Enter last name">
-                  <div *ngIf="profileForm.get('last_name')?.touched && profileForm.get('last_name')?.errors?.['required']"
-                       class="mt-1 text-sm text-red-600 dark:text-red-400">
-                    Last name is required
-                  </div>
-                </div>
-              </div>
-
-              <div class="mb-4">
-                <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Role <span class="text-red-500 dark:text-red-400">*</span>
-                </label>
-                <select
-                  id="role"
-                  formControlName="role"
-                  class="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  <option value="creator">Creator</option>
-                  <option value="learner">Learner</option>
-                  <option value="both">Creator & Learner</option>
-                </select>
-              </div>
-
-              <div class="mb-4">
-                <label for="bio" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bio</label>
-                <textarea
-                  id="bio"
-                  formControlName="bio"
-                  rows="3"
-                  class="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Tell us about yourself..."></textarea>
-              </div>
-
-              <div class="flex space-x-3">
-                <button
-                  type="button"
-                  class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center transition duration-200 disabled:bg-blue-400 dark:disabled:bg-blue-700"
-                  [disabled]="profileForm.invalid || isLoading['profileUpdate']"
-                  (click)="updateProfile()">
-                  <div *ngIf="isLoading['profileUpdate']" class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                  <fa-icon [icon]="faSave" class="mr-2"></fa-icon>
-                  <span>{{ isLoading['profileUpdate'] ? 'Saving...' : 'Save Changes' }}</span>
-                </button>
-                <button
-                  type="button"
-                  class="bg-gray-200 dark:bg-slate-600 hover:bg-gray-300 dark:hover:bg-slate-500 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md transition duration-200"
-                  (click)="toggleEditProfile()">
-                  Cancel
-                </button>
-              </div>
-            </form>
+                </form>
+              }
+            </div>
           </div>
 
-          <!-- Gemini API Key (BYOK) Section -->
-          <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-6 border border-gray-200 dark:border-slate-600">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
-                <fa-icon [icon]="faKey" class="mr-2"></fa-icon>
-                Gemini API Key
-              </h3>
-              <span *ngIf="user?.has_api_key"
+          <!-- Gemini API Key (BYOK) Section — HTML unchanged, only outer card restyled -->
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+            <div class="h-px bg-gradient-to-r from-[#FBBF24]/40 to-transparent"></div>
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
+                  <fa-icon [icon]="faKey" class="mr-2"></fa-icon>
+                  Gemini API Key
+                </h3>
+                @if (user?.has_api_key) {
+                  <span
                     class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs px-2 py-1 rounded-full font-medium">
-                Key stored
-              </span>
-              <span *ngIf="!user?.has_api_key"
+                    Key stored
+                  </span>
+                }
+                @if (!user?.has_api_key) {
+                  <span
                     class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs px-2 py-1 rounded-full font-medium">
-                Not set
-              </span>
-            </div>
-
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Provide your own
-              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer"
-                 class="text-blue-600 dark:text-blue-400 underline">Google AI Studio API key</a>
-              to use AI image generation. Your key is encrypted before storage.
-            </p>
-
-            <!-- Key actions when key IS set -->
-            <div *ngIf="user?.has_api_key && !showApiKeyInput" class="flex space-x-3">
-              <button type="button"
-                      class="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center"
-                      (click)="showApiKeyInput = true; apiKeyInput = ''">
-                <fa-icon [icon]="faEdit" class="mr-1"></fa-icon>
-                Replace key
-              </button>
-              <button type="button"
-                      class="text-sm text-red-600 dark:text-red-400 hover:underline flex items-center"
-                      [disabled]="isLoadingApiKey"
-                      (click)="removeApiKey()">
-                <fa-icon [icon]="faTrash" class="mr-1"></fa-icon>
-                Remove key
-              </button>
-            </div>
-
-            <!-- Add key button when key is NOT set -->
-            <div *ngIf="!user?.has_api_key && !showApiKeyInput">
-              <button type="button"
-                      class="text-sm bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
-                      (click)="showApiKeyInput = true">
-                <fa-icon [icon]="faKey" class="mr-2"></fa-icon>
-                Add API Key
-              </button>
-            </div>
-
-            <!-- Input form -->
-            <div *ngIf="showApiKeyInput" class="mt-3">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Gemini API Key
-              </label>
-              <input type="password"
-                     [(ngModel)]="apiKeyInput"
-                     placeholder="AIza..."
-                     class="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mb-3">
-              <div class="flex space-x-3">
-                <button type="button"
-                        class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center text-sm disabled:bg-blue-400"
-                        [disabled]="!apiKeyInput.trim() || isLoadingApiKey"
-                        (click)="saveApiKey()">
-                  <div *ngIf="isLoadingApiKey" class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                  <fa-icon [icon]="faSave" class="mr-2"></fa-icon>
-                  {{ isLoadingApiKey ? 'Saving...' : 'Save Key' }}
-                </button>
-                <button type="button"
-                        class="bg-gray-200 dark:bg-slate-600 hover:bg-gray-300 dark:hover:bg-slate-500 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
-                        (click)="showApiKeyInput = false; apiKeyInput = ''">
-                  Cancel
-                </button>
+                    Not set
+                  </span>
+                }
               </div>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                Provide your own
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer"
+                class="text-blue-600 dark:text-blue-400 underline">Google AI Studio API key</a>
+                to use AI image generation. Your key is encrypted before storage.
+              </p>
+              <!-- Key actions when key IS set -->
+              @if (user?.has_api_key && !showApiKeyInput) {
+                <div class="flex space-x-3">
+                  <button type="button"
+                    class="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+                    (click)="showApiKeyInput = true; apiKeyInput = ''">
+                    <fa-icon [icon]="faEdit" class="mr-1"></fa-icon>
+                    Replace key
+                  </button>
+                  <button type="button"
+                    class="text-sm text-red-600 dark:text-red-400 hover:underline flex items-center"
+                    [disabled]="isLoadingApiKey"
+                    (click)="removeApiKey()">
+                    <fa-icon [icon]="faTrash" class="mr-1"></fa-icon>
+                    Remove key
+                  </button>
+                </div>
+              }
+              <!-- Add key button when key is NOT set -->
+              @if (!user?.has_api_key && !showApiKeyInput) {
+                <div>
+                  <button type="button"
+                    class="text-sm bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+                    (click)="showApiKeyInput = true">
+                    <fa-icon [icon]="faKey" class="mr-2"></fa-icon>
+                    Add API Key
+                  </button>
+                </div>
+              }
+              <!-- Input form -->
+              @if (showApiKeyInput) {
+                <div class="mt-3">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Gemini API Key
+                  </label>
+                  <input type="password"
+                    [(ngModel)]="apiKeyInput"
+                    placeholder="AIza..."
+                    class="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mb-3">
+                  <div class="flex space-x-3">
+                    <button type="button"
+                      class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center text-sm disabled:bg-blue-400"
+                      [disabled]="!apiKeyInput.trim() || isLoadingApiKey"
+                      (click)="saveApiKey()">
+                      @if (isLoadingApiKey) {
+                        <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                      }
+                      <fa-icon [icon]="faSave" class="mr-2"></fa-icon>
+                      {{ isLoadingApiKey ? 'Saving...' : 'Save Key' }}
+                    </button>
+                    <button type="button"
+                      class="bg-gray-200 dark:bg-slate-600 hover:bg-gray-300 dark:hover:bg-slate-500 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
+                      (click)="showApiKeyInput = false; apiKeyInput = ''">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              }
             </div>
           </div>
 
-          <!-- Password Change Section -->
-          <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-6 border border-gray-200 dark:border-slate-600">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
-                <fa-icon [icon]="faLock" class="mr-2"></fa-icon>
+          <!-- Change Password Section -->
+          <div class="bg-white dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/50 overflow-hidden">
+            <div class="h-px bg-gradient-to-r from-[#2563EB]/40 to-transparent"></div>
+            <div class="p-6">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-5">
+                <span class="w-7 h-7 rounded-lg bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center">
+                  <fa-icon [icon]="faLock" class="text-xs"></fa-icon>
+                </span>
                 Change Password
               </h3>
-            </div>
-            
-            <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
-              <!-- Current Password -->
-              <div class="mb-4">
-                <label for="currentPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
-                <div class="flex">
-                  <div class="relative flex-grow">
+
+              <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+                <!-- Current Password -->
+                <div class="mb-4">
+                  <label for="currentPassword" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Current Password</label>
+                  <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <fa-icon [icon]="faLock" class="text-gray-400 dark:text-gray-500"></fa-icon>
+                      <fa-icon [icon]="faLock" class="text-slate-400 dark:text-slate-500 text-xs"></fa-icon>
                     </div>
-                    <input 
-                      [type]="showCurrentPassword ? 'text' : 'password'" 
-                      class="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
-                      id="currentPassword" 
-                      placeholder="Enter current password" 
+                    <input
+                      [type]="showCurrentPassword ? 'text' : 'password'"
+                      class="block w-full pl-9 pr-10 py-2.5 text-sm border border-slate-200 dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-xl shadow-sm focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] outline-none transition-colors"
+                      id="currentPassword"
+                      placeholder="Enter current password"
                       formControlName="currentPassword">
-                    <button 
+                    <button
                       type="button"
-                      class="absolute inset-y-0 right-0 px-3 flex items-center"
+                      class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                       (click)="togglePasswordVisibility('current')">
-                      <fa-icon [icon]="showCurrentPassword ? faEyeSlash : faEye" class="text-gray-400 dark:text-gray-500"></fa-icon>
+                      <fa-icon [icon]="showCurrentPassword ? faEyeSlash : faEye"></fa-icon>
                     </button>
                   </div>
+                  @if (passwordForm.get('currentPassword')?.touched && passwordForm.get('currentPassword')?.errors?.['required']) {
+                    <p class="mt-1 text-xs text-red-600 dark:text-red-400">Current password is required</p>
+                  }
                 </div>
-                <div *ngIf="passwordForm.get('currentPassword')?.touched && passwordForm.get('currentPassword')?.errors?.['required']" 
-                    class="mt-1 text-sm text-red-600 dark:text-red-400">
-                  Current password is required
-                </div>
-              </div>
 
-              <!-- New Password -->
-              <div class="mb-4">
-                <label for="newPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
-                <div class="flex">
-                  <div class="relative flex-grow">
+                <!-- New Password -->
+                <div class="mb-4">
+                  <label for="newPassword" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">New Password</label>
+                  <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <fa-icon [icon]="faLock" class="text-gray-400 dark:text-gray-500"></fa-icon>
+                      <fa-icon [icon]="faLock" class="text-slate-400 dark:text-slate-500 text-xs"></fa-icon>
                     </div>
-                    <input 
-                      [type]="showNewPassword ? 'text' : 'password'" 
-                      class="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
-                      id="newPassword" 
-                      placeholder="Enter new password" 
+                    <input
+                      [type]="showNewPassword ? 'text' : 'password'"
+                      class="block w-full pl-9 pr-10 py-2.5 text-sm border border-slate-200 dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-xl shadow-sm focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] outline-none transition-colors"
+                      id="newPassword"
+                      placeholder="Enter new password"
                       formControlName="newPassword">
-                    <button 
+                    <button
                       type="button"
-                      class="absolute inset-y-0 right-0 px-3 flex items-center"
+                      class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                       (click)="togglePasswordVisibility('new')">
-                      <fa-icon [icon]="showNewPassword ? faEyeSlash : faEye" class="text-gray-400 dark:text-gray-500"></fa-icon>
+                      <fa-icon [icon]="showNewPassword ? faEyeSlash : faEye"></fa-icon>
                     </button>
                   </div>
-                </div>
-                <div *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.errors" 
-                    class="mt-1 text-sm text-red-600 dark:text-red-400">
-                  <div *ngIf="passwordForm.get('newPassword')?.errors?.['required']">New password is required</div>
-                  <div *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Password must be at least 8 characters</div>
-                </div>
-              </div>
-
-              <!-- Confirm Password -->
-              <div class="mb-4">
-                <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
-                <div class="flex">
-                  <div class="relative flex-grow">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <fa-icon [icon]="faLock" class="text-gray-400 dark:text-gray-500"></fa-icon>
+                  @if (passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.errors) {
+                    <div class="mt-1 text-xs text-red-600 dark:text-red-400 space-y-0.5">
+                      @if (passwordForm.get('newPassword')?.errors?.['required']) {
+                        <p>New password is required</p>
+                      }
+                      @if (passwordForm.get('newPassword')?.errors?.['minlength']) {
+                        <p>Password must be at least 8 characters</p>
+                      }
                     </div>
-                    <input 
-                      [type]="showConfirmPassword ? 'text' : 'password'" 
-                      class="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" 
-                      id="confirmPassword" 
-                      placeholder="Confirm new password" 
+                  }
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-5">
+                  <label for="confirmPassword" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Confirm Password</label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <fa-icon [icon]="faLock" class="text-slate-400 dark:text-slate-500 text-xs"></fa-icon>
+                    </div>
+                    <input
+                      [type]="showConfirmPassword ? 'text' : 'password'"
+                      class="block w-full pl-9 pr-10 py-2.5 text-sm border border-slate-200 dark:border-slate-600 dark:bg-slate-900 dark:text-white rounded-xl shadow-sm focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] outline-none transition-colors"
+                      id="confirmPassword"
+                      placeholder="Confirm new password"
                       formControlName="confirmPassword">
-                    <button 
+                    <button
                       type="button"
-                      class="absolute inset-y-0 right-0 px-3 flex items-center"
+                      class="absolute inset-y-0 right-0 px-3 flex items-center text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                       (click)="togglePasswordVisibility('confirm')">
-                      <fa-icon [icon]="showConfirmPassword ? faEyeSlash : faEye" class="text-gray-400 dark:text-gray-500"></fa-icon>
+                      <fa-icon [icon]="showConfirmPassword ? faEyeSlash : faEye"></fa-icon>
                     </button>
                   </div>
+                  @if (passwordForm.get('confirmPassword')?.touched &&
+                    (passwordForm.get('confirmPassword')?.errors?.['required'] || passwordForm.hasError('mismatch'))) {
+                    <div class="mt-1 text-xs text-red-600 dark:text-red-400 space-y-0.5">
+                      @if (passwordForm.get('confirmPassword')?.errors?.['required']) {
+                        <p>Please confirm your password</p>
+                      }
+                      @if (passwordForm.hasError('mismatch')) {
+                        <p>Passwords do not match</p>
+                      }
+                    </div>
+                  }
                 </div>
-                <div *ngIf="passwordForm.get('confirmPassword')?.touched && 
-                    (passwordForm.get('confirmPassword')?.errors?.['required'] || passwordForm.hasError('mismatch'))" 
-                    class="mt-1 text-sm text-red-600 dark:text-red-400">
-                  <div *ngIf="passwordForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</div>
-                  <div *ngIf="passwordForm.hasError('mismatch')">Passwords do not match</div>
-                </div>
-              </div>
 
-              <button 
-                type="submit" 
-                class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center transition duration-200 disabled:bg-blue-400 dark:disabled:bg-blue-700"
-                [disabled]="passwordForm.invalid || isLoading['passwordChange']">
-                <div *ngIf="isLoading['passwordChange']" class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-                <fa-icon [icon]="faSave" class="mr-2"></fa-icon>
-                <span>{{ isLoading['passwordChange'] ? 'Changing...' : 'Change Password' }}</span>
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold bg-[#2563EB] hover:bg-[#0EA5E9] text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  [disabled]="passwordForm.invalid || isLoading['passwordChange']">
+                  @if (isLoading['passwordChange']) {
+                    <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                  }
+                  <fa-icon [icon]="faSave" class="text-xs"></fa-icon>
+                  {{ isLoading['passwordChange'] ? 'Changing...' : 'Change Password' }}
+                </button>
+              </form>
+            </div>
           </div>
+
         </div>
       </div>
-    </div>
+    }
   </div>
 </div>

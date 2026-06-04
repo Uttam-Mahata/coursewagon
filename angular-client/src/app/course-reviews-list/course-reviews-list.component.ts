@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faSpinner, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { StarRatingComponent } from '../shared/star-rating/star-rating.component';
@@ -8,7 +8,7 @@ import { ReviewService, CourseReview, ReviewsListResponse } from '../services/re
 @Component({
   selector: 'app-course-reviews-list',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, StarRatingComponent],
+  imports: [FontAwesomeModule, StarRatingComponent],
   templateUrl: './course-reviews-list.component.html',
   styleUrl: './course-reviews-list.component.css'
 })

@@ -4,26 +4,43 @@
       <!-- About Course Wagon Section -->
       <div class="lg:col-span-2">
         <div class="flex items-center mb-6">
-          <img src="/coursewagon.png" alt="Course Wagon Logo" class="h-10 w-auto mr-3">
-          <h3 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Course Wagon</h3>
+          <svg viewBox="0 0 160 120" class="w-8 h-6 mr-3" aria-hidden="true">
+            <defs>
+              <linearGradient id="fCGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0EA5E9"/><stop offset="100%" stop-color="#2563EB"/>
+              </linearGradient>
+              <linearGradient id="fWGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#059669"/><stop offset="100%" stop-color="#10B981"/>
+              </linearGradient>
+              <linearGradient id="fSparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FBBF24"/><stop offset="100%" stop-color="#F59E0B"/>
+              </linearGradient>
+            </defs>
+            <g transform="translate(10, 0)">
+              <path d="M 94.5 31.1 A 45 45 0 1 0 94.5 88.9" fill="none" stroke="url(#fCGrad)" stroke-width="14" stroke-linecap="round"/>
+              <path d="M 20 60 L 45 90 L 70 55 L 95 85 L 120 45" fill="none" stroke="url(#fWGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M 120 2 Q 120 18 136 18 Q 120 18 120 34 Q 120 18 104 18 Q 120 18 120 2 Z" fill="url(#fSparkGrad)"/>
+            </g>
+          </svg>
+          <h3 class="text-2xl font-bold bg-gradient-to-r from-[#0EA5E9] to-[#2563EB] bg-clip-text text-transparent">CourseWagon</h3>
         </div>
         <p class="text-gray-400 dark:text-gray-500 leading-relaxed mb-4 text-base">
           Course Wagon automates course creation with Generative AI, delivering dynamic, interactive learning experiences. Whether you're a student or a professional, our platform caters to your personalized learning journey.
         </p>
         <!-- <div class="flex space-x-4 mt-6">
-          <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-white transition-colors duration-300">
+          <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-[#0EA5E9] transition-colors duration-300">
             <fa-icon [icon]="faFacebook" class="text-xl"></fa-icon>
             <span class="sr-only">Facebook</span>
           </a>
-          <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-white transition-colors duration-300">
+          <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-[#0EA5E9] transition-colors duration-300">
             <fa-icon [icon]="faTwitter" class="text-xl"></fa-icon>
             <span class="sr-only">Twitter</span>
           </a>
-          <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-white transition-colors duration-300">
+          <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-[#0EA5E9] transition-colors duration-300">
             <fa-icon [icon]="faLinkedin" class="text-xl"></fa-icon>
             <span class="sr-only">LinkedIn</span>
           </a>
-          <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-white transition-colors duration-300">
+          <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-[#0EA5E9] transition-colors duration-300">
             <fa-icon [icon]="faInstagram" class="text-xl"></fa-icon>
             <span class="sr-only">Instagram</span>
           </a>
@@ -35,23 +52,23 @@
         <h5 class="text-white dark:text-gray-200 font-semibold text-lg mb-5">Explore</h5>
         <ul class="space-y-3">
           <li>
-            <a routerLink="/courses" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> Courses
+            <a routerLink="/courses" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-[#0EA5E9] dark:text-[#0EA5E9] group-hover:translate-x-1 transition-transform"></fa-icon> Courses
             </a>
           </li>
           <li>
-            <a routerLink="/how-it-works" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> How It Works
+            <a routerLink="/how-it-works" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-[#0EA5E9] dark:text-[#0EA5E9] group-hover:translate-x-1 transition-transform"></fa-icon> How It Works
             </a>
           </li>
           <!-- <li>
-            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500"></fa-icon> Pricing
+            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-[#0EA5E9] transition-colors duration-300 flex items-center">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-[#0EA5E9]"></fa-icon> Pricing
             </a>
           </li> -->
           <!-- <li>
-            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-indigo-400 transition-colors duration-300 flex items-center">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500"></fa-icon> Blog
+            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 hover:text-[#0EA5E9] transition-colors duration-300 flex items-center">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-[#0EA5E9]"></fa-icon> Blog
             </a>
           </li> -->
         </ul>
@@ -62,23 +79,23 @@
         <h5 class="text-white dark:text-gray-200 font-semibold text-lg mb-5">Resources</h5>
         <ul class="space-y-3">
           <!-- <li>
-            <a routerLink="/create-course" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> AI Course Generator
+            <a routerLink="/create-course" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-[#0EA5E9] dark:text-[#0EA5E9] group-hover:translate-x-1 transition-transform"></fa-icon> AI Course Generator
             </a>
           </li> -->
           <!-- <li>
-            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> Developer Resources
+            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-[#0EA5E9] dark:text-[#0EA5E9] group-hover:translate-x-1 transition-transform"></fa-icon> Developer Resources
             </a>
           </li>
            <li>
-            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> Community Forum
+            <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-[#0EA5E9] dark:text-[#0EA5E9] group-hover:translate-x-1 transition-transform"></fa-icon> Community Forum
             </a>
           </li> -->
           <li>
-            <a routerLink="/help-center" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300 flex items-center group">
-              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-indigo-500 dark:text-indigo-400 group-hover:translate-x-1 transition-transform"></fa-icon> Help Center
+            <a routerLink="/help-center" (click)="scrollToTop()" class="text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-colors duration-300 flex items-center group">
+              <fa-icon [icon]="faChevronRight" class="text-xs mr-2 text-[#0EA5E9] dark:text-[#0EA5E9] group-hover:translate-x-1 transition-transform"></fa-icon> Help Center
             </a>
           </li>
         </ul>
@@ -90,11 +107,11 @@
         <ul class="space-y-3">
 
           <li class="flex items-center">
-            <fa-icon [icon]="faEnvelope" class="text-indigo-500 dark:text-indigo-400 mr-3"></fa-icon>
+            <fa-icon [icon]="faEnvelope" class="text-[#0EA5E9] dark:text-[#0EA5E9] mr-3"></fa-icon>
             <span class="text-gray-400 dark:text-gray-500">coursewagon&#64;gmail.com</span>
           </li>
           <!-- <li class="flex items-center">
-            <fa-icon [icon]="faPhone" class="text-indigo-500 mr-3"></fa-icon>
+            <fa-icon [icon]="faPhone" class="text-[#0EA5E9] mr-3"></fa-icon>
             <span class="text-gray-400">+91 9679244057</span>
           </li>
             <span class="text-gray-400"></span>
@@ -108,9 +125,9 @@
       <div class="flex flex-col md:flex-row justify-between items-center">
         <p class="text-sm text-gray-400 dark:text-gray-500">© 2025 Course Wagon. All rights reserved.</p>
         <div class="flex space-x-6 mt-4 md:mt-0">
-          <a routerLink="/privacy-policy" (click)="scrollToTop()" class="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300">Privacy Policy</a>
-          <a routerLink="/terms" (click)="scrollToTop()" class="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300">Terms of Service</a>
-          <!-- <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-sm text-gray-400 dark:text-gray-500 hover:text-indigo-400 dark:hover:text-indigo-400 transition-colors duration-300">Cookie Policy</a> -->
+          <a routerLink="/privacy-policy" (click)="scrollToTop()" class="text-sm text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-colors duration-300">Privacy Policy</a>
+          <a routerLink="/terms" (click)="scrollToTop()" class="text-sm text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-colors duration-300">Terms of Service</a>
+          <!-- <a routerLink="/coming-soon" (click)="scrollToTop()" class="text-sm text-gray-400 dark:text-gray-500 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-colors duration-300">Cookie Policy</a> -->
         </div>
       </div>
     </div>

@@ -3,16 +3,38 @@
     <div class="flex justify-between items-center h-16">
       <!-- Logo and Brand -->
       <a class="flex items-center gap-3 group" routerLink="/home" (click)="scrollToTop()">
-        <img src="/coursewagon.png" alt="Course Wagon Logo" class="h-10 w-auto transition-transform group-hover:scale-105">
-        <span class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Course Wagon</span>
+        <svg viewBox="0 0 160 120" class="w-10 h-8 transition-transform group-hover:scale-105" aria-hidden="true">
+          <defs>
+            <linearGradient id="hCGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#0EA5E9"/>
+              <stop offset="100%" stop-color="#2563EB"/>
+            </linearGradient>
+            <linearGradient id="hWGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#059669"/>
+              <stop offset="100%" stop-color="#10B981"/>
+            </linearGradient>
+            <linearGradient id="hSparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FBBF24"/>
+              <stop offset="100%" stop-color="#F59E0B"/>
+            </linearGradient>
+          </defs>
+          <g transform="translate(10, 0)">
+            <path d="M 94.5 31.1 A 45 45 0 1 0 94.5 88.9" fill="none" stroke="url(#hCGrad)" stroke-width="14" stroke-linecap="round"/>
+            <path d="M 20 60 L 45 90 L 70 55 L 95 85 L 120 45" fill="none" stroke="url(#hWGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 120 2 Q 120 18 136 18 Q 120 18 120 34 Q 120 18 104 18 Q 120 18 120 2 Z" fill="url(#hSparkGrad)"/>
+          </g>
+        </svg>
+        <span class="text-xl font-extrabold tracking-tight text-slate-800 dark:text-white">
+          Course<span class="font-normal text-slate-500 dark:text-slate-400">Wagon</span>
+        </span>
       </a>
 
       <!-- Mobile Menu Button & Theme Toggle -->
       <div class="lg:hidden flex items-center gap-2">
-        <button (click)="toggleTheme()" class="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none transition-all hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg" title="Toggle Theme">
+        <button (click)="toggleTheme()" class="p-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] focus:outline-none transition-all hover:bg-sky-50 dark:hover:bg-slate-800 rounded-lg" title="Toggle Theme">
           <fa-icon [icon]="themeService.isDarkMode() ? faSun : faMoon" size="lg"></fa-icon>
         </button>
-        <button (click)="toggleNavbar()" class="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none transition-all hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg" title="Toggle Navbar">
+        <button (click)="toggleNavbar()" class="p-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] focus:outline-none transition-all hover:bg-sky-50 dark:hover:bg-slate-800 rounded-lg" title="Toggle Navbar">
           <fa-icon [icon]="isNavbarOpen ? faTimes : faBars" size="lg"></fa-icon>
         </button>
       </div>
@@ -21,42 +43,47 @@
       <div class="hidden lg:flex lg:items-center lg:space-x-2">
         <ul class="flex items-center space-x-2">
           <!-- Show these items only when authenticated -->
-          <ng-container *ngIf="isAuthenticated">
+          @if (isAuthenticated) {
             <!-- Creator-specific menu items -->
-            <li *ngIf="isCreator">
-              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/courses" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
-                <fa-icon [icon]="faBook" class="text-lg"></fa-icon> My Courses
-              </a>
-            </li>
-
-            <li *ngIf="isCreator">
-              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/my-courses-dashboard" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
-                <fa-icon [icon]="faChartLine" class="text-lg"></fa-icon>  Dashboard
-              </a>
-            </li>
-
+            @if (isCreator) {
+              <li>
+                <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/courses" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="scrollToTop()">
+                  <fa-icon [icon]="faBook" class="text-lg"></fa-icon> My Courses
+                </a>
+              </li>
+            }
+            @if (isCreator) {
+              <li>
+                <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/my-courses-dashboard" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="scrollToTop()">
+                  <fa-icon [icon]="faChartLine" class="text-lg"></fa-icon>  Dashboard
+                </a>
+              </li>
+            }
             <!-- Learner-specific menu items -->
-            <li *ngIf="isLearner">
-              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/courses/browse" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
-                <fa-icon [icon]="faSearch" class="text-lg"></fa-icon> Browse Courses
-              </a>
-            </li>
-
-            <li *ngIf="isLearner">
-              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/learner/dashboard" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
-                <fa-icon [icon]="faGraduationCap" class="text-lg"></fa-icon> My Learning
-              </a>
-            </li>
-
+            @if (isLearner) {
+              <li>
+                <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/courses/browse" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="scrollToTop()">
+                  <fa-icon [icon]="faSearch" class="text-lg"></fa-icon> Browse Courses
+                </a>
+              </li>
+            }
+            @if (isLearner) {
+              <li>
+                <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/learner/dashboard" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="scrollToTop()">
+                  <fa-icon [icon]="faGraduationCap" class="text-lg"></fa-icon> My Learning
+                </a>
+              </li>
+            }
             <!-- Admin Link - Only show for admin users -->
-            <li *ngIf="isAdmin">
-              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/admin" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
-                <fa-icon [icon]="faUserShield" class="text-lg"></fa-icon> Admin
-              </a>
-            </li>
-
+            @if (isAdmin) {
+              <li>
+                <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/admin" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="scrollToTop()">
+                  <fa-icon [icon]="faUserShield" class="text-lg"></fa-icon> Admin
+                </a>
+              </li>
+            }
             <li>
-              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/profile" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/profile" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="scrollToTop()">
                 <fa-icon [icon]="faUser" class="text-lg"></fa-icon> Profile
               </a>
             </li>
@@ -65,25 +92,25 @@
                 <fa-icon [icon]="faPowerOff" class="text-lg"></fa-icon> Logout
               </a>
             </li>
-          </ng-container>
+          }
 
           <!-- Show login/signup when not authenticated -->
-          <ng-container *ngIf="!isAuthenticated">
+          @if (!isAuthenticated) {
             <li>
-              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-4 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="scrollToTop()">
                 <fa-icon [icon]="faSignInAlt" class="text-lg"></fa-icon> Login
               </a>
             </li>
             <li>
-              <a class="flex items-center gap-2 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 transition-all font-poppins px-4 py-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="scrollToTop()">
+              <a class="flex items-center gap-2 text-white bg-[#0EA5E9] hover:bg-[#2563EB] transition-all font-poppins px-4 py-2 rounded-lg shadow-sm shadow-blue-500/30 hover:shadow-md transform hover:scale-105" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="scrollToTop()">
                 <fa-icon [icon]="faUserPlus" class="text-lg"></fa-icon> Sign Up
               </a>
             </li>
-          </ng-container>
+          }
 
           <!-- Theme Toggle Button -->
           <li class="ml-2">
-            <button (click)="toggleTheme()" class="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none transition-all hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg" title="Toggle Theme">
+            <button (click)="toggleTheme()" class="p-2 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] focus:outline-none transition-all hover:bg-sky-50 dark:hover:bg-slate-800 rounded-lg" title="Toggle Theme">
               <fa-icon [icon]="themeService.isDarkMode() ? faSun : faMoon" size="lg"></fa-icon>
             </button>
           </li>
@@ -93,68 +120,73 @@
 
     <!-- Mobile Menu (Collapsible) -->
     <div [ngClass]="{'block': isNavbarOpen, 'hidden': !isNavbarOpen}" class="lg:hidden pb-4 border-t border-gray-200 dark:border-slate-800 mt-2">
-       <ul class="flex flex-col space-y-1 pt-3">
-          <!-- Show these items only when authenticated -->
-          <ng-container *ngIf="isAuthenticated">
-            <!-- Creator-specific menu items -->
-            <li *ngIf="isCreator">
-              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/courses" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
+      <ul class="flex flex-col space-y-1 pt-3">
+        <!-- Show these items only when authenticated -->
+        @if (isAuthenticated) {
+          <!-- Creator-specific menu items -->
+          @if (isCreator) {
+            <li>
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/courses" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faBook" class="text-lg w-5 text-center"></fa-icon> My Courses
               </a>
             </li>
-
-            <li *ngIf="isCreator">
-              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/my-courses-dashboard" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
+          }
+          @if (isCreator) {
+            <li>
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/my-courses-dashboard" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faChartLine" class="text-lg w-5 text-center"></fa-icon>  Dashboard
               </a>
             </li>
-
-            <!-- Learner-specific menu items -->
-            <li *ngIf="isLearner">
-              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/courses/browse" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
+          }
+          <!-- Learner-specific menu items -->
+          @if (isLearner) {
+            <li>
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/courses/browse" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faSearch" class="text-lg w-5 text-center"></fa-icon> Browse Courses
               </a>
             </li>
-
-            <li *ngIf="isLearner">
-              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/learner/dashboard" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
+          }
+          @if (isLearner) {
+            <li>
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/learner/dashboard" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faGraduationCap" class="text-lg w-5 text-center"></fa-icon> My Learning
               </a>
             </li>
-
-            <!-- Admin Link - Only show for admin users -->
-            <li *ngIf="isAdmin">
-              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/admin" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
+          }
+          <!-- Admin Link - Only show for admin users -->
+          @if (isAdmin) {
+            <li>
+              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/admin" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="toggleNavbar(); scrollToTop()">
                 <fa-icon [icon]="faUserShield" class="text-lg w-5 text-center"></fa-icon> Admin
               </a>
             </li>
+          }
+          <li>
+            <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" routerLink="/profile" routerLinkActive="bg-sky-50 dark:bg-slate-800 text-[#0EA5E9]" (click)="toggleNavbar(); scrollToTop()">
+              <fa-icon [icon]="faUser" class="text-lg w-5 text-center"></fa-icon> Profile
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer" (click)="onLogout(); toggleNavbar(); scrollToTop()">
+              <fa-icon [icon]="faPowerOff" class="text-lg w-5 text-center"></fa-icon> Logout
+            </a>
+          </li>
+        }
 
-            <li>
-              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" routerLink="/profile" routerLinkActive="bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400" (click)="toggleNavbar(); scrollToTop()">
-                <fa-icon [icon]="faUser" class="text-lg w-5 text-center"></fa-icon> Profile
-              </a>
-            </li>
-            <li>
-              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer" (click)="onLogout(); toggleNavbar(); scrollToTop()">
-                <fa-icon [icon]="faPowerOff" class="text-lg w-5 text-center"></fa-icon> Logout
-              </a>
-            </li>
-          </ng-container>
-
-          <!-- Mobile menu login/signup -->
-          <ng-container *ngIf="!isAuthenticated">
-            <li>
-              <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all font-poppins px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="toggleNavbar(); scrollToTop()">
-                <fa-icon [icon]="faSignInAlt" class="text-lg w-5 text-center"></fa-icon> Login
-              </a>
-            </li>
-            <li>
-              <a class="flex items-center gap-3 text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 transition-all font-poppins px-4 py-2 rounded-lg shadow-md" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="toggleNavbar(); scrollToTop()">
-                <fa-icon [icon]="faUserPlus" class="text-lg w-5 text-center"></fa-icon> Sign Up
-              </a>
-            </li>
-          </ng-container>
-        </ul>
+        <!-- Mobile menu login/signup -->
+        @if (!isAuthenticated) {
+          <li>
+            <a class="flex items-center gap-3 text-gray-700 dark:text-gray-300 hover:text-[#0EA5E9] dark:hover:text-[#0EA5E9] transition-all font-poppins px-3 py-2 rounded-lg hover:bg-sky-50 dark:hover:bg-slate-800" [routerLink]="['/auth']" [queryParams]="{mode: 'login'}" (click)="toggleNavbar(); scrollToTop()">
+              <fa-icon [icon]="faSignInAlt" class="text-lg w-5 text-center"></fa-icon> Login
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3 text-white bg-[#0EA5E9] hover:bg-[#2563EB] transition-all font-poppins px-4 py-2 rounded-lg shadow-sm shadow-blue-500/30" [routerLink]="['/auth']" [queryParams]="{mode: 'signup'}" (click)="toggleNavbar(); scrollToTop()">
+              <fa-icon [icon]="faUserPlus" class="text-lg w-5 text-center"></fa-icon> Sign Up
+            </a>
+          </li>
+        }
+      </ul>
     </div>
   </div>
 </nav>

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth/auth.service';
 import { Router, RouterModule } from '@angular/router';
-import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import {
   faEnvelope, faCheckCircle, faTimesCircle,
   faExclamationCircle, faTimes,
   faEye, faEyeSlash, faLock, faSave, faUser,
-  faCalendar, faShieldAlt, faEdit, faCamera, faUserTag
+  faCalendar, faShieldAlt, faEdit, faCamera, faUserTag, faKey, faTrash
 } from '@fortawesome/free-solid-svg-icons';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -17,7 +17,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     templateUrl: './profile.component.html',
     styleUrls: ['./profile.component.scss'],
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule, RouterModule]
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, FontAwesomeModule, RouterModule]
 })
 export class ProfileComponent implements OnInit {
   // FontAwesome icons
@@ -36,6 +36,8 @@ export class ProfileComponent implements OnInit {
   faEdit = faEdit;
   faCamera = faCamera;
   faUserTag = faUserTag;
+  faKey = faKey;
+  faTrash = faTrash;
 
   user: any = null;
   successMessage: string = '';
@@ -54,6 +56,11 @@ export class ProfileComponent implements OnInit {
   showNewPassword = false;
   showConfirmPassword = false;
   isEditingProfile = false;
+
+  // API Key state
+  apiKeyInput = '';
+  showApiKeyInput = false;
+  isLoadingApiKey = false;
 
   constructor(
     private authService: AuthService,
@@ -194,6 +201,39 @@ export class ProfileComponent implements OnInit {
       error: (err) => {
         this.errorMessage = err.error?.error || 'Failed to update profile';
         this.isLoading['profileUpdate'] = false;
+      }
+    });
+  }
+
+  saveApiKey(): void {
+    if (!this.apiKeyInput.trim()) return;
+    this.isLoadingApiKey = true;
+    this.clearMessages();
+    this.authService.setApiKey(this.apiKeyInput.trim()).subscribe({
+      next: () => {
+        this.successMessage = 'Gemini API key saved successfully.';
+        this.isLoadingApiKey = false;
+        this.showApiKeyInput = false;
+        this.apiKeyInput = '';
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Failed to save API key.';
+        this.isLoadingApiKey = false;
+      }
+    });
+  }
+
+  removeApiKey(): void {
+    this.isLoadingApiKey = true;
+    this.clearMessages();
+    this.authService.deleteApiKey().subscribe({
+      next: () => {
+        this.successMessage = 'Gemini API key removed.';
+        this.isLoadingApiKey = false;
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Failed to remove API key.';
+        this.isLoadingApiKey = false;
       }
     });
   }

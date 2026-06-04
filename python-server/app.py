@@ -38,6 +38,7 @@ async def lifespan(app: FastAPI):
         from migrations.add_database_indexes import add_database_indexes
         from migrations.add_course_reviews import run_migration as run_course_reviews_migration
         from migrations.add_enrollment_composite_index import add_enrollment_composite_index
+        from migrations.add_gemini_api_key import add_gemini_api_key_column
 
         add_welcome_email_sent_column()
         run_email_verification_migration()
@@ -46,6 +47,7 @@ async def lifespan(app: FastAPI):
         add_database_indexes()  # Add performance indexes
         add_enrollment_composite_index()  # Add composite index for enrollment lookups
         run_course_reviews_migration()  # Add course reviews and ratings
+        add_gemini_api_key_column()  # BYOK: add encrypted_gemini_api_key column
         logger.info("Database migrations completed successfully")
     except Exception as e:
         logger.error(f"Database migration failed: {str(e)}")

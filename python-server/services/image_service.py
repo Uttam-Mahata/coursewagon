@@ -8,10 +8,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ImageService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, user_api_key: str = None):
         self.course_repo = CourseRepository(db)
         self.subject_repo = SubjectRepository(db)
         self.storage_helper = storage_helper
+        self.user_api_key = user_api_key
         
     def generate_course_image(self, course_id):
         """Generate and store a cover image for a course"""
@@ -21,10 +22,7 @@ class ImageService:
             if not course:
                 raise ValueError(f"Course not found: {course_id}")
                 
-            # Initialize the image generator using environment variables
-            generator = GeminiImageGenerator()
-            
-            # Generate the image
+            generator = GeminiImageGenerator(api_key=self.user_api_key)
             logger.info(f"Generating image for course '{course.name}' (ID: {course_id})")
             image_bytes = generator.generate_course_image(course.name, course.description)
             if not image_bytes:
@@ -76,10 +74,7 @@ class ImageService:
             if not course:
                 raise ValueError(f"Course not found: {course_id}")
                 
-            # Initialize the image generator using environment variables
-            generator = GeminiImageGenerator()
-            
-            # Generate the image
+            generator = GeminiImageGenerator(api_key=self.user_api_key)
             image_bytes = generator.generate_subject_image(subject.name, course.name)
             if not image_bytes:
                 raise ValueError("Failed to generate image")

@@ -235,6 +235,32 @@ export class AuthService {
     this.isLoggedInSource.next(false);
   }
 
+  // BYOK: Gemini API key management
+
+  setApiKey(apiKey: string): Observable<any> {
+    return this.http.post(`${this.authUrl}/api-key`, { api_key: apiKey }, { withCredentials: true }).pipe(
+      tap((response: any) => {
+        if (response?.user) {
+          this.storeUser(response.user);
+        }
+      })
+    );
+  }
+
+  deleteApiKey(): Observable<any> {
+    return this.http.delete(`${this.authUrl}/api-key`, { withCredentials: true }).pipe(
+      tap((response: any) => {
+        if (response?.user) {
+          this.storeUser(response.user);
+        }
+      })
+    );
+  }
+
+  hasApiKey(): boolean {
+    return !!this.getCurrentUser()?.has_api_key;
+  }
+
   // Role-based methods for learner functionality
 
   /**

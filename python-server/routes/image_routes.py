@@ -7,6 +7,7 @@ from services.course_service import CourseService
 from extensions import get_db
 from sqlalchemy.orm import Session
 from utils.rate_limiter import limiter, get_ai_rate_limit
+from utils.byok_helper import get_user_gemini_key
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,8 +16,12 @@ logger = logging.getLogger(__name__)
 image_router = APIRouter(prefix='/images', tags=['images'])
 
 # Use dependency injection for database session
-def get_image_service(db: Session = Depends(get_db)):
-    return ImageService(db)
+def get_image_service(
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id)
+):
+    user_api_key = get_user_gemini_key(current_user_id, db)
+    return ImageService(db, user_api_key=user_api_key)
 
 def get_auth_service(db: Session = Depends(get_db)):
     return AuthService(db)

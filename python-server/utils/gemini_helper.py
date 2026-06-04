@@ -82,11 +82,11 @@ def extract_markdown(content):
 
 class GeminiHelper:
     def __init__(self, api_key=None):
-        # Always use API key from environment variables
-        self.api_key = os.environ.get('API_KEY')
-        
+        # Use provided key (user's BYOK key) if available, fall back to platform env key
+        self.api_key = api_key or os.environ.get('API_KEY')
+
         if not self.api_key:
-            logger.warning("No API_KEY found in environment variables. Gemini functionality will not work.")
+            logger.warning("No API_KEY found. Gemini functionality will not work.")
         
         # Initialize the client only when needed, with API key
         self._client = None

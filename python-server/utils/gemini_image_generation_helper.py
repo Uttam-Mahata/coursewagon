@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 
 class GeminiImageGenerator:
     def __init__(self, api_key=None):
-        # Always use API key from environment variables
-        self.api_key = os.environ.get('GEMINI_IMAGE_GENERATION_API_KEY') or os.environ.get('API_KEY')
-        
+        # Use provided key (user's BYOK key) if available, fall back to platform env key
+        self.api_key = api_key or os.environ.get('GEMINI_IMAGE_GENERATION_API_KEY') or os.environ.get('API_KEY')
+
         if not self.api_key:
-            logger.warning("No API_KEY found in environment variables. Image generation functionality will not work.")
+            logger.warning("No API_KEY found. Image generation functionality will not work.")
             
         self.model_name = "gemini-2.5-flash-image"
         self._client = None

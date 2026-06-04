@@ -129,6 +129,9 @@ class ProfileUpdate(BaseModel):
     bio: Optional[str] = None
     role: Optional[str] = None
 
+class ApiKeyUpdate(BaseModel):
+    api_key: str
+
 class CheckEmail(BaseModel):
     email: EmailStr
 
@@ -494,6 +497,43 @@ async def verification_status(
     except Exception as e:
         logger.error(f"Error checking verification status: {str(e)}")
         raise HTTPException(status_code=500, detail='Internal server error')
+
+@auth_router.post('/api-key')
+async def set_api_key(
+    key_data: ApiKeyUpdate,
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """Store an encrypted Gemini API key for the authenticated user (BYOK)."""
+    try:
+        if not key_data.api_key or not key_data.api_key.strip():
+            raise HTTPException(status_code=400, detail={'error': 'API key cannot be empty.'})
+        auth_service = AuthService(db)
+        user = auth_service.set_gemini_api_key(current_user_id, key_data.api_key)
+        return {'message': 'API key saved successfully.', 'user': user.to_dict()}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail={'error': str(e)})
+    except Exception as e:
+        logger.error(f"Error saving API key: {str(e)}")
+        raise HTTPException(status_code=500, detail={'error': 'Failed to save API key.'})
+
+
+@auth_router.delete('/api-key')
+async def delete_api_key(
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """Remove the stored Gemini API key for the authenticated user."""
+    try:
+        auth_service = AuthService(db)
+        user = auth_service.delete_gemini_api_key(current_user_id)
+        return {'message': 'API key removed successfully.', 'user': user.to_dict()}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail={'error': str(e)})
+    except Exception as e:
+        logger.error(f"Error removing API key: {str(e)}")
+        raise HTTPException(status_code=500, detail={'error': 'Failed to remove API key.'})
+
 
 @auth_router.post('/logout')
 async def logout(response: Response):

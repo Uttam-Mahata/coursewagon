@@ -125,9 +125,37 @@ class AuthService:
         user = self.user_repository.get_user_by_id(user_id)
         if not user:
             raise ValueError("User not found")
-        
+
         # Password is handled directly by the model
         return self.user_repository.update_user(user, **kwargs)
+
+    # --- BYOK: Gemini API key management ---
+
+    def set_gemini_api_key(self, user_id: int, api_key: str):
+        """Encrypt and store the user's Gemini API key."""
+        if not self.encryption_service:
+            raise ValueError("Encryption is not configured on this server.")
+        user = self.user_repository.get_user_by_id(user_id)
+        if not user:
+            raise ValueError("User not found")
+        encrypted = self.encryption_service.encrypt(api_key.strip())
+        return self.user_repository.update_user(user, encrypted_gemini_api_key=encrypted)
+
+    def delete_gemini_api_key(self, user_id: int):
+        """Remove the stored Gemini API key for a user."""
+        user = self.user_repository.get_user_by_id(user_id)
+        if not user:
+            raise ValueError("User not found")
+        return self.user_repository.update_user(user, encrypted_gemini_api_key=None)
+
+    def get_gemini_api_key(self, user_id: int) -> str | None:
+        """Decrypt and return the user's Gemini API key, or None if not set."""
+        user = self.user_repository.get_user_by_id(user_id)
+        if not user or not user.encrypted_gemini_api_key:
+            return None
+        if not self.encryption_service:
+            return None
+        return self.encryption_service.decrypt(user.encrypted_gemini_api_key)
     
 
     def is_admin(self, user_id):

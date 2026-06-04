@@ -22,6 +22,7 @@ class User(Base):
     welcome_email_sent = db.Column(db.Boolean, default=False)  # Track if welcome email has been sent
     email_verified = db.Column(db.Boolean, default=False)  # Track if email has been verified
     email_verification_sent_at = db.Column(db.DateTime)  # Track when verification email was sent
+    encrypted_gemini_api_key = db.Column(db.Text, nullable=True)  # BYOK: user-supplied Gemini API key (encrypted)
 
     # Relationship with courses
     courses = db.relationship('Course', backref='creator', lazy=True)
@@ -52,5 +53,6 @@ class User(Base):
             'bio': self.bio,
             'profile_image_url': self.profile_image_url,
             'welcome_email_sent': self.welcome_email_sent,
-            'email_verified': self.email_verified
+            'email_verified': self.email_verified,
+            'has_api_key': bool(self.encrypted_gemini_api_key)
         }

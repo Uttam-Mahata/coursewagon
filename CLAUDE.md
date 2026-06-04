@@ -18,7 +18,8 @@ The backend follows a layered architecture:
 
 ```
 app.py                    # FastAPI app entry point with lifespan management
-├── routes/              # API endpoints (course, subject, chapter, topic, content, auth, admin, testimonial, image, enrollment, learning, utility)
+├── routes/              # API endpoints (course, subject, chapter, topic, content, auth, admin, testimonial, image, enrollment, learning, review, utility)
+├── agents/              # Google ADK LlmAgent definitions (curriculum_agents.py, content_agents.py, schemas.py)
 ├── services/            # Business logic layer
 ├── repositories/        # Data access layer
 ├── models/              # SQLAlchemy models (User, Course, Subject, Chapter, Topic, Content, Testimonial, PasswordReset)
@@ -35,6 +36,8 @@ app.py                    # FastAPI app entry point with lifespan management
 - **Dependency Injection**: FastAPI dependencies for database sessions and auth
 - **Lifespan Management**: Database migrations run on startup; background tasks are initialized and cleaned up properly
 - **Caching Strategy**: Two-tier caching with Redis (primary) and in-memory (fallback)
+- **Rate Limiting**: `slowapi` middleware applied globally; use `@limiter.limit(...)` on individual routes
+- **Google ADK Agents**: Curriculum and content generation use `google.adk.agents.LlmAgent` / `SequentialAgent`; agent definitions live in `agents/`, Pydantic output schemas in `agents/schemas.py`
 
 ### Frontend Structure (angular-client/src/app/)
 
@@ -56,7 +59,7 @@ app/
 - **Firebase Auth**: Client-side authentication with JWT tokens sent to backend
 - **Markdown Rendering**: ngx-markdown with KaTeX and MathJax for equations
 - **Mermaid Diagrams**: Dynamic diagram rendering with mermaid.js
-- **Route Guards**: Protect routes based on authentication and admin status
+- **Route Guards**: `AuthGuard`, `NonAuthGuard`, `AdminGuard`, `creatorGuard`, `learnerGuard`, `enrollmentGuard`
 - **HTTP Cache Interceptor**: Automatic GET request caching (3 min TTL)
 - **Multi-layer Caching**: Memory cache, LocalStorage, and Observable caching with shareReplay
 
@@ -162,9 +165,25 @@ npm run watch
 - Development: Also allows `localhost:4200` for local testing
 - Cookie-based auth requires exact origin matching (no wildcards)
 
+### User Roles
+
+The `User` model has a `role` column (`creator`, `learner`, or `both`). Frontend guards enforce this:
+- `creatorGuard` — protects course creation and management routes
+- `learnerGuard` — protects learner dashboard and enrolled course routes
+- `enrollmentGuard` — checks active enrollment before allowing `/learn/:course_id`
+- `AdminGuard` — checks `is_admin` flag (separate from role)
+
 ### AI Content Generation
 
-- **Gemini AI**: Used for generating course subjects, chapters, topics, and detailed content
+Two layers of AI generation exist:
+1. **Curriculum agents** (`agents/curriculum_agents.py`): Google ADK `LlmAgent` instances for structured output (course name, subject list, chapter list, topic list). Uses `gemini-2.5-flash-lite` by default; output validated against Pydantic schemas in `agents/schemas.py`.
+2. **Content agents** (`agents/content_agents.py`): A `SequentialAgent` pipeline (Outliner → Writer → Reviewer) for generating detailed topic content in Markdown.
+
+**Generated content format** — the Writer agent produces:
+- Mermaid diagrams: `<pre class="mermaid">...</pre>` (not fenced code blocks)
+- Chart.js data: ` ```chart-json {...} ``` ` blocks
+- LaTeX: `$$...$$` (block) and `$...$` (inline)
+
 - **Image Generation**: Gemini can generate images; stored in Azure Blob Storage or Firebase Storage
 - **Image Analysis**: `gemini_image_helper.py` handles image processing and analysis
 
@@ -251,17 +270,22 @@ from fastapi import Depends
 
 @router.get("/protected")
 async def protected_route(current_user: dict = Depends(get_current_user)):
-    # current_user contains decoded JWT payload with user_id, email, is_admin
+    # current_user contains decoded JWT payload with user_id, email, is_admin, role
     pass
 ```
 
 Frontend:
 ```typescript
-// Add AuthGuard to route in app.routes.ts
+// Authenticated users
 { path: 'feature', component: FeatureComponent, canActivate: [AuthGuard] }
 
-// For admin-only routes
-{ path: 'admin', component: AdminComponent, canActivate: [AuthGuard, AdminGuard] }
+// Role-based guards
+{ path: 'courses', component: CoursesComponent, canActivate: [creatorGuard] }
+{ path: 'learner/dashboard', component: LearnerDashboardComponent, canActivate: [learnerGuard] }
+{ path: 'learn/:course_id', component: LearningViewComponent, canActivate: [enrollmentGuard] }
+
+// Admin only
+{ path: 'admin', component: AdminComponent, canActivate: [AdminGuard] }
 ```
 
 ### Implementing Caching
@@ -357,10 +381,11 @@ REDIS_PASSWORD=your-redis-password
 
 - **Token Expiry**: JWT access tokens expire in 1 hour (configurable via `JWT_ACCESS_TOKEN_EXPIRES_HOURS`)
 - **CORS**: Backend allows specific origins based on environment (production restricts to prod domains only)
-- **Admin Routes**: Protected by admin middleware; check `is_admin` flag in user model
-- **Legacy Routes**: Some chapter-based routes exist for backward compatibility during migration
+- **Admin Routes**: Protected by admin middleware; check `is_admin` flag in user model (separate from `role`)
+- **User Roles**: `role` field on User is `creator`, `learner`, or `both`; guards enforce this on both sides
+- **Legacy Routes**: Some chapter-based routes exist for backward compatibility during migration; `RouteRedirectResolver` handles redirects
+- **Content Format**: AI-generated content uses `<pre class="mermaid">` for diagrams (not fenced blocks), ` ```chart-json``` ` for Chart.js, and `$$...$$`/`$...$` for LaTeX
 - **Math Rendering**: Content may contain LaTeX equations; use KaTeX or MathJax on frontend
-- **Mermaid Diagrams**: Content may include Mermaid.js diagram definitions
 - **Cache Fallback**: System automatically falls back to in-memory cache if Redis is unavailable
 - **Database Migrations**: Migrations run automatically on app startup; check logs for errors
 - **Background Tasks**: APScheduler handles async email sending; cleaned up on shutdown

@@ -211,6 +211,84 @@
             </form>
           </div>
 
+          <!-- Gemini API Key (BYOK) Section -->
+          <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-6 border border-gray-200 dark:border-slate-600">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
+                <fa-icon [icon]="faKey" class="mr-2"></fa-icon>
+                Gemini API Key
+              </h3>
+              <span *ngIf="user?.has_api_key"
+                    class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs px-2 py-1 rounded-full font-medium">
+                Key stored
+              </span>
+              <span *ngIf="!user?.has_api_key"
+                    class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs px-2 py-1 rounded-full font-medium">
+                Not set
+              </span>
+            </div>
+
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Provide your own
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer"
+                 class="text-blue-600 dark:text-blue-400 underline">Google AI Studio API key</a>
+              to use AI image generation. Your key is encrypted before storage.
+            </p>
+
+            <!-- Key actions when key IS set -->
+            <div *ngIf="user?.has_api_key && !showApiKeyInput" class="flex space-x-3">
+              <button type="button"
+                      class="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+                      (click)="showApiKeyInput = true; apiKeyInput = ''">
+                <fa-icon [icon]="faEdit" class="mr-1"></fa-icon>
+                Replace key
+              </button>
+              <button type="button"
+                      class="text-sm text-red-600 dark:text-red-400 hover:underline flex items-center"
+                      [disabled]="isLoadingApiKey"
+                      (click)="removeApiKey()">
+                <fa-icon [icon]="faTrash" class="mr-1"></fa-icon>
+                Remove key
+              </button>
+            </div>
+
+            <!-- Add key button when key is NOT set -->
+            <div *ngIf="!user?.has_api_key && !showApiKeyInput">
+              <button type="button"
+                      class="text-sm bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center"
+                      (click)="showApiKeyInput = true">
+                <fa-icon [icon]="faKey" class="mr-2"></fa-icon>
+                Add API Key
+              </button>
+            </div>
+
+            <!-- Input form -->
+            <div *ngIf="showApiKeyInput" class="mt-3">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Gemini API Key
+              </label>
+              <input type="password"
+                     [(ngModel)]="apiKeyInput"
+                     placeholder="AIza..."
+                     class="block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mb-3">
+              <div class="flex space-x-3">
+                <button type="button"
+                        class="bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center text-sm disabled:bg-blue-400"
+                        [disabled]="!apiKeyInput.trim() || isLoadingApiKey"
+                        (click)="saveApiKey()">
+                  <div *ngIf="isLoadingApiKey" class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                  <fa-icon [icon]="faSave" class="mr-2"></fa-icon>
+                  {{ isLoadingApiKey ? 'Saving...' : 'Save Key' }}
+                </button>
+                <button type="button"
+                        class="bg-gray-200 dark:bg-slate-600 hover:bg-gray-300 dark:hover:bg-slate-500 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md text-sm"
+                        (click)="showApiKeyInput = false; apiKeyInput = ''">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Password Change Section -->
           <div class="bg-gray-50 dark:bg-slate-700 rounded-xl p-6 border border-gray-200 dark:border-slate-600">
             <div class="flex items-center justify-between mb-4">
